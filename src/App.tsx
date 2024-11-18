@@ -47,8 +47,8 @@ function App() {
             onClick={() => setCurrentView('all-notes')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'all-notes'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-700 hover:bg-gray-50'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
             <StickyNote className='w-5 h-5' />
@@ -58,8 +58,8 @@ function App() {
             onClick={() => setCurrentView('archived')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'archived'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-700 hover:bg-gray-50'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
             <Archive className='w-5 h-5' />
@@ -74,7 +74,7 @@ function App() {
             {tags.map((tag) => (
               <button
                 key={tag}
-                className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors'
+                className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors'
               >
                 <Tag className='w-4 h-4' />
                 <span className='text-sm capitalize'>{tag}</span>
@@ -84,8 +84,8 @@ function App() {
         </div>
 
         {/* New Note Button */}
-        <div className='mt-auto p-6'>
-          <button className='w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors'>
+        <div className='mt-auto p-3'>
+          <button className='w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-lg transition-colors hover:bg-blue-600 font-medium'>
             <Plus className='w-5 h-5' />
             <span>New Note</span>
           </button>
