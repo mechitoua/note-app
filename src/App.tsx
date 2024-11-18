@@ -1,4 +1,4 @@
-import { Archive, ChevronRight, Feather, Home, Menu, Plus, Search, Settings, Tag } from 'lucide-react';
+import { Archive, Menu, Plus, Search, Settings, StickyNote, Tag } from 'lucide-react';
 import { useState } from 'react';
 
 function App() {
@@ -25,11 +25,19 @@ function App() {
           isSidebarOpen ? 'w-80' : 'w-0'
         } transition-all duration-300 overflow-hidden flex flex-col`}
       >
-        {/* Logo Section */}
+        {/* Logo and Search Section */}
         <div className='p-6 border-b border-gray-200'>
-          <div className='flex items-center gap-2'>
-            <Feather className='w-6 h-6 text-blue-600' />
+          <div className='flex items-center gap-2 mb-6'>
+            <StickyNote className='w-6 h-6 text-blue-500' />
             <h1 className='text-xl font-semibold text-gray-900'>Notes</h1>
+          </div>
+          <div className='relative'>
+            <Search className='w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
+            <input
+              type='text'
+              placeholder='Search notes...'
+              className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors'
+            />
           </div>
         </div>
 
@@ -39,35 +47,29 @@ function App() {
             onClick={() => setCurrentView('all-notes')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'all-notes'
-                ? 'bg-gray-100 text-gray-900'
+                ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <Home className='w-5 h-5' />
-            <span className='font-bold'>All Notes</span>
-            {currentView === 'all-notes' && (
-              <ChevronRight className='w-4 h-4 ml-auto text-blue-600' />
-            )}
+            <StickyNote className='w-5 h-5' />
+            <span>All Notes</span>
           </button>
           <button
             onClick={() => setCurrentView('archived')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'archived'
-                ? 'bg-gray-100 text-gray-900'
+                ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <Archive className='w-5 h-5' />
-            <span className='font-bold'>Archived Notes</span>
-            {currentView === 'archived' && (
-              <ChevronRight className='w-4 h-4 ml-auto text-blue-600' />
-            )}
+            <span>Archived Notes</span>
           </button>
         </div>
 
         {/* Tags Section */}
         <div className='p-3 border-t border-gray-200'>
-          <h2 className='text-sm font-bold text-gray-900 px-3 mb-2'>Tags</h2>
+          <h2 className='text-sm font-medium text-gray-500 px-3 mb-2'>Tags</h2>
           <div className='space-y-1'>
             {tags.map((tag) => (
               <button
@@ -75,7 +77,7 @@ function App() {
                 className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors'
               >
                 <Tag className='w-4 h-4' />
-                <span className='text-sm font-bold capitalize'>{tag}</span>
+                <span className='text-sm capitalize'>{tag}</span>
               </button>
             ))}
           </div>
@@ -83,53 +85,57 @@ function App() {
 
         {/* New Note Button */}
         <div className='mt-auto p-6'>
+          <button className='w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors'>
+            <Plus className='w-5 h-5' />
+            <span>New Note</span>
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className='flex-1 flex flex-col bg-white'>
-        {/* Header with Search */}
         <header className='h-16 border-b border-gray-200 flex items-center px-6'>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className='p-2 hover:bg-gray-100 rounded-lg transition-colors mr-4'
+            className='p-2 hover:bg-gray-100 rounded-lg transition-colors'
           >
-            <Menu className='w-5 h-5 text-gray-600' />
+            <Menu className='w-6 h-6 text-gray-600' />
           </button>
-          <h1 className='text-2xl font-semibold text-gray-900'>All Notes</h1>
-          <div className='flex items-center gap-4 ml-auto'>
-            <div className='relative'>
-              <Search className='w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
-              <input
-                type='text'
-                placeholder='Search in all notes...'
-                className='w-64 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-colors'
-              />
-            </div>
-            <button className='p-2 hover:bg-gray-100 rounded-lg transition-colors'>
-              <Settings className='w-5 h-5 text-gray-600' />
-            </button>
-          </div>
         </header>
 
         {/* All Notes View */}
         {currentView === 'all-notes' && (
           <div className='flex-1 flex flex-col'>
+            {/* Header */}
+            <div className='p-6 border-b border-gray-200'>
+              <div className='flex items-center justify-between'>
+                <h1 className='text-3xl font-semibold text-gray-900'>All Notes</h1>
+                <div className='flex items-center gap-4'>
+                  <div className='relative'>
+                    <Search className='w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
+                    <input
+                      type='text'
+                      placeholder='Search in all notes...'
+                      className='w-64 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors'
+                    />
+                  </div>
+                  <button className='p-2 hover:bg-gray-100 rounded-lg transition-colors'>
+                    <Settings className='w-5 h-5 text-gray-600' />
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Three Column Layout */}
             <div className='flex-1 grid grid-cols-4 divide-x divide-gray-200'>
               {/* Left Column (1fr) */}
               <div className='col-span-1 overflow-y-auto'>
                 <div className='p-4'>
-                  {/* New Note Button */}
-                  <button className='w-full flex items-center justify-center gap-2 px-4 py-2.5 mb-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm'>
-                    <Plus className='w-5 h-5' />
-                    <span>Create New Note</span>
-                  </button>
                   <div className='space-y-2'>
                     {[1, 2, 3].map((item) => (
                       <div
                         key={item}
-                        className='p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-600 cursor-pointer transition-colors'
+                        className='p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors'
                       >
                         <h3 className='font-medium text-gray-900 mb-1'>Note Title {item}</h3>
                         <p className='text-sm text-gray-500 line-clamp-2'>
