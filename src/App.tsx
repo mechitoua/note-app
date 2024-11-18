@@ -1,9 +1,9 @@
-import { Menu, Plus, Search, Archive, Tag, StickyNote, Settings } from 'lucide-react';
+import { Archive, Menu, Plus, Search, Settings, StickyNote, Tag } from 'lucide-react';
 import { useState } from 'react';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [currentView, setCurrentView] = useState('all-notes'); 
+  const [currentView, setCurrentView] = useState('all-notes');
   const tags = [
     'cooking',
     'dev',
@@ -14,7 +14,7 @@ function App() {
     'recipes',
     'shopping',
     'travel',
-    'typescript'
+    'typescript',
   ];
 
   return (
@@ -43,22 +43,22 @@ function App() {
 
         {/* Navigation Buttons */}
         <div className='p-3'>
-          <button 
+          <button
             onClick={() => setCurrentView('all-notes')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-              currentView === 'all-notes' 
-                ? 'bg-blue-50 text-blue-600' 
+              currentView === 'all-notes'
+                ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <StickyNote className='w-5 h-5' />
             <span>All Notes</span>
           </button>
-          <button 
+          <button
             onClick={() => setCurrentView('archived')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-              currentView === 'archived' 
-                ? 'bg-blue-50 text-blue-600' 
+              currentView === 'archived'
+                ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
