@@ -1,4 +1,4 @@
-import { Archive, Menu, Plus, Search, Settings, StickyNote, Tag } from 'lucide-react';
+import { Archive, Menu, Plus, Search, Settings, StickyNote, Tag, Home, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 function App() {
@@ -27,17 +27,9 @@ function App() {
       >
         {/* Logo and Search Section */}
         <div className='p-6 border-b border-gray-200'>
-          <div className='flex items-center gap-2 mb-6'>
+          <div className='flex items-center gap-2'>
             <StickyNote className='w-6 h-6 text-blue-500' />
             <h1 className='text-xl font-semibold text-gray-900'>Notes</h1>
-          </div>
-          <div className='relative'>
-            <Search className='w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
-            <input
-              type='text'
-              placeholder='Search notes...'
-              className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors'
-            />
           </div>
         </div>
 
@@ -47,23 +39,25 @@ function App() {
             onClick={() => setCurrentView('all-notes')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'all-notes'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-gray-200 text-gray-900'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <StickyNote className='w-5 h-5' />
+            <Home className='w-5 h-5 text-blue-500' />
             <span>All Notes</span>
+            {currentView === 'all-notes' && <ChevronRight className='w-4 h-4 ml-auto' />}
           </button>
           <button
             onClick={() => setCurrentView('archived')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
               currentView === 'archived'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-gray-200 text-gray-900'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <Archive className='w-5 h-5' />
+            <Archive className='w-5 h-5 text-blue-500' />
             <span>Archived Notes</span>
+            {currentView === 'archived' && <ChevronRight className='w-4 h-4 ml-auto' />}
           </button>
         </div>
 
@@ -77,7 +71,7 @@ function App() {
                 className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors'
               >
                 <Tag className='w-4 h-4' />
-                <span className='text-sm capitalize'>{tag}</span>
+                <span className='text-sm capitalize font-bold'>{tag}</span>
               </button>
             ))}
           </div>
