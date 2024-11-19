@@ -1,4 +1,4 @@
-import { Header, NoteActions, NoteEditor, NoteList, Sidebar, EmptyState } from '@/components';
+import { EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
 import { useNotes } from '@/hooks/useNotes';
 import { CurrentView } from '@/types';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ function App() {
   const {
     notes,
     selectedNote,
+    setSelectedNote,
     noteTitle,
     markdownContent,
     handleNoteClick,
@@ -30,8 +31,12 @@ function App() {
     'recipes',
     'shopping',
     'travel',
-    'typescript'
+    'typescript',
   ];
+
+  const handleLogoClick = () => {
+    setSelectedNote(null);
+  };
 
   return (
     <div className='h-screen flex bg-gray-50'>
@@ -46,6 +51,7 @@ function App() {
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           title={currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
+          onLogoClick={handleLogoClick}
         />
         <div className='flex-1 overflow-hidden'>
           <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
