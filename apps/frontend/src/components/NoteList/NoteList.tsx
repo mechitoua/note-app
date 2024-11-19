@@ -22,7 +22,7 @@ export const NoteList = ({
           className='w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors'
         >
           <Plus className='w-4 h-4' />
-          New Note
+          Create New Note
         </button>
       </div>
       <div className='overflow-y-auto h-[calc(100%-4rem)] px-4 pb-4'>
@@ -48,14 +48,11 @@ export const NoteList = ({
                   </span>
                 ))}
               </div>
-              <p className='text-sm text-gray-500 line-clamp-2 mb-2'>
-                {note.content}
-              </p>
-              <p className='text-xs text-gray-400'>
+              <p className='text-xs text-gray-500'>
                 {new Date(note.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
                   month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
+                  day: 'numeric'
                 })}
               </p>
             </div>

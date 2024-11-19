@@ -1,5 +1,5 @@
 import { CurrentView } from '@/types';
-import { Archive, ChevronRight, PenSquare, Home, Plus, Tag } from 'lucide-react';
+import { Archive, ChevronRight, Feather, Home, Plus, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 interface SidebarProps {
@@ -15,10 +15,12 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       className={`bg-white border-r border-gray-200 ${isOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden flex flex-col`}
     >
       {/* Logo Section */}
-      <div className='p-4 border-b border-gray-200'>
-        <div className='flex items-center gap-2'>
-          <PenSquare className='w-6 h-6 text-blue-700' />
-          <h1 className='text-xl font-semibold text-gray-900'>AppNote</h1>
+      <div className='p-4 pt-5'>
+        <div className='flex items-center gap-3'>
+          <Feather className='w-6 h-6 text-blue-700 flex-shrink-0' />
+          <h1 className='text-xl font-semibold text-gray-900 font-borel leading-none flex items-center mt-2'>
+            Notes
+          </h1>
         </div>
       </div>
 
