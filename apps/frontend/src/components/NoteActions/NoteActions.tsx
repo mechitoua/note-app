@@ -1,5 +1,5 @@
-import { ArchiveBold, ClockBold, TagBold, Trash2Bold } from 'lucide-react';
-import { Note } from '@types/note';
+import { Archive, Clock, Tag, Trash2 } from 'lucide-react';
+import { Note } from '@/types/note';
 
 interface NoteActionsProps {
   note: Note;
@@ -15,7 +15,7 @@ export const NoteActions = ({ note, onArchive, onDelete }: NoteActionsProps) => 
         <div className='space-y-4'>
           <div className='flex items-start gap-2'>
             <div className='flex items-center gap-2 text-gray-600'>
-              <TagBold className='w-4 h-4' />
+              <Tag className='w-4 h-4' />
             </div>
             <div className='flex-1'>
               <div className='text-sm font-medium text-gray-600 mb-2'>Tags</div>
@@ -39,7 +39,7 @@ export const NoteActions = ({ note, onArchive, onDelete }: NoteActionsProps) => 
 
         <div className='flex items-start gap-2'>
           <div className='flex items-center gap-2 text-gray-600'>
-            <ClockBold className='w-4 h-4' />
+            <Clock className='w-4 h-4' />
           </div>
           <div className='flex-1'>
             <div className='text-sm font-medium text-gray-600 mb-1'>Last edited</div>
@@ -61,14 +61,14 @@ export const NoteActions = ({ note, onArchive, onDelete }: NoteActionsProps) => 
               onClick={() => onArchive(note)}
               className='w-full flex items-center justify-center gap-2 px-3 py-2 text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors font-medium'
             >
-              <ArchiveBold className='w-4 h-4' />
+              <Archive className='w-4 h-4' />
               Archive Note
             </button>
             <button
               onClick={() => onDelete(note)}
               className='w-full flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors font-medium'
             >
-              <Trash2Bold className='w-4 h-4' />
+              <Trash2 className='w-4 h-4' />
               Delete Note
             </button>
           </div>

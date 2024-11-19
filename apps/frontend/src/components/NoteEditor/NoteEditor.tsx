@@ -1,5 +1,5 @@
 import MDEditor from '@uiw/react-md-editor';
-import { Note } from '@types/note';
+import { Note } from '@/types/note';
 import { useState, memo } from 'react';
 
 interface NoteEditorProps {
@@ -69,7 +69,6 @@ export const NoteEditor = memo(({
             }}
             textareaProps={{
               placeholder: 'Start writing in markdown...',
-              "data-color-mode": "light",
               style: { 
                 backgroundColor: 'white',
                 color: '#374151'

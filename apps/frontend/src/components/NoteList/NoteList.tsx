@@ -1,5 +1,5 @@
-import { PlusBold } from 'lucide-react';
-import { Note } from '@types/note';
+import { Plus } from 'lucide-react';
+import { Note } from '@/types/note';
 
 interface NoteListProps {
   notes: Note[];
@@ -21,7 +21,7 @@ export const NoteList = ({
           onClick={onNewNote}
           className='w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors'
         >
-          <PlusBold className='w-4 h-4' />
+          <Plus className='w-4 h-4' />
           New Note
         </button>
       </div>

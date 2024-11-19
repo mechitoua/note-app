@@ -1,5 +1,5 @@
 import { CurrentView } from '@/types';
-import { ArchiveBold, ChevronRightBold, PenSquareBold, HomeBold, PlusBold, TagBold } from 'lucide-react';
+import { Archive, ChevronRight, PenSquare, Home, Plus, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 interface SidebarProps {
@@ -17,7 +17,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       {/* Logo Section */}
       <div className='p-4 border-b border-gray-200'>
         <div className='flex items-center gap-2'>
-          <PenSquareBold className='w-6 h-6 text-blue-700' />
+          <PenSquare className='w-6 h-6 text-blue-700' />
           <h1 className='text-xl font-semibold text-gray-900'>AppNote</h1>
         </div>
       </div>
@@ -32,9 +32,9 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
               : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
-          <HomeBold className='w-5 h-5 text-blue-700' />
+          <Home className='w-5 h-5 text-blue-700' />
           <span>All Notes</span>
-          {currentView === 'all-notes' && <ChevronRightBold className='w-4 h-4 ml-auto' />}
+          {currentView === 'all-notes' && <ChevronRight className='w-4 h-4 ml-auto' />}
         </button>
         <button
           onClick={() => onViewChange('archived')}
@@ -44,9 +44,9 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
               : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
-          <ArchiveBold className='w-5 h-5 text-blue-700' />
+          <Archive className='w-5 h-5 text-blue-700' />
           <span>Archived</span>
-          {currentView === 'archived' && <ChevronRightBold className='w-4 h-4 ml-auto' />}
+          {currentView === 'archived' && <ChevronRight className='w-4 h-4 ml-auto' />}
         </button>
       </div>
 
@@ -61,7 +61,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
               console.log('Add tag clicked');
             }}
           >
-            <PlusBold className='w-4 h-4 text-gray-500' />
+            <Plus className='w-4 h-4 text-gray-500' />
           </button>
         </div>
         <div className='space-y-1'>
@@ -70,7 +70,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
               key={tag}
               className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium'
             >
-              <TagBold className='w-4 h-4 text-blue-700' />
+              <Tag className='w-4 h-4 text-blue-700' />
               <span className='text-sm capitalize'>{tag}</span>
             </button>
           ))}

@@ -1,4 +1,4 @@
-import { Note } from '@types/note';
+import { Note } from '@/types/note';
 import { useCallback, useState } from 'react';
 
 const initialNotes: Note[] = [
@@ -154,6 +154,15 @@ export const useNotes = () => {
     selectedNote,
     noteTitle,
     markdownContent,
+    setSelectedNote: useCallback((note: Note | null) => {
+      setState((prev) => ({
+        ...prev,
+        selectedNote: note,
+        editorContent: note
+          ? { title: note.title, content: note.content }
+          : { title: '', content: '' },
+      }));
+    }, []),
     handleNoteClick,
     handleContentChange,
     handleTitleChange,
