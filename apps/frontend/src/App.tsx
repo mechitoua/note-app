@@ -18,6 +18,8 @@ function App() {
     handleArchiveNote,
     handleDeleteNote,
     handleNewNote,
+    handleSaveNote,
+    handleCancelEdit,
   } = useNotes();
 
   // Predefined tags
@@ -69,6 +71,8 @@ function App() {
                   noteTitle={noteTitle}
                   handleContentChange={handleContentChange}
                   handleTitleChange={handleTitleChange}
+                  onSave={handleSaveNote}
+                  onCancel={handleCancelEdit}
                 />
                 <NoteActions
                   note={selectedNote}

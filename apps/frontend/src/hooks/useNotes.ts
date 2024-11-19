@@ -149,6 +149,35 @@ export const useNotes = () => {
     [handleDeleteNote]
   );
 
+  const handleSaveNote = useCallback(() => {
+    if (!selectedNote) return;
+
+    setState((prev) => ({
+      ...prev,
+      notes: prev.notes.map((note) =>
+        note.id === selectedNote.id
+          ? {
+              ...note,
+              title: prev.editorContent.title,
+              content: prev.editorContent.content,
+            }
+          : note
+      ),
+    }));
+  }, [selectedNote]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (!selectedNote) return;
+    
+    setState((prev) => ({
+      ...prev,
+      editorContent: {
+        title: selectedNote.title,
+        content: selectedNote.content,
+      },
+    }));
+  }, [selectedNote]);
+
   return {
     notes,
     selectedNote,
@@ -169,5 +198,7 @@ export const useNotes = () => {
     handleArchiveNote,
     handleDeleteNote,
     handleNewNote,
+    handleSaveNote,
+    handleCancelEdit,
   };
 };
