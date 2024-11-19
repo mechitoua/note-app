@@ -15,10 +15,76 @@ import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 
+interface Note {
+  id: number;
+  title: string;
+  content: string;
+  tags: string[];
+  createdAt: string;
+}
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentView, setCurrentView] = useState('all-notes');
-  const [markdownContent, setMarkdownContent] = useState("# Hello World\n\nStart writing your note here...");
+  const [markdownContent, setMarkdownContent] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
+  const [isMarkdownMode, setIsMarkdownMode] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
+  const [notes, setNotes] = useState<Note[]>([
+    {
+      id: 1,
+      title: 'Getting Started with React',
+      content: 'React is a powerful library for building user interfaces. Here are some key concepts...',
+      tags: ['react', 'dev', 'typescript'],
+      createdAt: '2024-03-20'
+    },
+    {
+      id: 2,
+      title: 'Markdown Tips and Tricks',
+      content: 'Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents...',
+      tags: ['dev', 'writing'],
+      createdAt: '2024-03-19'
+    },
+    {
+      id: 3,
+      title: 'Project Ideas',
+      content: 'Here are some interesting project ideas to work on...',
+      tags: ['personal', 'dev'],
+      createdAt: '2024-03-18'
+    }
+  ]);
+
+  const handleNoteClick = (note: Note) => {
+    setSelectedNote(note);
+    setMarkdownContent(note.content);
+    setNoteTitle(note.title);
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setMarkdownContent(newContent);
+    if (selectedNote) {
+      const updatedNotes = notes.map(note => 
+        note.id === selectedNote.id 
+          ? { ...note, content: newContent }
+          : note
+      );
+      setNotes(updatedNotes);
+    }
+  };
+
+  const handleTitleChange = (newTitle: string) => {
+    setNoteTitle(newTitle);
+    if (selectedNote) {
+      const updatedNotes = notes.map(note => 
+        note.id === selectedNote.id 
+          ? { ...note, title: newTitle }
+          : note
+      );
+      setNotes(updatedNotes);
+    }
+  };
+
   const tags = [
     'cooking',
     'dev',
@@ -127,9 +193,9 @@ function App() {
         {currentView === 'all-notes' && (
           <div className='flex-1 flex flex-col'>
             {/* Three Column Layout */}
-            <div className='flex-1 grid grid-cols-4 divide-x divide-gray-200'>
+            <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
               {/* Left Column (1fr) */}
-              <div className='col-span-1 overflow-y-auto'>
+              <div className='col-span-1 h-full border-r border-gray-200'>
                 <div className='p-4'>
                   {/* New Note Button */}
                   <button className='w-full flex items-center justify-center gap-2 px-4 py-2.5 mb-4 bg-blue-700 text-white rounded-lg transition-colors hover:bg-blue-800 font-medium'>
@@ -137,54 +203,119 @@ function App() {
                     <span>New Note</span>
                   </button>
                   <div className='space-y-2'>
-                    {[1, 2, 3].map((item) => (
+                    {notes.map((note) => (
                       <div
-                        key={item}
-                        className='p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-700 cursor-pointer transition-colors'
+                        key={note.id}
+                        onClick={() => handleNoteClick(note)}
+                        className={`p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition-all duration-200 ${
+                          selectedNote?.id === note.id ? 'border-blue-700' : ''
+                        }`}
                       >
-                        <h3 className='font-medium text-gray-900 mb-1'>Note Title {item}</h3>
-                        <p className='text-sm text-gray-500 line-clamp-2'>
-                          This is a preview of the note content that might span multiple lines...
+                        <h3 className='font-medium text-gray-900 mb-2'>{note.title}</h3>
+                        <div className='flex flex-wrap gap-1 mb-2'>
+                          {note.tags.map((tag) => (
+                            <span 
+                              key={tag} 
+                              className='px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs font-medium'
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        <p className='text-xs text-gray-500'>
+                          {new Date(note.createdAt).toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          }).toLowerCase()}
                         </p>
-                        <p className='text-xs text-gray-400 mt-2'>2 hours ago</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Middle Column (2fr) */}
-              <div className='col-span-2 h-full'>
+              {/* Middle Column */}
+              <div className={`${selectedNote ? 'col-span-2' : 'col-span-2'} h-full`}>
                 <div className='h-full p-4'>
-                  <div data-color-mode="light" className='h-full'>
-                    <MDEditor
-                      value={markdownContent}
-                      onChange={(val) => setMarkdownContent(val || '')}
-                      height="100%"
-                      preview="live"
-                      hideToolbar={false}
+                  {/* Editor Mode Toggle */}
+                  <div className='mb-4 flex items-center justify-end space-x-2'>
+                    <button
+                      onClick={() => setIsMarkdownMode(false)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        !isMarkdownMode
+                          ? 'bg-gray-200 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      Plain Text
+                    </button>
+                    <button
+                      onClick={() => setIsMarkdownMode(true)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        isMarkdownMode
+                          ? 'bg-gray-200 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      Markdown
+                    </button>
+                  </div>
+
+                  {/* Note Title Input */}
+                  <div className='mb-4'>
+                    <input
+                      type="text"
+                      value={noteTitle}
+                      onChange={(e) => handleTitleChange(e.target.value)}
+                      placeholder="Note title..."
+                      className='w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 transition-colors'
                     />
+                  </div>
+
+                  {/* Editor */}
+                  <div data-color-mode="light" className='h-[calc(100%-3rem)]'>
+                    {isMarkdownMode ? (
+                      <MDEditor
+                        value={markdownContent}
+                        onChange={(val) => handleContentChange(val || '')}
+                        height="100%"
+                        preview="edit"
+                        hideToolbar={false}
+                      />
+                    ) : (
+                      <textarea
+                        value={markdownContent}
+                        onChange={(e) => handleContentChange(e.target.value)}
+                        className='w-full h-full p-4 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 transition-colors resize-none'
+                        placeholder="Start writing your note here..."
+                      />
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Right Column (1fr) */}
-              <div className='col-span-1 p-4 border-l border-gray-200'>
-                <div className='space-y-3'>
-                  <button
-                    className='w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg transition-colors hover:bg-gray-200 font-medium'
-                  >
-                    <Archive className='w-5 h-5' />
-                    <span>Archive Note</span>
-                  </button>
-                  <button
-                    className='w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg transition-colors hover:bg-red-100 font-medium'
-                  >
-                    <Trash2 className='w-5 h-5' />
-                    <span>Delete Note</span>
-                  </button>
+              {/* Right Column (1fr) - Only show when note is selected */}
+              {selectedNote && (
+                <div className='col-span-1 h-full border-l border-gray-200'>
+                  <div className='p-4'>
+                    <div className='space-y-4'>
+                      <button
+                        className='w-full flex items-center justify-center gap-2 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors'
+                      >
+                        <Archive className='w-4 h-4' />
+                        Archive Note
+                      </button>
+                      <button
+                        className='w-full flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors'
+                      >
+                        <Trash2 className='w-4 h-4' />
+                        Delete Note
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
