@@ -1,5 +1,5 @@
 import { CurrentView } from '@/types';
-import { Archive, ChevronRight, Feather, Home, Plus, Tag } from 'lucide-react';
+import { ArchiveBold, ChevronRightBold, PenSquareBold, HomeBold, PlusBold, TagBold } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 interface SidebarProps {
@@ -15,9 +15,9 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       className={`bg-white border-r border-gray-200 ${isOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden flex flex-col`}
     >
       {/* Logo Section */}
-      <div className='p-6'>
+      <div className='p-4 border-b border-gray-200'>
         <div className='flex items-center gap-2'>
-          <Feather className='w-6 h-6 text-blue-700' />
+          <PenSquareBold className='w-6 h-6 text-blue-700' />
           <h1 className='text-xl font-semibold text-gray-900'>AppNote</h1>
         </div>
       </div>
@@ -26,27 +26,27 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       <div className='p-3'>
         <button
           onClick={() => onViewChange('all-notes')}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'all-notes'
               ? 'bg-gray-200 text-gray-900'
               : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
-          <Home className='w-5 h-5 text-blue-700' />
+          <HomeBold className='w-5 h-5 text-blue-700' />
           <span>All Notes</span>
-          {currentView === 'all-notes' && <ChevronRight className='w-4 h-4 ml-auto' />}
+          {currentView === 'all-notes' && <ChevronRightBold className='w-4 h-4 ml-auto' />}
         </button>
         <button
           onClick={() => onViewChange('archived')}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'archived'
               ? 'bg-gray-200 text-gray-900'
               : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
-          <Archive className='w-5 h-5 text-blue-700' />
-          <span>Archived Notes</span>
-          {currentView === 'archived' && <ChevronRight className='w-4 h-4 ml-auto' />}
+          <ArchiveBold className='w-5 h-5 text-blue-700' />
+          <span>Archived</span>
+          {currentView === 'archived' && <ChevronRightBold className='w-4 h-4 ml-auto' />}
         </button>
       </div>
 
@@ -54,23 +54,23 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       <div className='p-3 border-t border-gray-200'>
         <div className='flex items-center justify-between px-3 mb-2'>
           <h2 className='text-sm font-medium text-gray-500'>Tags</h2>
-          <button 
+          <button
             className='p-1 hover:bg-gray-100 rounded-lg transition-colors'
             onClick={() => {
               // TODO: Implement add tag functionality
               console.log('Add tag clicked');
             }}
           >
-            <Plus className='w-4 h-4 text-gray-500' />
+            <PlusBold className='w-4 h-4 text-gray-500' />
           </button>
         </div>
         <div className='space-y-1'>
           {tags.map((tag) => (
             <button
               key={tag}
-              className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors'
+              className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium'
             >
-              <Tag className='w-4 h-4 text-blue-700' />
+              <TagBold className='w-4 h-4 text-blue-700' />
               <span className='text-sm capitalize'>{tag}</span>
             </button>
           ))}
