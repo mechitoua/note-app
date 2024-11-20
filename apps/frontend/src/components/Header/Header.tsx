@@ -10,7 +10,7 @@ interface HeaderProps {
 
 export const Header = ({ isSidebarOpen, setIsSidebarOpen, title, onLogoClick }: HeaderProps) => {
   return (
-    <header className='h-14 border-b border-gray-200 bg-white dark:bg-gray-900 px-4 flex items-center'>
+    <header className='h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 flex items-center'>
       {/* Left section */}
       <div className='w-64 flex items-center gap-3'>
         <button

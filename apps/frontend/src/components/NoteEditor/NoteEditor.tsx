@@ -1,28 +1,18 @@
-import { Note } from '@/types/note';
 import MDEditor from '@uiw/react-md-editor';
 import { Save, X } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 
 interface NoteEditorProps {
-  selectedNote: Note | null;
-  markdownContent: string;
-  noteTitle: string;
-  handleContentChange: (content: string) => void;
-  handleTitleChange: (title: string) => void;
-  onSave?: () => void;
-  onCancel?: () => void;
+  title: string;
+  content: string;
+  onTitleChange: (title: string) => void;
+  onContentChange: (content: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
 }
 
 export const NoteEditor = memo(
-  ({
-    selectedNote,
-    markdownContent,
-    noteTitle,
-    handleContentChange,
-    handleTitleChange,
-    onSave,
-    onCancel,
-  }: NoteEditorProps) => {
+  ({ title, content, onTitleChange, onContentChange, onSave, onCancel }: NoteEditorProps) => {
     const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('plain');
 
     const convertMarkdownToPlainText = useCallback((markdown: string) => {
@@ -69,14 +59,12 @@ export const NoteEditor = memo(
       // Clean up any remaining extra whitespace while preserving intentional line breaks
       text = text.replace(/\s*\n\s*/g, '\n');
       text = text.replace(/\n{3,}/g, '\n\n');
-      
+
       return text;
     }, []);
 
-    if (!selectedNote) return null;
-
     return (
-      <div className='col-span-2 flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900'>
+      <div className='h-full flex flex-col overflow-hidden bg-white dark:bg-gray-900'>
         <div className='p-6 flex-1 flex flex-col'>
           <div className='space-y-4'>
             <div className='flex justify-end gap-2'>
@@ -84,7 +72,7 @@ export const NoteEditor = memo(
                 onClick={() => setEditorMode('plain')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'plain'
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
@@ -94,7 +82,7 @@ export const NoteEditor = memo(
                 onClick={() => setEditorMode('markdown')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'markdown'
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
@@ -103,17 +91,17 @@ export const NoteEditor = memo(
             </div>
             <input
               type='text'
-              value={noteTitle}
-              onChange={(e) => handleTitleChange(e.target.value)}
+              value={title}
+              onChange={(e) => onTitleChange(e.target.value)}
               placeholder='Note title...'
-              className='w-full text-2xl font-semibold px-3 py-2 border-b border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:border-blue-700 focus:outline-none transition-colors bg-transparent dark:text-white dark:placeholder-gray-400'
+              className='w-full text-2xl font-semibold px-3 py-2 border-b border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:border-indigo-700 focus:outline-none transition-colors bg-transparent dark:text-white dark:placeholder-gray-400'
             />
           </div>
           <div className='flex-1 overflow-hidden mt-4'>
             {editorMode === 'markdown' ? (
               <MDEditor
-                value={markdownContent}
-                onChange={(val) => handleContentChange(val || '')}
+                value={content}
+                onChange={(val) => onContentChange(val || '')}
                 preview='edit'
                 className='w-full h-full'
                 height='100%'
@@ -125,7 +113,7 @@ export const NoteEditor = memo(
                   remarkPlugins: [],
                 }}
                 textareaProps={{
-                  placeholder: '',
+                  placeholder: 'Start writing...',
                   style: {
                     backgroundColor: 'transparent',
                     color: 'inherit',
@@ -134,28 +122,28 @@ export const NoteEditor = memo(
               />
             ) : (
               <textarea
-                value={convertMarkdownToPlainText(markdownContent)}
-                onChange={(e) => handleContentChange(e.target.value)}
-                className='w-full h-full p-4 border rounded-lg focus:outline-none focus:border-blue-700 resize-none text-left bg-transparent dark:text-gray-200 dark:border-gray-700'
-                placeholder=''
+                value={convertMarkdownToPlainText(content)}
+                onChange={(e) => onContentChange(e.target.value)}
+                className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200'
+                placeholder='Start writing...'
                 style={{ textAlign: 'left' }}
               />
             )}
           </div>
         </div>
-        <div className='mx-6 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-3'>
+        <div className='mx-6 px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-2'>
           <button
             onClick={onSave}
-            className='px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2'
+            className='w-20 px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm'
           >
-            <Save className='w-4 h-4' />
+            <Save className='w-3.5 h-3.5' />
             Save
           </button>
           <button
             onClick={onCancel}
-            className='px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium inline-flex items-center gap-2 text-gray-600 dark:text-gray-300'
+            className='w-20 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm text-gray-600 dark:text-gray-300'
           >
-            <X className='w-4 h-4' />
+            <X className='w-3.5 h-3.5' />
             Cancel
           </button>
         </div>

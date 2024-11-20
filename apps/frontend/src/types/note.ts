@@ -1,8 +1,9 @@
 export interface Note {
-  id: number;
+  id: string;
   title: string;
   content: string;
   tags: string[];
   createdAt: string;
-  archived?: boolean;
+  updatedAt: string;
+  archived: boolean;
 }

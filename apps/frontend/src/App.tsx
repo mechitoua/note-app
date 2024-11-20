@@ -1,8 +1,19 @@
-import { EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
-import { useNotes } from '@/hooks/useNotes';
-import { CurrentView } from '@/types';
-import { useState } from 'react';
+import {
+  AddNoteModal,
+  ArchivedNotes,
+  EmptyState,
+  Header,
+  NoteActions,
+  NoteEditor,
+  NoteList,
+  Sidebar,
+} from '@/components';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useNotes } from '@/hooks/useNotes';
+import { useTags } from '@/hooks/useTags';
+import { CurrentView } from '@/types';
+import { useState, useEffect } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -10,75 +21,125 @@ function App() {
   const {
     notes,
     selectedNote,
-    markdownContent,
-    noteTitle,
+    editorContent,
+    isAddNoteModalOpen,
+    setIsAddNoteModalOpen,
     handleNewNote,
-    handleNoteClick,
+    handleNoteSelect,
     handleContentChange,
     handleTitleChange,
     handleSaveNote,
     handleCancelEdit,
     handleArchiveNote,
     handleDeleteNote,
-    setSelectedNote,
+    clearSelectedNote,
+    getFilteredNotes,
   } = useNotes();
 
-  const defaultTags = ['Personal', 'Work', 'Ideas'];
+  const {
+    tags,
+    selectedTag,
+    setSelectedTag,
+    addTags,
+    syncTags,
+    clearSelectedTag,
+  } = useTags();
+
+  useEffect(() => {
+    syncTags(notes);
+  }, [notes, syncTags]);
 
   const handleLogoClick = () => {
-    setSelectedNote(null);
+    clearSelectedNote();
+    clearSelectedTag();
   };
+
+  const handleNewNoteWithTags = (note: { title: string; tags: string[] }) => {
+    handleNewNote({
+      title: note.title,
+      content: '',
+      tags: note.tags,
+    });
+    addTags(note.tags);
+  };
+
+  const filteredNotes = getFilteredNotes(currentView === 'archived').filter(note => {
+    // Filter by selected tag if one is selected (case insensitive)
+    return selectedTag 
+      ? note.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+      : true;
+  });
 
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className='h-screen flex'>
+        <div className='h-screen flex overflow-hidden'>
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={setCurrentView}
-            tags={defaultTags}
+            onAllNotesClick={handleLogoClick}
+            tags={tags}
+            selectedTag={selectedTag}
+            onTagSelect={setSelectedTag}
           />
           <main className='flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden'>
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
-              title={currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
+              title={selectedTag ? `Tag: ${selectedTag}` : currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
-              <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
-                <NoteList
-                  notes={notes}
-                  selectedNote={selectedNote}
-                  onNoteClick={handleNoteClick}
-                  onNewNote={handleNewNote}
-                />
-                {selectedNote ? (
-                  <>
-                    <NoteEditor
-                      selectedNote={selectedNote}
-                      markdownContent={markdownContent}
-                      noteTitle={noteTitle}
-                      handleContentChange={handleContentChange}
-                      handleTitleChange={handleTitleChange}
-                      onSave={handleSaveNote}
-                      onCancel={handleCancelEdit}
+              <PanelGroup direction="horizontal">
+                <Panel defaultSize={25} minSize={20}>
+                  {currentView === 'archived' ? (
+                    <ArchivedNotes
+                      notes={filteredNotes}
+                      onNoteSelect={handleNoteSelect}
                     />
-                    <NoteActions
-                      note={selectedNote}
-                      onArchive={handleArchiveNote}
-                      onDelete={handleDeleteNote}
+                  ) : (
+                    <NoteList
+                      notes={filteredNotes}
+                      selectedNoteId={selectedNote?.id}
+                      onNoteSelect={handleNoteSelect}
+                      onCreateNote={() => setIsAddNoteModalOpen(true)}
                     />
-                  </>
-                ) : (
-                  <EmptyState />
-                )}
-              </div>
+                  )}
+                </Panel>
+                <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
+                <Panel minSize={30}>
+                  {selectedNote ? (
+                    <div className="h-full grid grid-cols-[1fr,250px]">
+                      <NoteEditor
+                        title={editorContent.title}
+                        content={editorContent.content}
+                        onTitleChange={handleTitleChange}
+                        onContentChange={handleContentChange}
+                        onSave={handleSaveNote}
+                        onCancel={handleCancelEdit}
+                      />
+                      <NoteActions
+                        selectedNote={selectedNote}
+                        onArchive={handleArchiveNote}
+                        onDelete={handleDeleteNote}
+                      />
+                    </div>
+                  ) : (
+                    <EmptyState />
+                  )}
+                </Panel>
+              </PanelGroup>
             </div>
           </main>
         </div>
       </div>
+      <AddNoteModal
+        isOpen={isAddNoteModalOpen}
+        onClose={() => setIsAddNoteModalOpen(false)}
+        onSave={handleNewNoteWithTags}
+        availableTags={tags}
+      />
     </ThemeProvider>
   );
 }

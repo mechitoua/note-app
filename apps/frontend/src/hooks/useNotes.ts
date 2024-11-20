@@ -1,5 +1,5 @@
-import { Note } from '@/types/note';
 import { noteService } from '@/services/noteService';
+import { Note } from '@/types/note';
 import { useCallback, useEffect, useState } from 'react';
 
 interface NoteState {
@@ -20,37 +20,40 @@ const initialState: NoteState = {
     title: '',
     content: '',
   },
-  isLoading: true,
+  isLoading: false,
   error: null,
 };
 
 export const useNotes = () => {
   const [state, setState] = useState<NoteState>(initialState);
+  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
 
-  // Derived state
-  const { notes, selectedNote, editorContent, isLoading, error } = state;
-  const { title: noteTitle, content: markdownContent } = editorContent;
-
-  // Load notes on mount
+  // Fetch notes
   useEffect(() => {
-    const loadNotes = async () => {
+    const fetchNotes = async () => {
+      setState((prev) => ({ ...prev, isLoading: true }));
       try {
-        const loadedNotes = await noteService.getNotes();
-        setState((prev) => ({ ...prev, notes: loadedNotes, isLoading: false }));
+        const notes = await noteService.getNotes();
+        setState((prev) => ({
+          ...prev,
+          notes,
+          isLoading: false,
+          error: null,
+        }));
       } catch (err) {
         setState((prev) => ({
           ...prev,
-          error: 'Failed to load notes',
           isLoading: false,
+          error: 'Failed to fetch notes',
         }));
       }
     };
 
-    loadNotes();
+    fetchNotes();
   }, []);
 
   // Handle note selection
-  const handleNoteClick = useCallback((note: Note) => {
+  const handleNoteSelect = useCallback((note: Note) => {
     setState((prevState) => ({
       ...prevState,
       selectedNote: note,
@@ -58,146 +61,202 @@ export const useNotes = () => {
         title: note.title,
         content: note.content,
       },
-      error: null,
     }));
   }, []);
 
-  // Handle content changes
-  const handleContentChange = useCallback((newContent: string) => {
+  // Handle content change
+  const handleContentChange = useCallback((content: string) => {
     setState((prevState) => ({
       ...prevState,
       editorContent: {
         ...prevState.editorContent,
-        content: newContent,
+        content,
       },
     }));
   }, []);
 
-  // Handle title changes
-  const handleTitleChange = useCallback((newTitle: string) => {
+  // Handle title change
+  const handleTitleChange = useCallback((title: string) => {
     setState((prevState) => ({
       ...prevState,
       editorContent: {
         ...prevState.editorContent,
-        title: newTitle,
+        title,
       },
     }));
   }, []);
 
-  // Save note changes
+  // Handle save note
   const handleSaveNote = useCallback(async () => {
-    if (!selectedNote) return;
+    if (!state.selectedNote) return;
+
+    const updatedNote = {
+      ...state.selectedNote,
+      title: state.editorContent.title,
+      content: state.editorContent.content,
+      updatedAt: new Date().toISOString(),
+    };
 
     try {
-      const updatedNote = await noteService.saveNote({
-        ...selectedNote,
-        title: editorContent.title,
-        content: editorContent.content,
-      });
-
+      await noteService.updateNote(updatedNote);
       setState((prevState) => ({
         ...prevState,
         notes: prevState.notes.map((note) =>
-          note.id === selectedNote.id ? updatedNote : note
+          note.id === state.selectedNote?.id ? updatedNote : note
         ),
-        selectedNote: updatedNote,
-        error: null,
-      }));
-    } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        error: 'Failed to save note',
-      }));
-    }
-  }, [selectedNote, editorContent]);
-
-  // Create new note
-  const handleNewNote = useCallback(async () => {
-    try {
-      const newNote: Note = {
-        id: Date.now(),
-        title: 'New Note',
-        content: '',
-        tags: ['Personal', 'Draft'],  
-        createdAt: new Date().toISOString(),
-      };
-
-      const savedNote = await noteService.saveNote(newNote);
-
-      setState((prevState) => ({
-        ...prevState,
-        notes: [savedNote, ...prevState.notes],
-        selectedNote: savedNote,
+        selectedNote: null,
         editorContent: {
-          title: savedNote.title,
-          content: savedNote.content,
+          title: '',
+          content: '',
         },
         error: null,
       }));
     } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        error: 'Failed to create new note',
-      }));
-    }
-  }, []);
-
-  // Delete note
-  const handleDeleteNote = useCallback(async (noteToDelete: Note) => {
-    try {
-      await noteService.deleteNote(noteToDelete.id);
-
       setState((prevState) => ({
         ...prevState,
-        notes: prevState.notes.filter((note) => note.id !== noteToDelete.id),
-        selectedNote: prevState.selectedNote?.id === noteToDelete.id ? null : prevState.selectedNote,
-        editorContent:
-          prevState.selectedNote?.id === noteToDelete.id
-            ? { title: '', content: '' }
-            : prevState.editorContent,
-        error: null,
-      }));
-    } catch (err) {
-      setState((prev) => ({
-        ...prev,
-        error: 'Failed to delete note',
+        error: 'Failed to save note',
       }));
     }
+  }, [state.selectedNote, state.editorContent]);
+
+  // Handle cancel edit
+  const handleCancelEdit = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedNote: null,
+      editorContent: {
+        title: '',
+        content: '',
+      },
+    }));
   }, []);
+
+  // Clear selected note
+  const clearSelectedNote = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedNote: null,
+      editorContent: {
+        title: '',
+        content: '',
+      },
+    }));
+  }, []);
+
+  // Create new note
+  const handleNewNote = useCallback(
+    async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
+      try {
+        const newNote = {
+          id: crypto.randomUUID(),
+          title,
+          content,
+          tags,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          archived: false,
+        };
+
+        await noteService.createNote(newNote);
+        setState((prevState) => ({
+          ...prevState,
+          notes: [newNote, ...prevState.notes],
+          selectedNote: newNote,
+          editorContent: {
+            title: newNote.title,
+            content: newNote.content,
+          },
+          error: null,
+        }));
+        setIsAddNoteModalOpen(false);
+      } catch (err) {
+        setState((prevState) => ({
+          ...prevState,
+          error: 'Failed to create note',
+        }));
+      }
+    },
+    []
+  );
 
   // Archive note
-  const handleArchiveNote = useCallback(async (noteToArchive: Note) => {
+  const handleArchiveNote = useCallback(async () => {
+    if (!state.selectedNote) return;
+
     try {
-      await noteService.archiveNote(noteToArchive.id);
+      const updatedNote = {
+        ...state.selectedNote,
+        archived: !state.selectedNote.archived,
+        updatedAt: new Date().toISOString(),
+      };
+      await noteService.updateNote(updatedNote);
 
       setState((prevState) => ({
         ...prevState,
-        notes: prevState.notes.filter((note) => note.id !== noteToArchive.id),
+        notes: prevState.notes.map((note) =>
+          note.id === state.selectedNote?.id ? updatedNote : note
+        ),
         selectedNote: null,
-        editorContent: { title: '', content: '' },
+        editorContent: {
+          title: '',
+          content: '',
+        },
         error: null,
       }));
     } catch (err) {
-      setState((prev) => ({
-        ...prev,
+      setState((prevState) => ({
+        ...prevState,
         error: 'Failed to archive note',
       }));
     }
-  }, []);
+  }, [state.selectedNote]);
+
+  // Get filtered notes based on archive status and search/tag filters
+  const getFilteredNotes = useCallback((archived: boolean = false) => {
+    return state.notes.filter((note) => note.archived === archived);
+  }, [state.notes]);
+
+  // Handle delete note
+  const handleDeleteNote = useCallback(async () => {
+    if (!state.selectedNote) return;
+
+    try {
+      await noteService.deleteNote(state.selectedNote.id);
+      setState((prevState) => ({
+        ...prevState,
+        notes: prevState.notes.filter((note) => note.id !== state.selectedNote?.id),
+        selectedNote: null,
+        editorContent: {
+          title: '',
+          content: '',
+        },
+        error: null,
+      }));
+    } catch (err) {
+      setState((prevState) => ({
+        ...prevState,
+        error: 'Failed to delete note',
+      }));
+    }
+  }, [state.selectedNote]);
 
   return {
-    notes,
-    selectedNote,
-    isLoading,
-    error,
-    noteTitle,
-    markdownContent,
+    notes: state.notes,
+    selectedNote: state.selectedNote,
+    editorContent: state.editorContent,
+    isLoading: state.isLoading,
+    error: state.error,
+    isAddNoteModalOpen,
+    setIsAddNoteModalOpen,
     handleNewNote,
-    handleDeleteNote,
-    handleArchiveNote,
-    handleNoteClick,
+    handleNoteSelect,
     handleContentChange,
     handleTitleChange,
     handleSaveNote,
+    handleCancelEdit,
+    handleArchiveNote,
+    handleDeleteNote,
+    clearSelectedNote,
+    getFilteredNotes,
   };
 };
