@@ -20,7 +20,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
       {/* Logo Section */}
       <div className='p-4 pt-5'>
         <div className='flex items-center gap-3'>
-          <Feather className='w-6 h-6 text-blue-600 dark:text-blue-500 flex-shrink-0' />
+          <Feather className='w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0' />
           <h1 className='text-xl font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-2'>
             Notes
           </h1>
@@ -40,7 +40,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Home className='w-5 h-5 text-blue-600 dark:text-blue-500' />
+          <Home className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
           <span>All Notes</span>
           {currentView === 'all-notes' && <ChevronRight className='w-4 h-4 ml-auto' />}
         </button>
@@ -52,7 +52,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Archive className='w-5 h-5 text-blue-600 dark:text-blue-500' />
+          <Archive className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
           <span>Archived</span>
           {currentView === 'archived' && <ChevronRight className='w-4 h-4 ml-auto' />}
         </button>
@@ -78,7 +78,7 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
               key={tag}
               className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-medium'
             >
-              <Tag className='w-4 h-4 text-blue-600 dark:text-blue-500' />
+              <Tag className='w-4 h-4 text-indigo-600 dark:text-indigo-500' />
               <span className='text-sm capitalize'>{tag}</span>
             </button>
           ))}

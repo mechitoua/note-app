@@ -59,7 +59,7 @@ export const NoteEditor = memo(
       // Clean up any remaining extra whitespace while preserving intentional line breaks
       text = text.replace(/\s*\n\s*/g, '\n');
       text = text.replace(/\n{3,}/g, '\n\n');
-      
+
       return text;
     }, []);
 
@@ -72,7 +72,7 @@ export const NoteEditor = memo(
                 onClick={() => setEditorMode('plain')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'plain'
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
@@ -82,7 +82,7 @@ export const NoteEditor = memo(
                 onClick={() => setEditorMode('markdown')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'markdown'
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
@@ -94,7 +94,7 @@ export const NoteEditor = memo(
               value={title}
               onChange={(e) => onTitleChange(e.target.value)}
               placeholder='Note title...'
-              className='w-full text-2xl font-semibold px-3 py-2 border-b border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:border-blue-700 focus:outline-none transition-colors bg-transparent dark:text-white dark:placeholder-gray-400'
+              className='w-full text-2xl font-semibold px-3 py-2 border-b border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:border-indigo-700 focus:outline-none transition-colors bg-transparent dark:text-white dark:placeholder-gray-400'
             />
           </div>
           <div className='flex-1 overflow-hidden mt-4'>
@@ -124,7 +124,7 @@ export const NoteEditor = memo(
               <textarea
                 value={convertMarkdownToPlainText(content)}
                 onChange={(e) => onContentChange(e.target.value)}
-                className='w-full h-full p-4 border rounded-lg focus:outline-none focus:border-blue-700 resize-none text-left bg-transparent dark:text-gray-200 dark:border-gray-700'
+                className='w-full h-full p-4 border rounded-lg focus:outline-none focus:border-indigo-700 resize-none text-left bg-transparent dark:text-gray-200 dark:border-gray-700'
                 placeholder='Start writing...'
                 style={{ textAlign: 'left' }}
               />
@@ -134,7 +134,7 @@ export const NoteEditor = memo(
         <div className='mx-6 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-3'>
           <button
             onClick={onSave}
-            className='px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2'
+            className='px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium inline-flex items-center gap-2'
           >
             <Save className='w-4 h-4' />
             Save

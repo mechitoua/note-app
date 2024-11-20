@@ -10,27 +10,34 @@ interface Tag {
 interface AddNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (note: { title: string; content: string; tags: string[] }) => void;
+  onSave: (note: { title: string; tags: string[] }) => void;
   availableTags: string[];
 }
 
 export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNoteModalProps) => {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [newTag, setNewTag] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
       title,
-      content,
       tags: selectedTags,
     });
     // Reset form
     setTitle('');
-    setContent('');
+    setNewTag('');
     setSelectedTags([]);
     onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newTag.trim() && !availableTags.includes(newTag.trim())) {
+      e.preventDefault();
+      setSelectedTags(prev => [...prev, newTag.trim()]);
+      setNewTag('');
+    }
   };
 
   const handleTagToggle = (tag: string) => {
@@ -91,7 +98,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                       id="title"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700"
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 bg-white dark:bg-gray-800"
                       placeholder="Enter note title"
                       required
                     />
@@ -101,37 +108,32 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                       Tags
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {availableTags.map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => handleTagToggle(tag)}
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            selectedTags.includes(tag)
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                      ))}
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="flex-1 w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 bg-white dark:bg-gray-800"
+                        placeholder="Type a tag and press Enter"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        {availableTags.map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => handleTagToggle(tag)}
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              selectedTags.includes(tag)
+                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Content
-                    </label>
-                    <textarea
-                      id="content"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      rows={6}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700"
-                      placeholder="Enter note content"
-                      required
-                    />
                   </div>
 
                   <div className="flex justify-end gap-3">
@@ -144,7 +146,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                       Save Note
                     </button>

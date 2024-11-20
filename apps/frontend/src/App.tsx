@@ -1,4 +1,12 @@
-import { AddNoteModal, EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
+import {
+  AddNoteModal,
+  EmptyState,
+  Header,
+  NoteActions,
+  NoteEditor,
+  NoteList,
+  Sidebar,
+} from '@/components';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { CurrentView } from '@/types';
@@ -33,7 +41,7 @@ function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className='h-screen flex'>
+        <div className='h-screen flex overflow-hidden'>
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
@@ -49,7 +57,7 @@ function App() {
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
-              <div className='grid h-full' style={{ gridTemplateColumns: '1fr 2.3fr 0.7fr' }}>
+              <div className='h-full grid' style={{ gridTemplateColumns: '1fr 2.3fr 0.7fr' }}>
                 <NoteList
                   notes={notes.filter((note) =>
                     currentView === 'archived' ? note.archived : !note.archived
@@ -60,7 +68,7 @@ function App() {
                 />
                 {selectedNote ? (
                   <>
-                    <div className='col-span-1'>
+                    <div className='h-full overflow-hidden'>
                       <NoteEditor
                         title={editorContent.title}
                         content={editorContent.content}

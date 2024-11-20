@@ -9,7 +9,7 @@
 }
 
 /* Override default markdown editor styles */
-[data-color-mode*='light'] .wmde-markdown-var, 
+[data-color-mode*='light'] .wmde-markdown-var,
 [data-color-mode*='light'] .wmde-markdown-var code {
   color: #374151 !important;
   background-color: transparent !important;
