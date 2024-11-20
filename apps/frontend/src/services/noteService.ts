@@ -12,28 +12,37 @@ const getNotes = async (): Promise<Note[]> => {
   }
 };
 
-const saveNote = async (note: Note): Promise<Note> => {
+const createNote = async (note: Note): Promise<Note> => {
+  try {
+    const notes = await getNotes();
+    notes.unshift(note);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return note;
+  } catch (error) {
+    console.error('Error creating note:', error);
+    throw new Error('Failed to create note');
+  }
+};
+
+const updateNote = async (note: Note): Promise<Note> => {
   try {
     const notes = await getNotes();
     const existingNoteIndex = notes.findIndex((n) => n.id === note.id);
 
-    if (existingNoteIndex !== -1) {
-      // Update existing note
-      notes[existingNoteIndex] = note;
-    } else {
-      // Add new note
-      notes.unshift(note);
+    if (existingNoteIndex === -1) {
+      throw new Error('Note not found');
     }
 
+    notes[existingNoteIndex] = note;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
     return note;
   } catch (error) {
-    console.error('Error saving note:', error);
-    throw new Error('Failed to save note');
+    console.error('Error updating note:', error);
+    throw new Error('Failed to update note');
   }
 };
 
-const deleteNote = async (noteId: number): Promise<void> => {
+const deleteNote = async (noteId: string): Promise<void> => {
   try {
     const notes = await getNotes();
     const updatedNotes = notes.filter((note) => note.id !== noteId);
@@ -50,7 +59,7 @@ const archiveNote = async (noteId: number): Promise<void> => {
     const noteToArchive = notes.find((note) => note.id === noteId);
     if (noteToArchive) {
       noteToArchive.archived = true;
-      await saveNote(noteToArchive);
+      await updateNote(noteToArchive);
     }
   } catch (error) {
     console.error('Error archiving note:', error);
@@ -64,7 +73,7 @@ const unarchiveNote = async (noteId: number): Promise<void> => {
     const noteToUnarchive = notes.find((note) => note.id === noteId);
     if (noteToUnarchive) {
       noteToUnarchive.archived = false;
-      await saveNote(noteToUnarchive);
+      await updateNote(noteToUnarchive);
     }
   } catch (error) {
     console.error('Error unarchiving note:', error);
@@ -74,7 +83,8 @@ const unarchiveNote = async (noteId: number): Promise<void> => {
 
 export const noteService = {
   getNotes,
-  saveNote,
+  createNote,
+  updateNote,
   deleteNote,
   archiveNote,
   unarchiveNote,

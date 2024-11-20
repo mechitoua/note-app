@@ -1,4 +1,5 @@
 // Export your components here
+export { AddNoteModal } from './AddNoteModal';
 export { EmptyState } from './EmptyState/EmptyState';
 export { Header } from './Header/Header';
 export { NoteActions } from './NoteActions/NoteActions';

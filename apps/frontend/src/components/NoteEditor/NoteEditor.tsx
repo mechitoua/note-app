@@ -1,28 +1,18 @@
-import { Note } from '@/types/note';
 import MDEditor from '@uiw/react-md-editor';
 import { Save, X } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 
 interface NoteEditorProps {
-  selectedNote: Note | null;
-  markdownContent: string;
-  noteTitle: string;
-  handleContentChange: (content: string) => void;
-  handleTitleChange: (title: string) => void;
-  onSave?: () => void;
-  onCancel?: () => void;
+  title: string;
+  content: string;
+  onTitleChange: (title: string) => void;
+  onContentChange: (content: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
 }
 
 export const NoteEditor = memo(
-  ({
-    selectedNote,
-    markdownContent,
-    noteTitle,
-    handleContentChange,
-    handleTitleChange,
-    onSave,
-    onCancel,
-  }: NoteEditorProps) => {
+  ({ title, content, onTitleChange, onContentChange, onSave, onCancel }: NoteEditorProps) => {
     const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('plain');
 
     const convertMarkdownToPlainText = useCallback((markdown: string) => {
@@ -73,10 +63,8 @@ export const NoteEditor = memo(
       return text;
     }, []);
 
-    if (!selectedNote) return null;
-
     return (
-      <div className='col-span-2 flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900'>
+      <div className='h-full flex flex-col overflow-hidden bg-white dark:bg-gray-900'>
         <div className='p-6 flex-1 flex flex-col'>
           <div className='space-y-4'>
             <div className='flex justify-end gap-2'>
@@ -103,8 +91,8 @@ export const NoteEditor = memo(
             </div>
             <input
               type='text'
-              value={noteTitle}
-              onChange={(e) => handleTitleChange(e.target.value)}
+              value={title}
+              onChange={(e) => onTitleChange(e.target.value)}
               placeholder='Note title...'
               className='w-full text-2xl font-semibold px-3 py-2 border-b border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:border-blue-700 focus:outline-none transition-colors bg-transparent dark:text-white dark:placeholder-gray-400'
             />
@@ -112,8 +100,8 @@ export const NoteEditor = memo(
           <div className='flex-1 overflow-hidden mt-4'>
             {editorMode === 'markdown' ? (
               <MDEditor
-                value={markdownContent}
-                onChange={(val) => handleContentChange(val || '')}
+                value={content}
+                onChange={(val) => onContentChange(val || '')}
                 preview='edit'
                 className='w-full h-full'
                 height='100%'
@@ -125,7 +113,7 @@ export const NoteEditor = memo(
                   remarkPlugins: [],
                 }}
                 textareaProps={{
-                  placeholder: '',
+                  placeholder: 'Start writing...',
                   style: {
                     backgroundColor: 'transparent',
                     color: 'inherit',
@@ -134,10 +122,10 @@ export const NoteEditor = memo(
               />
             ) : (
               <textarea
-                value={convertMarkdownToPlainText(markdownContent)}
-                onChange={(e) => handleContentChange(e.target.value)}
+                value={convertMarkdownToPlainText(content)}
+                onChange={(e) => onContentChange(e.target.value)}
                 className='w-full h-full p-4 border rounded-lg focus:outline-none focus:border-blue-700 resize-none text-left bg-transparent dark:text-gray-200 dark:border-gray-700'
-                placeholder=''
+                placeholder='Start writing...'
                 style={{ textAlign: 'left' }}
               />
             )}

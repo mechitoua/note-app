@@ -3,17 +3,17 @@ import { Plus } from 'lucide-react';
 
 interface NoteListProps {
   notes: Note[];
-  selectedNote: Note | null;
-  onNoteClick: (note: Note) => void;
-  onNewNote: () => void;
+  selectedNoteId: string | undefined;
+  onNoteSelect: (note: Note) => void;
+  onCreateNote: () => void;
 }
 
-export const NoteList = ({ notes, selectedNote, onNoteClick, onNewNote }: NoteListProps) => {
+export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: NoteListProps) => {
   return (
     <div className='col-span-1 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='p-4'>
         <button
-          onClick={onNewNote}
+          onClick={onCreateNote}
           className='w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors'
         >
           <Plus className='w-4 h-4' />
@@ -25,9 +25,9 @@ export const NoteList = ({ notes, selectedNote, onNoteClick, onNewNote }: NoteLi
           {notes.map((note) => (
             <div
               key={note.id}
-              onClick={() => onNoteClick(note)}
+              onClick={() => onNoteSelect(note)}
               className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                selectedNote?.id === note.id
+                selectedNoteId === note.id
                   ? 'border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/50'
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
@@ -49,7 +49,7 @@ export const NoteList = ({ notes, selectedNote, onNoteClick, onNewNote }: NoteLi
                 <div className='text-xs text-gray-500 dark:text-gray-400'>
                   {new Date(note.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
-                    month: 'long',
+                    month: 'short',
                     day: 'numeric',
                   })}
                 </div>
