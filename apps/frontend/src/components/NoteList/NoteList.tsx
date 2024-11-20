@@ -20,18 +20,20 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
           Create New Note
         </button>
       </div>
-      <div 
+      <div
         className='h-[calc(100vh-8rem)] overflow-y-auto px-4 pb-4'
-        style={{
-          '--scrollbar-width': '8px',
-          '--scrollbar-track-bg': 'transparent',
-          '--scrollbar-thumb-bg': 'rgb(229 231 235)',
-          '--scrollbar-thumb-bg-dark': 'rgb(31 41 55)',
-          '--scrollbar-thumb-hover': 'rgb(209 213 219)',
-          '--scrollbar-thumb-hover-dark': 'rgb(17 24 39)',
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'var(--scrollbar-thumb-bg) var(--scrollbar-track-bg)',
-        } as React.CSSProperties}
+        style={
+          {
+            '--scrollbar-width': '8px',
+            '--scrollbar-track-bg': 'transparent',
+            '--scrollbar-thumb-bg': 'rgb(229 231 235)',
+            '--scrollbar-thumb-bg-dark': 'rgb(31 41 55)',
+            '--scrollbar-thumb-hover': 'rgb(209 213 219)',
+            '--scrollbar-thumb-hover-dark': 'rgb(17 24 39)',
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'var(--scrollbar-thumb-bg) var(--scrollbar-track-bg)',
+          } as React.CSSProperties
+        }
       >
         <style>
           {`

@@ -131,19 +131,19 @@ export const NoteEditor = memo(
             )}
           </div>
         </div>
-        <div className='mx-6 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-3'>
+        <div className='mx-6 px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-2'>
           <button
             onClick={onSave}
-            className='px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium inline-flex items-center gap-2'
+            className='w-20 px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm'
           >
-            <Save className='w-4 h-4' />
+            <Save className='w-3.5 h-3.5' />
             Save
           </button>
           <button
             onClick={onCancel}
-            className='px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium inline-flex items-center gap-2 text-gray-600 dark:text-gray-300'
+            className='w-20 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm text-gray-600 dark:text-gray-300'
           >
-            <X className='w-4 h-4' />
+            <X className='w-3.5 h-3.5' />
             Cancel
           </button>
         </div>
