@@ -1,4 +1,4 @@
-import { EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
+import { AddNoteModal, EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { CurrentView } from '@/types';
@@ -10,10 +10,11 @@ function App() {
   const {
     notes,
     selectedNote,
-    markdownContent,
-    noteTitle,
+    editorContent,
+    isAddNoteModalOpen,
+    setIsAddNoteModalOpen,
     handleNewNote,
-    handleNoteClick,
+    handleNoteSelect,
     handleContentChange,
     handleTitleChange,
     handleSaveNote,
@@ -31,7 +32,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className='h-screen flex'>
           <Sidebar
             isOpen={isSidebarOpen}
@@ -48,37 +49,49 @@ function App() {
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
-              <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
+              <div className='grid h-full' style={{ gridTemplateColumns: '1fr 2.3fr 0.7fr' }}>
                 <NoteList
-                  notes={notes}
-                  selectedNote={selectedNote}
-                  onNoteClick={handleNoteClick}
-                  onNewNote={handleNewNote}
+                  notes={notes.filter((note) =>
+                    currentView === 'archived' ? note.archived : !note.archived
+                  )}
+                  selectedNoteId={selectedNote?.id}
+                  onNoteSelect={handleNoteSelect}
+                  onCreateNote={() => setIsAddNoteModalOpen(true)}
                 />
                 {selectedNote ? (
                   <>
-                    <NoteEditor
-                      selectedNote={selectedNote}
-                      markdownContent={markdownContent}
-                      noteTitle={noteTitle}
-                      handleContentChange={handleContentChange}
-                      handleTitleChange={handleTitleChange}
-                      onSave={handleSaveNote}
-                      onCancel={handleCancelEdit}
-                    />
+                    <div className='col-span-1'>
+                      <NoteEditor
+                        title={editorContent.title}
+                        content={editorContent.content}
+                        onTitleChange={handleTitleChange}
+                        onContentChange={handleContentChange}
+                        onSave={handleSaveNote}
+                        onCancel={handleCancelEdit}
+                      />
+                    </div>
                     <NoteActions
-                      note={selectedNote}
-                      onArchive={handleArchiveNote}
-                      onDelete={handleDeleteNote}
+                      selectedNote={selectedNote}
+                      onArchive={() => handleArchiveNote(selectedNote.id)}
+                      onDelete={() => handleDeleteNote(selectedNote.id)}
                     />
                   </>
                 ) : (
-                  <EmptyState />
+                  <div className='col-span-2 flex items-center justify-center'>
+                    <EmptyState onCreateNote={() => setIsAddNoteModalOpen(true)} />
+                  </div>
                 )}
               </div>
             </div>
           </main>
         </div>
+
+        <AddNoteModal
+          isOpen={isAddNoteModalOpen}
+          onClose={() => setIsAddNoteModalOpen(false)}
+          onSave={handleNewNote}
+          availableTags={defaultTags}
+        />
       </div>
     </ThemeProvider>
   );
