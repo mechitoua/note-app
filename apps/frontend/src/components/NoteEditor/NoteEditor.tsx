@@ -99,27 +99,32 @@ export const NoteEditor = memo(
           </div>
           <div className='flex-1 overflow-hidden mt-4'>
             {editorMode === 'markdown' ? (
-              <MDEditor
-                value={content}
-                onChange={(val) => onContentChange(val || '')}
-                preview='edit'
-                className='w-full h-full'
-                height='100%'
-                data-color-mode={
-                  document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-                }
-                previewOptions={{
-                  rehypePlugins: [],
-                  remarkPlugins: [],
-                }}
-                textareaProps={{
-                  placeholder: 'Start writing...',
-                  style: {
-                    backgroundColor: 'transparent',
-                    color: 'inherit',
-                  },
-                }}
-              />
+              <div className='h-full [&_.w-md-editor-text]:!min-h-full [&_.w-md-editor]:!border-none [&_.w-md-editor-content]:!border-none [&_.w-md-editor-area]:!border-none [&_*]:!outline-none'>
+                <MDEditor
+                  value={content}
+                  onChange={(val) => onContentChange(val || '')}
+                  preview='edit'
+                  className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200'
+                  visibleDragbar={false}
+                  data-color-mode={
+                    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                  }
+                  previewOptions={{
+                    rehypePlugins: [],
+                    remarkPlugins: [],
+                  }}
+                  textareaProps={{
+                    placeholder: 'Start writing...',
+                    className:
+                      'w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200',
+                    style: {
+                      backgroundColor: 'transparent',
+                      color: 'inherit',
+                      outline: 'none',
+                    },
+                  }}
+                />
+              </div>
             ) : (
               <textarea
                 value={convertMarkdownToPlainText(content)}

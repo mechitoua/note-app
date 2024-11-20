@@ -86,7 +86,7 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
                     {note.tags?.map((tag) => (
                       <span
                         key={tag}
-                        className='px-2 py-0.5 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-full text-xs font-medium'
+                        className='px-1.5 py-0.5 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded text-xs font-medium'
                       >
                         {tag}
                       </span>

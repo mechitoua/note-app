@@ -18,19 +18,27 @@ export const useTags = () => {
     if (isDefaultTag(tag) || customTags.some(t => normalizeTag(t) === normalizedTag)) {
       return;
     }
-    setCustomTags(prev => [...prev, tag.trim()]);
+    setCustomTags(prev => [...prev.filter(t => normalizeTag(t) !== normalizedTag), normalizedTag]);
   }, [customTags]);
 
   const addTags = useCallback((newTags: string[]) => {
     setCustomTags(prev => {
-      const existingNormalized = prev.map(normalizeTag);
-      const filteredTags = newTags.filter(tag => {
-        const normalizedTag = normalizeTag(tag);
-        return !isDefaultTag(tag) && 
-               !existingNormalized.includes(normalizedTag) && 
-               !DEFAULT_TAGS.some(dt => normalizeTag(dt) === normalizedTag);
+      const uniqueTags = new Map<string, string>(); // normalized -> original
+      
+      // Add existing tags first
+      prev.forEach(tag => {
+        uniqueTags.set(normalizeTag(tag), tag);
       });
-      return [...prev, ...filteredTags.map(t => t.trim())];
+
+      // Add new tags, skipping duplicates and default tags
+      newTags.forEach(tag => {
+        const normalizedTag = normalizeTag(tag);
+        if (!isDefaultTag(tag) && !uniqueTags.has(normalizedTag)) {
+          uniqueTags.set(normalizedTag, normalizedTag);
+        }
+      });
+
+      return Array.from(uniqueTags.values());
     });
   }, []);
 
@@ -51,7 +59,7 @@ export const useTags = () => {
       note.tags?.forEach(tag => {
         // Only add non-default tags to the sync process
         if (!isDefaultTag(tag)) {
-          uniqueTags.set(normalizeTag(tag), tag);
+          uniqueTags.set(normalizeTag(tag), normalizeTag(tag));
         }
       });
     });

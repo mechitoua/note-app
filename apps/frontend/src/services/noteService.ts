@@ -12,30 +12,45 @@ const getNotes = async (): Promise<Note[]> => {
   }
 };
 
-const createNote = async (note: Note): Promise<Note> => {
+const createNote = async (noteData: { title: string; content: string; tags: string[] }): Promise<Note> => {
   try {
     const notes = await getNotes();
-    notes.unshift(note);
+    const newNote: Note = {
+      id: crypto.randomUUID(),
+      title: noteData.title,
+      content: noteData.content,
+      tags: noteData.tags,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      archived: false
+    };
+    notes.unshift(newNote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    return note;
+    return newNote;
   } catch (error) {
     console.error('Error creating note:', error);
     throw new Error('Failed to create note');
   }
 };
 
-const updateNote = async (note: Note): Promise<Note> => {
+const updateNote = async (noteId: string, noteData: { title: string; content: string }): Promise<Note> => {
   try {
     const notes = await getNotes();
-    const existingNoteIndex = notes.findIndex((n) => n.id === note.id);
+    const existingNoteIndex = notes.findIndex((n) => n.id === noteId);
 
     if (existingNoteIndex === -1) {
       throw new Error('Note not found');
     }
 
-    notes[existingNoteIndex] = note;
+    const updatedNote: Note = {
+      ...notes[existingNoteIndex],
+      ...noteData,
+      updatedAt: new Date().toISOString()
+    };
+
+    notes[existingNoteIndex] = updatedNote;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    return note;
+    return updatedNote;
   } catch (error) {
     console.error('Error updating note:', error);
     throw new Error('Failed to update note');
@@ -53,28 +68,48 @@ const deleteNote = async (noteId: string): Promise<void> => {
   }
 };
 
-const archiveNote = async (noteId: number): Promise<void> => {
+const archiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = await getNotes();
-    const noteToArchive = notes.find((note) => note.id === noteId);
-    if (noteToArchive) {
-      noteToArchive.archived = true;
-      await updateNote(noteToArchive);
+    const noteIndex = notes.findIndex((note) => note.id === noteId);
+    
+    if (noteIndex === -1) {
+      throw new Error('Note not found');
     }
+
+    const updatedNote: Note = {
+      ...notes[noteIndex],
+      archived: true,
+      updatedAt: new Date().toISOString()
+    };
+
+    notes[noteIndex] = updatedNote;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return updatedNote;
   } catch (error) {
     console.error('Error archiving note:', error);
     throw new Error('Failed to archive note');
   }
 };
 
-const unarchiveNote = async (noteId: number): Promise<void> => {
+const unarchiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = await getNotes();
-    const noteToUnarchive = notes.find((note) => note.id === noteId);
-    if (noteToUnarchive) {
-      noteToUnarchive.archived = false;
-      await updateNote(noteToUnarchive);
+    const noteIndex = notes.findIndex((note) => note.id === noteId);
+    
+    if (noteIndex === -1) {
+      throw new Error('Note not found');
     }
+
+    const updatedNote: Note = {
+      ...notes[noteIndex],
+      archived: false,
+      updatedAt: new Date().toISOString()
+    };
+
+    notes[noteIndex] = updatedNote;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return updatedNote;
   } catch (error) {
     console.error('Error unarchiving note:', error);
     throw new Error('Failed to unarchive note');
@@ -85,7 +120,7 @@ export const noteService = {
   getNotes,
   createNote,
   updateNote,
-  deleteNote: deleteNote,
+  deleteNote,
   archiveNote,
   unarchiveNote,
 };

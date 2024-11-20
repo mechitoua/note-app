@@ -54,10 +54,10 @@ function App() {
     clearSelectedTag();
   };
 
-  const handleNewNoteWithTags = (note: { title: string; tags: string[] }) => {
+  const handleNewNoteWithTags = (note: { title: string; content: string; tags: string[] }) => {
     handleNewNote({
       title: note.title,
-      content: '',
+      content: note.content,
       tags: note.tags,
     });
     addTags(note.tags);
