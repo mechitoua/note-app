@@ -1,5 +1,5 @@
-import { Note } from '@/types/note';
 import { noteService } from '@/services/noteService';
+import { Note } from '@/types/note';
 import { useCallback, useEffect, useState } from 'react';
 
 interface NoteState {
@@ -144,61 +144,70 @@ export const useNotes = () => {
   }, []);
 
   // Create new note
-  const handleNewNote = useCallback(async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
-    try {
-      const newNote = {
-        id: crypto.randomUUID(),
-        title,
-        content,
-        tags,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        archived: false,
-      };
+  const handleNewNote = useCallback(
+    async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
+      try {
+        const newNote = {
+          id: crypto.randomUUID(),
+          title,
+          content,
+          tags,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          archived: false,
+        };
 
-      await noteService.createNote(newNote);
-      setState((prevState) => ({
-        ...prevState,
-        notes: [newNote, ...prevState.notes],
-        error: null,
-      }));
-      setIsAddNoteModalOpen(false);
-    } catch (err) {
-      setState((prevState) => ({
-        ...prevState,
-        error: 'Failed to create note',
-      }));
-    }
-  }, []);
+        await noteService.createNote(newNote);
+        setState((prevState) => ({
+          ...prevState,
+          notes: [newNote, ...prevState.notes],
+          selectedNote: newNote,
+          editorContent: {
+            title: newNote.title,
+            content: newNote.content,
+          },
+          error: null,
+        }));
+        setIsAddNoteModalOpen(false);
+      } catch (err) {
+        setState((prevState) => ({
+          ...prevState,
+          error: 'Failed to create note',
+        }));
+      }
+    },
+    []
+  );
 
   // Archive note
-  const handleArchiveNote = useCallback(async (noteId: string) => {
-    try {
-      const noteToArchive = state.notes.find((note) => note.id === noteId);
-      if (!noteToArchive) return;
+  const handleArchiveNote = useCallback(
+    async (noteId: string) => {
+      try {
+        const noteToArchive = state.notes.find((note) => note.id === noteId);
+        if (!noteToArchive) return;
 
-      const archivedNote = { ...noteToArchive, archived: true };
-      await noteService.updateNote(archivedNote);
+        const archivedNote = { ...noteToArchive, archived: true };
+        await noteService.updateNote(archivedNote);
 
-      setState((prevState) => ({
-        ...prevState,
-        notes: prevState.notes.map((note) =>
-          note.id === noteId ? archivedNote : note
-        ),
-        selectedNote: null,
-        editorContent: {
-          title: '',
-          content: '',
-        },
-        error: null,
-      }));
-    } catch (err) {
-      setState((prevState) => ({
-        ...prevState,
-        error: 'Failed to archive note',
-      }));
-    }
-  }, [state.notes]);
+        setState((prevState) => ({
+          ...prevState,
+          notes: prevState.notes.map((note) => (note.id === noteId ? archivedNote : note)),
+          selectedNote: null,
+          editorContent: {
+            title: '',
+            content: '',
+          },
+          error: null,
+        }));
+      } catch (err) {
+        setState((prevState) => ({
+          ...prevState,
+          error: 'Failed to archive note',
+        }));
+      }
+    },
+    [state.notes]
+  );
 
   // Delete note
   const handleDeleteNote = useCallback(async (noteId: string) => {

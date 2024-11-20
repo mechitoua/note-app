@@ -11,7 +11,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { CurrentView } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -38,8 +38,13 @@ function App() {
     selectedTag,
     setSelectedTag,
     addTags,
+    syncTags,
     clearSelectedTag,
-  } = useTags(['Personal', 'Work', 'Ideas']);
+  } = useTags();
+
+  useEffect(() => {
+    syncTags(notes);
+  }, [notes, syncTags]);
 
   const handleLogoClick = () => {
     clearSelectedNote();
@@ -47,7 +52,11 @@ function App() {
   };
 
   const handleNewNoteWithTags = (note: { title: string; tags: string[] }) => {
-    handleNewNote(note);
+    handleNewNote({
+      title: note.title,
+      content: '',
+      tags: note.tags,
+    });
     addTags(note.tags);
   };
 
@@ -55,8 +64,10 @@ function App() {
     // First filter by archive status
     const archiveFilter = currentView === 'archived' ? note.archived : !note.archived;
     
-    // Then filter by selected tag if one is selected
-    const tagFilter = selectedTag ? note.tags.includes(selectedTag) : true;
+    // Then filter by selected tag if one is selected (case insensitive)
+    const tagFilter = selectedTag 
+      ? note.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+      : true;
     
     return archiveFilter && tagFilter;
   });
@@ -82,7 +93,7 @@ function App() {
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
-              <div className='h-full grid' style={{ gridTemplateColumns: '1fr 2.3fr 0.7fr' }}>
+              <div className='h-full grid' style={{ gridTemplateColumns: '1.5fr 2fr 0.7fr' }}>
                 <NoteList
                   notes={filteredNotes}
                   selectedNoteId={selectedNote?.id}

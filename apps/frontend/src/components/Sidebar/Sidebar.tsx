@@ -72,8 +72,8 @@ export const Sidebar = ({
       </div>
 
       {/* Tags Section */}
-      <div className='p-3 border-t border-gray-200 dark:border-gray-700'>
-        <div className='flex items-center justify-between px-3 mb-2'>
+      <div className='flex-1 flex flex-col min-h-0 border-t border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center justify-between p-3 px-6'>
           <h2 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Tags</h2>
           <button
             className='p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors'
@@ -85,29 +85,35 @@ export const Sidebar = ({
             <Plus className='w-4 h-4 text-gray-500 dark:text-gray-400' />
           </button>
         </div>
-        <div className='space-y-1'>
-          {tags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => {
-                if (selectedTag === tag) {
-                  onTagSelect(null);
-                } else {
-                  onTagSelect(tag);
-                  onViewChange('all-notes');
-                }
-              }}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
-                selectedTag === tag
-                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <Tag className='w-4 h-4 text-indigo-600 dark:text-indigo-500' />
-              <span className='text-sm capitalize'>{tag}</span>
-              {selectedTag === tag && <ChevronRight className='w-4 h-4 ml-auto' />}
-            </button>
-          ))}
+        <div className='flex-1 overflow-y-auto px-3 pb-4' 
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgb(156 163 175) transparent'
+          }}>
+          <div className='space-y-1'>
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => {
+                  if (selectedTag === tag) {
+                    onTagSelect(null);
+                  } else {
+                    onTagSelect(tag);
+                    onViewChange('all-notes');
+                  }
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
+                  selectedTag === tag
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <Tag className='w-3.5 h-3.5 text-indigo-600 dark:text-indigo-500' />
+                <span className='truncate text-sm font-medium'>{tag}</span>
+                {selectedTag === tag && <ChevronRight className='w-3.5 h-3.5 ml-auto flex-shrink-0' />}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </aside>

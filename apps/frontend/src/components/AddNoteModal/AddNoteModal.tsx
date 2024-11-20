@@ -5,23 +5,26 @@ import { X } from 'lucide-react';
 interface AddNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (note: { title: string; tags: string[] }) => void;
+  onSave: (note: { title: string; content: string; tags: string[] }) => void;
   availableTags: string[];
 }
 
 export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNoteModalProps) => {
   const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [newTag, setNewTag] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
-      title,
+      title: title.trim() || 'Untitled Note',
+      content: content,
       tags: selectedTags,
     });
     // Reset form
     setTitle('');
+    setContent('');
     setNewTag('');
     setSelectedTags([]);
     onClose();
@@ -39,7 +42,12 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
       
       if (tagsToAdd.length > 0) {
         setSelectedTags(prev => {
-          const uniqueTags = new Set([...prev, ...tagsToAdd]);
+          const uniqueTags = new Set([
+            ...prev,
+            ...tagsToAdd.filter(tag => 
+              !prev.some(t => t.toLowerCase() === tag.toLowerCase())
+            )
+          ]);
           return Array.from(uniqueTags);
         });
         setNewTag('');
@@ -57,7 +65,12 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
       
       if (tagsToAdd.length > 0) {
         setSelectedTags(prev => {
-          const uniqueTags = new Set([...prev, ...tagsToAdd]);
+          const uniqueTags = new Set([
+            ...prev,
+            ...tagsToAdd.filter(tag => 
+              !prev.some(t => t.toLowerCase() === tag.toLowerCase())
+            )
+          ]);
           return Array.from(uniqueTags);
         });
         setNewTag('');
@@ -122,6 +135,19 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                       className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 bg-white dark:bg-gray-800"
                       placeholder="Enter note title"
                       required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                      Content
+                    </label>
+                    <textarea
+                      id="content"
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 bg-white dark:bg-gray-800"
+                      placeholder="Enter note content"
                     />
                   </div>
 
