@@ -12,6 +12,7 @@ import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { CurrentView } from '@/types';
 import { useState, useEffect } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -93,37 +94,40 @@ function App() {
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
-              <div className='h-full grid' style={{ gridTemplateColumns: '1.5fr 2fr 0.7fr' }}>
-                <NoteList
-                  notes={filteredNotes}
-                  selectedNoteId={selectedNote?.id}
-                  onNoteSelect={handleNoteSelect}
-                  onCreateNote={() => setIsAddNoteModalOpen(true)}
-                />
-                {selectedNote ? (
-                  <>
-                    <div className='h-full overflow-hidden'>
-                      <NoteEditor
-                        title={editorContent.title}
-                        content={editorContent.content}
-                        onTitleChange={handleTitleChange}
-                        onContentChange={handleContentChange}
-                        onSave={handleSaveNote}
-                        onCancel={handleCancelEdit}
-                      />
-                    </div>
-                    <NoteActions
-                      selectedNote={selectedNote}
-                      onArchive={() => handleArchiveNote(selectedNote.id)}
-                      onDelete={() => handleDeleteNote(selectedNote.id)}
-                    />
-                  </>
-                ) : (
-                  <div className='col-span-2 flex items-center justify-center'>
-                    <EmptyState />
+              <PanelGroup direction="horizontal">
+                <Panel defaultSize={30} minSize={30}>
+                  <NoteList
+                    notes={filteredNotes}
+                    selectedNoteId={selectedNote?.id}
+                    onNoteSelect={handleNoteSelect}
+                    onCreateNote={() => setIsAddNoteModalOpen(true)}
+                  />
+                </Panel>
+                <PanelResizeHandle className="w-1 hover:w-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-150 cursor-col-resize" />
+                <Panel defaultSize={70} minSize={50}>
+                  <div className="h-full grid" style={{ gridTemplateColumns: '2fr 0.7fr' }}>
+                    {selectedNote ? (
+                      <>
+                        <NoteEditor
+                          title={editorContent.title}
+                          content={editorContent.content}
+                          onTitleChange={handleTitleChange}
+                          onContentChange={handleContentChange}
+                          onSave={handleSaveNote}
+                          onCancel={handleCancelEdit}
+                        />
+                        <NoteActions
+                          selectedNote={selectedNote}
+                          onArchive={handleArchiveNote}
+                          onDelete={handleDeleteNote}
+                        />
+                      </>
+                    ) : (
+                      <EmptyState />
+                    )}
                   </div>
-                )}
-              </div>
+                </Panel>
+              </PanelGroup>
             </div>
           </main>
         </div>
