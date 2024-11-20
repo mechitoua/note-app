@@ -1,25 +1,26 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import path from 'path';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tsconfigPaths()
+  ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@components': resolve(__dirname, './src/components'),
-      '@hooks': resolve(__dirname, './src/hooks'),
-      '@utils': resolve(__dirname, './src/utils'),
-      '@types': resolve(__dirname, './src/types'),
-      '@pages': resolve(__dirname, './src/pages'),
-      '@assets': resolve(__dirname, './src/assets'),
-      '@layouts': resolve(__dirname, './src/layouts'),
-      '@lib': resolve(__dirname, './src/lib'),
-      '@styles': resolve(__dirname, './src/styles'),
-      '@features': resolve(__dirname, './src/features')
+      '@': path.resolve(__dirname, './src'),
     }
   },
   server: {
     port: 3000
+  },
+  build: {
+    sourcemap: true,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
   }
 });

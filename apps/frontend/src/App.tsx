@@ -2,6 +2,7 @@ import { EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '
 import { useNotes } from '@/hooks/useNotes';
 import { CurrentView } from '@/types';
 import { useState } from 'react';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -9,84 +10,76 @@ function App() {
   const {
     notes,
     selectedNote,
-    setSelectedNote,
-    noteTitle,
     markdownContent,
+    noteTitle,
+    handleNewNote,
     handleNoteClick,
     handleContentChange,
     handleTitleChange,
-    handleArchiveNote,
-    handleDeleteNote,
-    handleNewNote,
     handleSaveNote,
     handleCancelEdit,
+    handleArchiveNote,
+    handleDeleteNote,
+    setSelectedNote,
   } = useNotes();
 
-  // Predefined tags
-  const defaultTags = [
-    'cooking',
-    'dev',
-    'fitness',
-    'health',
-    'personal',
-    'react',
-    'recipes',
-    'shopping',
-    'travel',
-    'typescript',
-  ];
+  const defaultTags = ['Personal', 'Work', 'Ideas'];
 
   const handleLogoClick = () => {
     setSelectedNote(null);
   };
 
   return (
-    <div className='h-screen flex bg-gray-50'>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        tags={defaultTags}
-      />
-      <main className='flex-1 flex flex-col bg-white overflow-hidden'>
-        <Header
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          title={currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
-          onLogoClick={handleLogoClick}
-        />
-        <div className='flex-1 overflow-hidden'>
-          <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
-            <NoteList
-              notes={notes}
-              selectedNote={selectedNote}
-              onNoteClick={handleNoteClick}
-              onNewNote={handleNewNote}
+    <ThemeProvider>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className='h-screen flex'>
+          <Sidebar
+            isOpen={isSidebarOpen}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+            tags={defaultTags}
+          />
+          <main className='flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden'>
+            <Header
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              title={currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
+              onLogoClick={handleLogoClick}
             />
-            {selectedNote ? (
-              <>
-                <NoteEditor
+            <div className='flex-1 overflow-hidden'>
+              <div className={`grid h-full ${selectedNote ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                <NoteList
+                  notes={notes}
                   selectedNote={selectedNote}
-                  markdownContent={markdownContent}
-                  noteTitle={noteTitle}
-                  handleContentChange={handleContentChange}
-                  handleTitleChange={handleTitleChange}
-                  onSave={handleSaveNote}
-                  onCancel={handleCancelEdit}
+                  onNoteClick={handleNoteClick}
+                  onNewNote={handleNewNote}
                 />
-                <NoteActions
-                  note={selectedNote}
-                  onArchive={handleArchiveNote}
-                  onDelete={handleDeleteNote}
-                />
-              </>
-            ) : (
-              <EmptyState />
-            )}
-          </div>
+                {selectedNote ? (
+                  <>
+                    <NoteEditor
+                      selectedNote={selectedNote}
+                      markdownContent={markdownContent}
+                      noteTitle={noteTitle}
+                      handleContentChange={handleContentChange}
+                      handleTitleChange={handleTitleChange}
+                      onSave={handleSaveNote}
+                      onCancel={handleCancelEdit}
+                    />
+                    <NoteActions
+                      note={selectedNote}
+                      onArchive={handleArchiveNote}
+                      onDelete={handleDeleteNote}
+                    />
+                  </>
+                ) : (
+                  <EmptyState />
+                )}
+              </div>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }
 
