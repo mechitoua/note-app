@@ -100,7 +100,11 @@ export const useNotes = () => {
         notes: prevState.notes.map((note) =>
           note.id === selectedNote.id ? updatedNote : note
         ),
-        selectedNote: updatedNote,
+        selectedNote: null,
+        editorContent: {
+          title: '',
+          content: '',
+        },
         error: null,
       }));
     } catch (err) {
@@ -110,6 +114,30 @@ export const useNotes = () => {
       }));
     }
   }, [selectedNote, editorContent]);
+
+  // Handle cancel edit
+  const handleCancelEdit = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedNote: null,
+      editorContent: {
+        title: '',
+        content: '',
+      },
+    }));
+  }, []);
+
+  // Clear selected note
+  const clearSelectedNote = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedNote: null,
+      editorContent: {
+        title: '',
+        content: '',
+      },
+    }));
+  }, []);
 
   // Create new note
   const handleNewNote = useCallback(async () => {
@@ -199,5 +227,8 @@ export const useNotes = () => {
     handleContentChange,
     handleTitleChange,
     handleSaveNote,
+    handleCancelEdit,
+    clearSelectedNote,
+    setSelectedNote: clearSelectedNote,
   };
 };

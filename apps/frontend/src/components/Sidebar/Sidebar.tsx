@@ -7,9 +7,10 @@ interface SidebarProps {
   currentView: CurrentView;
   onViewChange: Dispatch<SetStateAction<CurrentView>>;
   tags: string[];
+  onAllNotesClick: () => void;
 }
 
-export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProps) => {
+export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesClick }: SidebarProps) => {
   return (
     <aside
       className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
@@ -29,7 +30,10 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags }: SidebarProp
       {/* Navigation Buttons */}
       <div className='p-3'>
         <button
-          onClick={() => onViewChange('all-notes')}
+          onClick={() => {
+            onViewChange('all-notes');
+            onAllNotesClick();
+          }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'all-notes'
               ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'

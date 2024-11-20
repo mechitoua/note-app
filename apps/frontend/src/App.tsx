@@ -1,8 +1,8 @@
 import { EmptyState, Header, NoteActions, NoteEditor, NoteList, Sidebar } from '@/components';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { CurrentView } from '@/types';
 import { useState } from 'react';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -20,23 +20,24 @@ function App() {
     handleCancelEdit,
     handleArchiveNote,
     handleDeleteNote,
-    setSelectedNote,
+    clearSelectedNote,
   } = useNotes();
 
   const defaultTags = ['Personal', 'Work', 'Ideas'];
 
   const handleLogoClick = () => {
-    setSelectedNote(null);
+    clearSelectedNote();
   };
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
         <div className='h-screen flex'>
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={setCurrentView}
+            onAllNotesClick={clearSelectedNote}
             tags={defaultTags}
           />
           <main className='flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden'>
