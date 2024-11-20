@@ -25,10 +25,10 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
         style={{
           '--scrollbar-width': '8px',
           '--scrollbar-track-bg': 'transparent',
-          '--scrollbar-thumb-bg': 'rgb(199 210 254)',
-          '--scrollbar-thumb-bg-dark': 'rgba(129 140 248, 0.5)',
-          '--scrollbar-thumb-hover': 'rgb(165 180 252)',
-          '--scrollbar-thumb-hover-dark': 'rgba(129 140 248, 0.7)',
+          '--scrollbar-thumb-bg': 'rgb(229 231 235)',
+          '--scrollbar-thumb-bg-dark': 'rgb(31 41 55)',
+          '--scrollbar-thumb-hover': 'rgb(209 213 219)',
+          '--scrollbar-thumb-hover-dark': 'rgb(17 24 39)',
           scrollbarWidth: 'thin',
           scrollbarColor: 'var(--scrollbar-thumb-bg) var(--scrollbar-track-bg)',
         } as React.CSSProperties}
@@ -36,7 +36,7 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
         <style>
           {`
             .dark div[style*="--scrollbar-thumb-bg"] {
-              scrollbar-color: var(--scrollbar-thumb-bg-dark) var(--scrollbar-track-bg);
+              scrollbar-color: var(--scrollbar-thumb-bg-dark) var(--scrollbar-track-bg) !important;
             }
             div[style*="--scrollbar-width"]::-webkit-scrollbar {
               width: var(--scrollbar-width);
@@ -52,10 +52,10 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
               background: var(--scrollbar-thumb-hover);
             }
             .dark div[style*="--scrollbar-width"]::-webkit-scrollbar-thumb {
-              background: var(--scrollbar-thumb-bg-dark);
+              background: var(--scrollbar-thumb-bg-dark) !important;
             }
             .dark div[style*="--scrollbar-width"]::-webkit-scrollbar-thumb:hover {
-              background: var(--scrollbar-thumb-hover-dark);
+              background: var(--scrollbar-thumb-hover-dark) !important;
             }
           `}
         </style>

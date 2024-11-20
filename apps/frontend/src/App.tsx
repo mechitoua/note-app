@@ -86,7 +86,7 @@ function App() {
                   </>
                 ) : (
                   <div className='col-span-2 flex items-center justify-center'>
-                    <EmptyState onCreateNote={() => setIsAddNoteModalOpen(true)} />
+                    <EmptyState />
                   </div>
                 )}
               </div>
