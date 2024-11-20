@@ -24,14 +24,14 @@ export const Sidebar = ({
   return (
     <aside
       className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
-        isOpen ? 'w-64' : 'w-0'
+        isOpen ? 'w-52' : 'w-0'
       } transition-all duration-300 overflow-hidden flex flex-col`}
     >
       {/* Logo Section */}
-      <div className='p-4 pt-5'>
-        <div className='flex items-center gap-3'>
-          <Feather className='w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0' />
-          <h1 className='text-xl font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-2'>
+      <div className='p-3 pt-4'>
+        <div className='flex items-center gap-2'>
+          <Feather className='w-5 h-5 text-indigo-600 dark:text-indigo-500 flex-shrink-0' />
+          <h1 className='text-lg font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-1.5'>
             Notes
           </h1>
         </div>

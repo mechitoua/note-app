@@ -1,7 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
 import { Fragment, useState } from 'react';
-import MDEditor from '@uiw/react-md-editor';
 
 interface AddNoteModalProps {
   isOpen: boolean;
@@ -20,7 +19,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
     e.preventDefault();
     onSave({
       title: title.trim() || 'Untitled Note',
-      content: content,
+      content: content.split('\n').join('\n\n'), // Add proper markdown line breaks
       tags: selectedTags,
     });
     // Reset form
@@ -145,12 +144,13 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                     >
                       Content
                     </label>
-                    <MDEditor
+                    <textarea
+                      id='content'
                       value={content}
-                      onChange={(value) => setContent(value || '')}
-                      preview='edit'
-                      className='mt-1'
-                      height={200}
+                      onChange={(e) => setContent(e.target.value)}
+                      className='mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 bg-white dark:bg-gray-800'
+                      placeholder='Write your note content here...'
+                      rows={10}
                     />
                   </div>
 

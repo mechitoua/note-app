@@ -124,7 +124,7 @@ export const NoteEditor = memo(
               <textarea
                 value={convertMarkdownToPlainText(content)}
                 onChange={(e) => onContentChange(e.target.value)}
-                className='w-full h-full p-4 border rounded-lg focus:outline-none focus:border-indigo-700 resize-none text-left bg-transparent dark:text-gray-200 dark:border-gray-700'
+                className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200'
                 placeholder='Start writing...'
                 style={{ textAlign: 'left' }}
               />

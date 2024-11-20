@@ -85,7 +85,7 @@ export const noteService = {
   getNotes,
   createNote,
   updateNote,
-  deleteNote,
+  deleteNote: deleteNote,
   archiveNote,
   unarchiveNote,
 };

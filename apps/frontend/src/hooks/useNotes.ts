@@ -180,42 +180,51 @@ export const useNotes = () => {
   );
 
   // Archive note
-  const handleArchiveNote = useCallback(
-    async (noteId: string) => {
-      try {
-        const noteToArchive = state.notes.find((note) => note.id === noteId);
-        if (!noteToArchive) return;
+  const handleArchiveNote = useCallback(async () => {
+    if (!state.selectedNote) return;
 
-        const archivedNote = { ...noteToArchive, archived: true };
-        await noteService.updateNote(archivedNote);
-
-        setState((prevState) => ({
-          ...prevState,
-          notes: prevState.notes.map((note) => (note.id === noteId ? archivedNote : note)),
-          selectedNote: null,
-          editorContent: {
-            title: '',
-            content: '',
-          },
-          error: null,
-        }));
-      } catch (err) {
-        setState((prevState) => ({
-          ...prevState,
-          error: 'Failed to archive note',
-        }));
-      }
-    },
-    [state.notes]
-  );
-
-  // Delete note
-  const handleDeleteNote = useCallback(async (noteId: string) => {
     try {
-      await noteService.deleteNote(noteId);
+      const updatedNote = {
+        ...state.selectedNote,
+        archived: !state.selectedNote.archived,
+        updatedAt: new Date().toISOString(),
+      };
+      await noteService.updateNote(updatedNote);
+
       setState((prevState) => ({
         ...prevState,
-        notes: prevState.notes.filter((note) => note.id !== noteId),
+        notes: prevState.notes.map((note) =>
+          note.id === state.selectedNote?.id ? updatedNote : note
+        ),
+        selectedNote: null,
+        editorContent: {
+          title: '',
+          content: '',
+        },
+        error: null,
+      }));
+    } catch (err) {
+      setState((prevState) => ({
+        ...prevState,
+        error: 'Failed to archive note',
+      }));
+    }
+  }, [state.selectedNote]);
+
+  // Get filtered notes based on archive status and search/tag filters
+  const getFilteredNotes = useCallback((archived: boolean = false) => {
+    return state.notes.filter((note) => note.archived === archived);
+  }, [state.notes]);
+
+  // Handle delete note
+  const handleDeleteNote = useCallback(async () => {
+    if (!state.selectedNote) return;
+
+    try {
+      await noteService.deleteNote(state.selectedNote.id);
+      setState((prevState) => ({
+        ...prevState,
+        notes: prevState.notes.filter((note) => note.id !== state.selectedNote?.id),
         selectedNote: null,
         editorContent: {
           title: '',
@@ -229,7 +238,7 @@ export const useNotes = () => {
         error: 'Failed to delete note',
       }));
     }
-  }, []);
+  }, [state.selectedNote]);
 
   return {
     notes: state.notes,
@@ -239,14 +248,15 @@ export const useNotes = () => {
     error: state.error,
     isAddNoteModalOpen,
     setIsAddNoteModalOpen,
+    handleNewNote,
     handleNoteSelect,
     handleContentChange,
     handleTitleChange,
     handleSaveNote,
     handleCancelEdit,
-    clearSelectedNote,
-    handleNewNote,
     handleArchiveNote,
     handleDeleteNote,
+    clearSelectedNote,
+    getFilteredNotes,
   };
 };
