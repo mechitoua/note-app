@@ -1,7 +1,7 @@
 import { Note } from '@/types/note';
 import MDEditor from '@uiw/react-md-editor';
 import { Save, X } from 'lucide-react';
-import { memo, useState, useCallback } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 interface NoteEditorProps {
   selectedNote: Note | null;
@@ -26,35 +26,49 @@ export const NoteEditor = memo(
     const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('plain');
 
     const convertMarkdownToPlainText = useCallback((markdown: string) => {
-      // Remove headers
-      let text = markdown.replace(/#{1,6}\s/g, '');
-      
-      // Remove bold and italic
-      text = text.replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1');
-      
-      // Remove links but keep text
+      if (!markdown) return '';
+
+      // Keep a copy of the original text
+      let text = markdown;
+
+      // Replace multiple newlines with a placeholder
+      text = text.replace(/\n{2,}/g, '\n[PARAGRAPH_BREAK]\n');
+
+      // Remove headers while preserving content
+      text = text.replace(/^#{1,6}\s+(.*?)$/gm, '$1');
+
+      // Remove bold and italic while preserving content and spaces
+      text = text.replace(/\*\*(.+?)\*\*/g, '$1'); // Bold
+      text = text.replace(/\*(.+?)\*/g, '$1'); // Italic
+      text = text.replace(/__(.+?)__/g, '$1'); // Bold
+      text = text.replace(/_(.+?)_/g, '$1'); // Italic
+
+      // Remove links but keep text and spaces
       text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-      
+
       // Remove images
       text = text.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
-      
-      // Remove code blocks
+
+      // Remove code blocks while preserving content
       text = text.replace(/```[\s\S]*?```/g, '');
       text = text.replace(/`([^`]+)`/g, '$1');
-      
-      // Remove blockquotes
-      text = text.replace(/^\s*>\s/gm, '');
-      
+
+      // Remove blockquotes while preserving content
+      text = text.replace(/^\s*>\s*(.*?)$/gm, '$1');
+
       // Remove horizontal rules
       text = text.replace(/^[-*_]{3,}\s*$/gm, '');
-      
-      // Remove list markers
-      text = text.replace(/^[\s-*+]\s+/gm, '');
-      text = text.replace(/^\d+\.\s+/gm, '');
-      
-      // Clean up extra whitespace
+
+      // Remove list markers while preserving content and indentation
+      text = text.replace(/^(\s*)[*+-]\s+/gm, '$1');
+      text = text.replace(/^(\s*)\d+\.\s+/gm, '$1');
+
+      // Restore paragraph breaks
+      text = text.replace(/\[PARAGRAPH_BREAK\]/g, '\n\n');
+
+      // Clean up any remaining extra whitespace while preserving intentional line breaks
+      text = text.replace(/\s*\n\s*/g, '\n');
       text = text.replace(/\n{3,}/g, '\n\n');
-      text = text.trim();
       
       return text;
     }, []);
