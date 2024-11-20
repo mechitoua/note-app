@@ -7,10 +7,20 @@ interface SidebarProps {
   currentView: CurrentView;
   onViewChange: Dispatch<SetStateAction<CurrentView>>;
   tags: string[];
+  selectedTag: string | null;
+  onTagSelect: (tag: string | null) => void;
   onAllNotesClick: () => void;
 }
 
-export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesClick }: SidebarProps) => {
+export const Sidebar = ({
+  isOpen,
+  currentView,
+  onViewChange,
+  tags,
+  selectedTag,
+  onTagSelect,
+  onAllNotesClick,
+}: SidebarProps) => {
   return (
     <aside
       className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
@@ -35,17 +45,20 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
             onAllNotesClick();
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
-            currentView === 'all-notes'
+            currentView === 'all-notes' && !selectedTag
               ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Home className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
           <span>All Notes</span>
-          {currentView === 'all-notes' && <ChevronRight className='w-4 h-4 ml-auto' />}
+          {currentView === 'all-notes' && !selectedTag && <ChevronRight className='w-4 h-4 ml-auto' />}
         </button>
         <button
-          onClick={() => onViewChange('archived')}
+          onClick={() => {
+            onViewChange('archived');
+            onTagSelect(null);
+          }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'archived'
               ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
@@ -76,10 +89,23 @@ export const Sidebar = ({ isOpen, currentView, onViewChange, tags, onAllNotesCli
           {tags.map((tag) => (
             <button
               key={tag}
-              className='w-full flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-medium'
+              onClick={() => {
+                if (selectedTag === tag) {
+                  onTagSelect(null);
+                } else {
+                  onTagSelect(tag);
+                  onViewChange('all-notes');
+                }
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
+                selectedTag === tag
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
             >
               <Tag className='w-4 h-4 text-indigo-600 dark:text-indigo-500' />
               <span className='text-sm capitalize'>{tag}</span>
+              {selectedTag === tag && <ChevronRight className='w-4 h-4 ml-auto' />}
             </button>
           ))}
         </div>

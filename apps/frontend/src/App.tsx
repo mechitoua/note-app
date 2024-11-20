@@ -9,6 +9,7 @@ import {
 } from '@/components';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
+import { useTags } from '@/hooks/useTags';
 import { CurrentView } from '@/types';
 import { useState } from 'react';
 
@@ -32,11 +33,33 @@ function App() {
     clearSelectedNote,
   } = useNotes();
 
-  const defaultTags = ['Personal', 'Work', 'Ideas'];
+  const {
+    tags,
+    selectedTag,
+    setSelectedTag,
+    addTags,
+    clearSelectedTag,
+  } = useTags(['Personal', 'Work', 'Ideas']);
 
   const handleLogoClick = () => {
     clearSelectedNote();
+    clearSelectedTag();
   };
+
+  const handleNewNoteWithTags = (note: { title: string; tags: string[] }) => {
+    handleNewNote(note);
+    addTags(note.tags);
+  };
+
+  const filteredNotes = notes.filter(note => {
+    // First filter by archive status
+    const archiveFilter = currentView === 'archived' ? note.archived : !note.archived;
+    
+    // Then filter by selected tag if one is selected
+    const tagFilter = selectedTag ? note.tags.includes(selectedTag) : true;
+    
+    return archiveFilter && tagFilter;
+  });
 
   return (
     <ThemeProvider>
@@ -46,22 +69,22 @@ function App() {
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={setCurrentView}
-            onAllNotesClick={clearSelectedNote}
-            tags={defaultTags}
+            onAllNotesClick={handleLogoClick}
+            tags={tags}
+            selectedTag={selectedTag}
+            onTagSelect={setSelectedTag}
           />
           <main className='flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden'>
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
-              title={currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
+              title={selectedTag ? `Tag: ${selectedTag}` : currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
               onLogoClick={handleLogoClick}
             />
             <div className='flex-1 overflow-hidden'>
               <div className='h-full grid' style={{ gridTemplateColumns: '1fr 2.3fr 0.7fr' }}>
                 <NoteList
-                  notes={notes.filter((note) =>
-                    currentView === 'archived' ? note.archived : !note.archived
-                  )}
+                  notes={filteredNotes}
                   selectedNoteId={selectedNote?.id}
                   onNoteSelect={handleNoteSelect}
                   onCreateNote={() => setIsAddNoteModalOpen(true)}
@@ -97,8 +120,8 @@ function App() {
         <AddNoteModal
           isOpen={isAddNoteModalOpen}
           onClose={() => setIsAddNoteModalOpen(false)}
-          onSave={handleNewNote}
-          availableTags={defaultTags}
+          onSave={handleNewNoteWithTags}
+          availableTags={tags}
         />
       </div>
     </ThemeProvider>
