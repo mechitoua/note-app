@@ -62,40 +62,47 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
           `}
         </style>
         <div className='space-y-2'>
-          {notes.map((note) => (
-            <div
-              key={note.id}
-              onClick={() => onNoteSelect(note)}
-              className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                selectedNoteId === note.id
-                  ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              <div className='space-y-2'>
-                <h3 className='font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2'>
-                  {note.title || 'Untitled Note'}
-                </h3>
-                <div className='flex flex-wrap gap-1.5'>
-                  {note.tags?.map((tag) => (
-                    <span
-                      key={tag}
-                      className='px-2 py-0.5 bg-gray-300 dark:bg-gray-700/50 text-gray-800 dark:text-gray-300 rounded-full text-xs font-medium'
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className='text-xs text-gray-500 dark:text-gray-400'>
-                  {new Date(note.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+          {notes.length === 0 ? (
+            <div className='flex flex-col items-center justify-center py-8 px-4 text-center'>
+              <p className='text-gray-600 dark:text-gray-400 mb-2'>No notes created yet</p>
+              <p className='text-sm text-gray-500 dark:text-gray-500'>Click the "Create New Note" button above to get started</p>
+            </div>
+          ) : (
+            notes.map((note) => (
+              <div
+                key={note.id}
+                onClick={() => onNoteSelect(note)}
+                className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                  selectedNoteId === note.id
+                    ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <div className='space-y-2'>
+                  <h3 className='font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2'>
+                    {note.title || 'Untitled Note'}
+                  </h3>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {note.tags?.map((tag) => (
+                      <span
+                        key={tag}
+                        className='px-2 py-0.5 bg-gray-300 dark:bg-gray-700/50 text-gray-800 dark:text-gray-300 rounded-full text-xs font-medium'
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>
+                    {new Date(note.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
