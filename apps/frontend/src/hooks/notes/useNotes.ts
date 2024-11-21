@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNotesState } from './useNotesState';
 import { useNotesCrud } from './useNotesCrud';
 import { useNotesFilter } from './useNotesFilter';
@@ -16,6 +16,7 @@ export const useNotes = () => {
     createNote,
     deleteNote,
     archiveNote,
+    unarchiveNote,
   } = useNotesCrud();
 
   const {
@@ -36,11 +37,23 @@ export const useNotes = () => {
     handleTitleChange,
     handleSaveNote,
     handleCancelEdit,
+    clearSelection,
   } = useNotesEditor();
 
   useEffect(() => {
     fetchNotes();
   }, [fetchNotes]);
+
+  const handleUnarchiveNote = useCallback(
+    async (noteId: string) => {
+      const success = await unarchiveNote(noteId);
+      if (success) {
+        clearSelection();
+      }
+      return success;
+    },
+    [unarchiveNote, clearSelection]
+  );
 
   return {
     // State
@@ -59,6 +72,8 @@ export const useNotes = () => {
     handleNewNote: createNote,
     handleDeleteNote: deleteNote,
     handleArchiveNote: archiveNote,
+    handleUnarchiveNote,
+    clearSelection,
 
     // Editor
     handleNoteSelect,

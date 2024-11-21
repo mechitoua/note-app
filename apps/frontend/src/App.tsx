@@ -34,6 +34,8 @@ function App() {
     handleDeleteNote,
     clearSelectedNote,
     getFilteredNotes,
+    handleUnarchiveNote: originalHandleUnarchiveNote,
+    fetchNotes,
   } = useNotes();
 
   const {
@@ -70,6 +72,15 @@ function App() {
       : true;
   });
 
+  const handleUnarchiveNote = async (noteId: string) => {
+    const success = await originalHandleUnarchiveNote(noteId);
+    if (success) {
+      // Switch to all notes view after unarchiving
+      setCurrentView('all-notes');
+      clearSelectedNote();
+    }
+  };
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -92,11 +103,12 @@ function App() {
             />
             <div className='flex-1 overflow-hidden'>
               <PanelGroup direction="horizontal">
-                <Panel defaultSize={25} minSize={20}>
+                <Panel defaultSize={35} minSize={30}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
                       onNoteSelect={handleNoteSelect}
+                      onUnarchive={handleUnarchiveNote}
                     />
                   ) : (
                     <NoteList
@@ -117,11 +129,11 @@ function App() {
                         onTitleChange={handleTitleChange}
                         onContentChange={handleContentChange}
                         onSave={handleSaveNote}
-                        onCancel={handleCancelEdit}
+                        onCancel={() => handleCancelEdit()}
                       />
                       <NoteActions
                         selectedNote={selectedNote}
-                        onArchive={handleArchiveNote}
+                        onArchive={selectedNote.archived ? () => handleUnarchiveNote(selectedNote.id) : handleArchiveNote}
                         onDelete={handleDeleteNote}
                       />
                     </div>

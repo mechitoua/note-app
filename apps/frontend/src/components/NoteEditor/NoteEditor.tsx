@@ -135,22 +135,22 @@ export const NoteEditor = memo(
               />
             )}
           </div>
-        </div>
-        <div className='mx-6 px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex gap-2'>
-          <button
-            onClick={onSave}
-            className='w-20 px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm'
-          >
-            <Save className='w-3.5 h-3.5' />
-            Save
-          </button>
-          <button
-            onClick={onCancel}
-            className='w-20 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium inline-flex items-center justify-center gap-1.5 text-sm text-gray-600 dark:text-gray-300'
-          >
-            <X className='w-3.5 h-3.5' />
-            Cancel
-          </button>
+          <div className='flex justify-start gap-2 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4'>
+            <button
+              onClick={onCancel}
+              className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-2'
+            >
+              <X className='w-4 h-4' />
+              Cancel
+            </button>
+            <button
+              onClick={onSave}
+              className='px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg transition-colors flex items-center gap-2'
+            >
+              <Save className='w-4 h-4' />
+              Save
+            </button>
+          </div>
         </div>
       </div>
     );

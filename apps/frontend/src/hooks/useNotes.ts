@@ -14,6 +14,7 @@ export const useNotes = () => {
     createNote,
     updateNote,
     archiveNote,
+    unarchiveNote,
     deleteNote,
   } = useNoteOperations();
 
@@ -53,12 +54,27 @@ export const useNotes = () => {
     }
   };
 
+  const handleUnarchiveNote = async (noteId: string) => {
+    const success = await unarchiveNote(noteId);
+    if (success) {
+      clearSelection();
+      // Force a refresh of notes
+      await fetchNotes();
+    }
+    return success;
+  };
+
   const handleDeleteNote = async () => {
     if (!selectedNote) return;
     const success = await deleteNote(selectedNote.id);
     if (success) {
       clearSelection();
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Clear selection which will close the editor and reset content
+    clearSelection();
   };
 
   const getFilteredNotes = (archived: boolean) => {
@@ -79,7 +95,9 @@ export const useNotes = () => {
     handleTitleChange,
     handleSaveNote,
     handleArchiveNote,
+    handleUnarchiveNote,
     handleDeleteNote,
+    handleCancelEdit,
     clearSelectedNote: clearSelection,
     getFilteredNotes,
   };
