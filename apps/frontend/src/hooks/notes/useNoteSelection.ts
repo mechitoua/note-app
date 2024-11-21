@@ -1,22 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Note } from '@/types/note';
+
+interface EditorContent {
+  title: string;
+  content: string;
+}
 
 interface NoteSelection {
   selectedNote: Note | null;
-  editorContent: {
-    title: string;
-    content: string;
-  };
+  editorContent: EditorContent;
 }
 
+const DEFAULT_SELECTION: NoteSelection = {
+  selectedNote: null,
+  editorContent: {
+    title: '',
+    content: '',
+  },
+};
+
 export const useNoteSelection = () => {
-  const [selection, setSelection] = useState<NoteSelection>({
-    selectedNote: null,
-    editorContent: {
-      title: '',
-      content: '',
-    },
-  });
+  const [selection, setSelection] = useState<NoteSelection>(DEFAULT_SELECTION);
 
   const handleNoteSelect = useCallback((note: Note) => {
     setSelection({
@@ -49,14 +53,17 @@ export const useNoteSelection = () => {
   }, []);
 
   const clearSelection = useCallback(() => {
-    setSelection({
-      selectedNote: null,
-      editorContent: {
-        title: '',
-        content: '',
-      },
-    });
+    setSelection(DEFAULT_SELECTION);
   }, []);
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!selection.selectedNote) return false;
+    
+    return (
+      selection.editorContent.title !== selection.selectedNote.title ||
+      selection.editorContent.content !== selection.selectedNote.content
+    );
+  }, [selection.selectedNote, selection.editorContent]);
 
   return {
     ...selection,
@@ -64,5 +71,6 @@ export const useNoteSelection = () => {
     handleContentChange,
     handleTitleChange,
     clearSelection,
+    hasUnsavedChanges,
   };
 };

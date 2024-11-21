@@ -1,4 +1,4 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@components/ThemeProvider/ThemeProvider";
 import { Menu, Transition } from "@headlessui/react";
 import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
