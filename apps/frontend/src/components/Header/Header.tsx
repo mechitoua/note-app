@@ -58,7 +58,7 @@ export const Header = ({
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder='Search by content, title or tag...'
-              className='w-full py-1.5 pl-3 pr-10 bg-gray-100 dark:bg-gray-800 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:text-sm placeholder:font-normal'
+              className='w-full py-1.5 pl-3 pr-10 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:text-sm placeholder:font-normal'
             />
             <div className='absolute right-3 flex items-center'>
               <Search className='h-4 w-4 text-gray-500 dark:text-gray-400' />

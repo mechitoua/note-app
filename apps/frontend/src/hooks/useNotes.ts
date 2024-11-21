@@ -1,6 +1,8 @@
+import { noteService } from '@/services/noteService';
 import { useEffect, useState } from 'react';
 import { useNoteOperations } from './notes/useNoteOperations';
 import { useNoteSelection } from './notes/useNoteSelection';
+import { useTags } from './useTags';
 
 export const useNotes = () => {
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
@@ -25,7 +27,10 @@ export const useNotes = () => {
     handleContentChange,
     handleTitleChange,
     clearSelection,
+    setSelection,
   } = useNoteSelection();
+
+  const { syncTags } = useTags();
 
   useEffect(() => {
     fetchNotes();
@@ -87,7 +92,7 @@ export const useNotes = () => {
 
   const handleAddTags = async (tags: string[]) => {
     if (!selectedNote) return;
-    
+
     // Update note tags with the new tag list
     const success = await updateNoteTags(selectedNote.id, tags);
     if (success) {
@@ -107,7 +112,13 @@ export const useNotes = () => {
           .getNotes()
           .then((notes) => notes.find((note) => note.id === noteId));
         if (updatedNote) {
-          setSelectedNote(updatedNote);
+          setSelection({
+            selectedNote: updatedNote,
+            editorContent: {
+              title: updatedNote.title,
+              content: updatedNote.content,
+            },
+          });
         }
       }
     }

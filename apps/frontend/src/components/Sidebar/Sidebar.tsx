@@ -1,5 +1,5 @@
 import { CurrentView } from '@/types';
-import { Archive, ChevronRight, Feather, Home, Plus, Tag } from 'lucide-react';
+import { Archive, ChevronRight, Feather, Home, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 interface SidebarProps {
@@ -75,15 +75,6 @@ export const Sidebar = ({
       <div className='flex-1 flex flex-col min-h-0 border-t border-gray-200 dark:border-gray-700'>
         <div className='flex items-center justify-between p-3 px-6'>
           <h2 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Tags</h2>
-          <button
-            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors'
-            onClick={() => {
-              // TODO: Implement add tag functionality
-              console.log('Add tag clicked');
-            }}
-          >
-            <Plus className='w-4 h-4 text-gray-500 dark:text-gray-400' />
-          </button>
         </div>
         <div className='flex-1 overflow-y-auto px-3 pb-4' 
           style={{
