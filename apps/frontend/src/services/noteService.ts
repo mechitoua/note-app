@@ -2,79 +2,118 @@ import { Note } from '@/types/note';
 
 const STORAGE_KEY = 'notes';
 
-const getNotes = async (): Promise<Note[]> => {
+class NoteServiceError extends Error {
+  constructor(message: string, public code?: string) {
+    super(message);
+    this.name = 'NoteServiceError';
+  }
+}
+
+const getStorageData = (): Note[] => {
   try {
     const notesJson = localStorage.getItem(STORAGE_KEY);
     return notesJson ? JSON.parse(notesJson) : [];
   } catch (error) {
-    console.error('Error loading notes:', error);
+    console.error('Error parsing notes from storage:', error);
     return [];
+  }
+};
+
+const setStorageData = (notes: Note[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  } catch (error) {
+    console.error('Error saving notes to storage:', error);
+    throw new NoteServiceError('Failed to save notes to storage');
+  }
+};
+
+const getNotes = async (): Promise<Note[]> => {
+  try {
+    return getStorageData();
+  } catch (error) {
+    console.error('Error loading notes:', error);
+    throw new NoteServiceError('Failed to load notes');
   }
 };
 
 const createNote = async (noteData: { title: string; content: string; tags: string[] }): Promise<Note> => {
   try {
-    const notes = await getNotes();
+    const notes = getStorageData();
     const newNote: Note = {
       id: crypto.randomUUID(),
-      title: noteData.title,
-      content: noteData.content,
-      tags: noteData.tags,
+      title: noteData.title.trim(),
+      content: noteData.content.trim(),
+      tags: [...new Set(noteData.tags.map(tag => tag.trim()))], // Remove duplicates and trim
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       archived: false
     };
+    
     notes.unshift(newNote);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    setStorageData(notes);
     return newNote;
   } catch (error) {
     console.error('Error creating note:', error);
-    throw new Error('Failed to create note');
+    throw new NoteServiceError('Failed to create note');
   }
 };
 
 const updateNote = async (noteId: string, noteData: { title: string; content: string }): Promise<Note> => {
   try {
-    const notes = await getNotes();
+    const notes = getStorageData();
     const existingNoteIndex = notes.findIndex((n) => n.id === noteId);
 
     if (existingNoteIndex === -1) {
-      throw new Error('Note not found');
+      throw new NoteServiceError('Note not found', 'NOT_FOUND');
     }
 
     const updatedNote: Note = {
       ...notes[existingNoteIndex],
-      ...noteData,
+      title: noteData.title.trim(),
+      content: noteData.content.trim(),
       updatedAt: new Date().toISOString()
     };
 
     notes[existingNoteIndex] = updatedNote;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    setStorageData(notes);
     return updatedNote;
   } catch (error) {
     console.error('Error updating note:', error);
-    throw new Error('Failed to update note');
+    if (error instanceof NoteServiceError) {
+      throw error;
+    }
+    throw new NoteServiceError('Failed to update note');
   }
 };
 
 const deleteNote = async (noteId: string): Promise<void> => {
   try {
-    const notes = await getNotes();
-    const updatedNotes = notes.filter((note) => note.id !== noteId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedNotes));
+    const notes = getStorageData();
+    const noteIndex = notes.findIndex((note) => note.id === noteId);
+    
+    if (noteIndex === -1) {
+      throw new NoteServiceError('Note not found', 'NOT_FOUND');
+    }
+    
+    notes.splice(noteIndex, 1);
+    setStorageData(notes);
   } catch (error) {
     console.error('Error deleting note:', error);
-    throw new Error('Failed to delete note');
+    if (error instanceof NoteServiceError) {
+      throw error;
+    }
+    throw new NoteServiceError('Failed to delete note');
   }
 };
 
 const archiveNote = async (noteId: string): Promise<Note> => {
   try {
-    const notes = await getNotes();
+    const notes = getStorageData();
     const noteIndex = notes.findIndex((note) => note.id === noteId);
     
     if (noteIndex === -1) {
-      throw new Error('Note not found');
+      throw new NoteServiceError('Note not found', 'NOT_FOUND');
     }
 
     const updatedNote: Note = {
@@ -84,21 +123,24 @@ const archiveNote = async (noteId: string): Promise<Note> => {
     };
 
     notes[noteIndex] = updatedNote;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    setStorageData(notes);
     return updatedNote;
   } catch (error) {
     console.error('Error archiving note:', error);
-    throw new Error('Failed to archive note');
+    if (error instanceof NoteServiceError) {
+      throw error;
+    }
+    throw new NoteServiceError('Failed to archive note');
   }
 };
 
 const unarchiveNote = async (noteId: string): Promise<Note> => {
   try {
-    const notes = await getNotes();
+    const notes = getStorageData();
     const noteIndex = notes.findIndex((note) => note.id === noteId);
     
     if (noteIndex === -1) {
-      throw new Error('Note not found');
+      throw new NoteServiceError('Note not found', 'NOT_FOUND');
     }
 
     const updatedNote: Note = {
@@ -108,11 +150,14 @@ const unarchiveNote = async (noteId: string): Promise<Note> => {
     };
 
     notes[noteIndex] = updatedNote;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    setStorageData(notes);
     return updatedNote;
   } catch (error) {
     console.error('Error unarchiving note:', error);
-    throw new Error('Failed to unarchive note');
+    if (error instanceof NoteServiceError) {
+      throw error;
+    }
+    throw new NoteServiceError('Failed to unarchive note');
   }
 };
 
