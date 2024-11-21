@@ -114,11 +114,40 @@ export const useNotesCrud = () => {
     [state.notes, setNotes, clearEditor, setError]
   );
 
+  const unarchiveNote = useCallback(
+    async (noteId: string) => {
+      const noteToUnarchive = state.notes.find((note) => note.id === noteId);
+      if (!noteToUnarchive) return false;
+
+      try {
+        const updatedNote = {
+          ...noteToUnarchive,
+          archived: false,
+          updatedAt: new Date().toISOString(),
+        };
+        await noteService.updateNote(updatedNote);
+        setNotes(
+          state.notes.map((note) =>
+            note.id === updatedNote.id ? updatedNote : note
+          )
+        );
+        clearEditor();
+        setError(null);
+        return true;
+      } catch (err) {
+        setError('Failed to unarchive note');
+        return false;
+      }
+    },
+    [state.notes, setNotes, clearEditor, setError]
+  );
+
   return {
     fetchNotes,
     createNote,
     updateNote,
     deleteNote,
     archiveNote,
+    unarchiveNote,
   };
 };

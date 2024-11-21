@@ -1,13 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNoteSelection } from '@hooks/notes/useNoteSelection';
-import { useNoteOperations } from '@hooks/notes/useNoteOperations';
-import { Note } from '@/types/note';
+import { useEffect, useCallback } from 'react';
+import { useNotesState } from './useNotesState';
+import { useNotesCrud } from './useNotesCrud';
+import { useNotesFilter } from './useNotesFilter';
+import { useNotesEditor } from './useNotesEditor';
 
 export const useNotes = () => {
-  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const {
+    state,
+    isAddNoteModalOpen,
+    setIsAddNoteModalOpen,
+  } = useNotesState();
+
+  const {
+    fetchNotes,
+    createNote,
+    deleteNote,
+    archiveNote,
+    unarchiveNote,
+  } = useNotesCrud();
+
+  const {
+    showArchived,
+    setShowArchived,
+    searchTerm,
+    setSearchTerm,
+    selectedTag,
+    setSelectedTag,
+    getFilteredNotes,
+  } = useNotesFilter(state.notes);
 
   const {
     selectedNote,
@@ -15,87 +35,51 @@ export const useNotes = () => {
     handleNoteSelect,
     handleContentChange,
     handleTitleChange,
+    handleSaveNote,
+    handleCancelEdit,
     clearSelection,
-    hasUnsavedChanges,
-  } = useNoteSelection();
-
-  const {
-    notes,
-    isLoading,
-    error,
-    fetchNotes,
-    createNote,
-    updateNote,
-    archiveNote,
-    deleteNote,
-  } = useNoteOperations();
+  } = useNotesEditor();
 
   useEffect(() => {
     fetchNotes();
   }, [fetchNotes]);
 
-  const handleNewNote = async (noteData: { title: string; content: string; tags: string[] }) => {
-    const success = await createNote(noteData.title, noteData.content, noteData.tags);
-    if (success) {
-      setIsAddNoteModalOpen(false);
-    }
-  };
-
-  const handleSaveNote = async () => {
-    if (!selectedNote || !hasUnsavedChanges) return;
-    
-    const success = await updateNote(selectedNote.id, editorContent.title, editorContent.content);
-    if (success) {
-      clearSelection();
-    }
-  };
-
-  const handleCancelEdit = () => {
-    clearSelection();
-  };
-
-  const getFilteredNotes = useCallback(() => {
-    return notes
-      .filter(note => note.archived === showArchived)
-      .filter(note => {
-        if (!searchTerm) return true;
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          note.title.toLowerCase().includes(searchLower) ||
-          note.content.toLowerCase().includes(searchLower)
-        );
-      })
-      .filter(note => {
-        if (!selectedTag) return true;
-        return note.tags.some(tag => 
-          tag.toLowerCase() === selectedTag.toLowerCase()
-        );
-      });
-  }, [notes, showArchived, searchTerm, selectedTag]);
+  const handleUnarchiveNote = useCallback(
+    async (noteId: string) => {
+      const success = await unarchiveNote(noteId);
+      if (success) {
+        clearSelection();
+      }
+      return success;
+    },
+    [unarchiveNote, clearSelection]
+  );
 
   return {
     // State
-    notes,
+    notes: state.notes,
+    filteredNotes: getFilteredNotes(),
     selectedNote,
     editorContent,
-    isLoading,
-    error,
+    isLoading: state.isLoading,
+    error: state.error,
     isAddNoteModalOpen,
-    hasUnsavedChanges,
 
     // Modal
     setIsAddNoteModalOpen,
 
     // CRUD Operations
-    handleNewNote,
+    handleNewNote: createNote,
     handleDeleteNote: deleteNote,
     handleArchiveNote: archiveNote,
-    handleSaveNote,
+    handleUnarchiveNote,
+    clearSelection,
 
     // Editor
     handleNoteSelect,
     handleContentChange,
     handleTitleChange,
+    handleSaveNote,
     handleCancelEdit,
 
     // Filters
@@ -105,6 +89,5 @@ export const useNotes = () => {
     setSearchTerm,
     selectedTag,
     setSelectedTag,
-    getFilteredNotes,
   };
 };

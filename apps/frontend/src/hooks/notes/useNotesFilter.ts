@@ -8,7 +8,8 @@ export const useNotesFilter = (notes: Note[]) => {
 
   const filterByArchiveStatus = useCallback(
     (notes: Note[]) => {
-      return notes.filter((note) => note.archived === showArchived);
+      // Ensure we only show notes that match the current archive status
+      return notes.filter((note) => Boolean(note.archived) === showArchived);
     },
     [showArchived]
   );
@@ -37,8 +38,10 @@ export const useNotesFilter = (notes: Note[]) => {
     [selectedTag]
   );
 
-  const getFilteredNotes = useCallback(() => {
-    let filtered = filterByArchiveStatus(notes);
+  const getFilteredNotes = useCallback((forceArchiveStatus?: boolean) => {
+    let filtered = forceArchiveStatus !== undefined 
+      ? notes.filter((note) => note.archived === forceArchiveStatus)
+      : filterByArchiveStatus(notes);
     filtered = filterBySearchTerm(filtered);
     filtered = filterByTag(filtered);
     return filtered;
