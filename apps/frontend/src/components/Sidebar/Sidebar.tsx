@@ -38,7 +38,7 @@ export const Sidebar = ({
       </div>
 
       {/* Navigation Buttons */}
-      <div className='p-3'>
+      <div className='p-3 space-y-2'>
         <button
           onClick={() => {
             onViewChange('all-notes');

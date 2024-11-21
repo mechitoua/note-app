@@ -1,6 +1,6 @@
 import MDEditor from '@uiw/react-md-editor';
 import { Save, X } from 'lucide-react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, useEffect } from 'react';
 
 interface NoteEditorProps {
   title: string;
@@ -9,11 +9,33 @@ interface NoteEditorProps {
   onContentChange: (content: string) => void;
   onSave: () => void;
   onCancel: () => void;
+  selectedTag?: string | null;
 }
 
 export const NoteEditor = memo(
-  ({ title, content, onTitleChange, onContentChange, onSave, onCancel }: NoteEditorProps) => {
-    const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('plain');
+  ({ title, content, onTitleChange, onContentChange, onSave, onCancel, selectedTag }: NoteEditorProps) => {
+    // Initialize in markdown mode with preview
+    const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('markdown');
+    const [isPreview, setIsPreview] = useState(true);
+
+    const handleModeChange = (mode: 'markdown' | 'plain') => {
+      setEditorMode(mode);
+      if (mode === 'markdown') {
+        setIsPreview(true);
+      }
+    };
+
+    useEffect(() => {
+      if (selectedTag) {
+        setEditorMode('markdown');
+      }
+    }, [selectedTag]);
+
+    useEffect(() => {
+      if (selectedTag) {
+        setEditorMode('markdown');
+      }
+    }, []); // Run once on mount
 
     const convertMarkdownToPlainText = useCallback((markdown: string) => {
       if (!markdown) return '';
@@ -21,8 +43,8 @@ export const NoteEditor = memo(
       // Keep a copy of the original text
       let text = markdown;
 
-      // Replace multiple newlines with a placeholder
-      text = text.replace(/\n{2,}/g, '\n[PARAGRAPH_BREAK]\n');
+      // Replace multiple newlines with a single newline
+      text = text.replace(/\n{2,}/g, '\n');
 
       // Remove headers while preserving content
       text = text.replace(/^#{1,6}\s+(.*?)$/gm, '$1');
@@ -49,19 +71,28 @@ export const NoteEditor = memo(
       // Remove horizontal rules
       text = text.replace(/^[-*_]{3,}\s*$/gm, '');
 
-      // Remove list markers while preserving content and indentation
-      text = text.replace(/^(\s*)[*+-]\s+/gm, '$1');
-      text = text.replace(/^(\s*)\d+\.\s+/gm, '$1');
+      // Remove list markers while preserving content
+      text = text.replace(/^\s*[-*+]\s+/gm, '');
+      text = text.replace(/^\s*\d+\.\s+/gm, '');
 
-      // Restore paragraph breaks
-      text = text.replace(/\[PARAGRAPH_BREAK\]/g, '\n\n');
+      // Replace any remaining multiple spaces with a single space
+      text = text.replace(/\s+/g, ' ');
 
-      // Clean up any remaining extra whitespace while preserving intentional line breaks
-      text = text.replace(/\s*\n\s*/g, '\n');
-      text = text.replace(/\n{3,}/g, '\n\n');
+      return text.trim();
+    }, []);
 
+    const convertPlainTextToMarkdown = useCallback((text: string) => {
+      if (!text) return '';
       return text;
     }, []);
+
+    const handleContentChange = useCallback((newContent: string) => {
+      if (editorMode === 'markdown') {
+        onContentChange(newContent);
+      } else {
+        onContentChange(convertPlainTextToMarkdown(newContent));
+      }
+    }, [editorMode, onContentChange, convertPlainTextToMarkdown]);
 
     return (
       <div className='h-full flex flex-col overflow-hidden bg-white dark:bg-gray-900'>
@@ -69,7 +100,7 @@ export const NoteEditor = memo(
           <div className='space-y-4'>
             <div className='flex justify-end gap-2'>
               <button
-                onClick={() => setEditorMode('plain')}
+                onClick={() => handleModeChange('plain')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'plain'
                     ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
@@ -79,7 +110,7 @@ export const NoteEditor = memo(
                 Plain Text
               </button>
               <button
-                onClick={() => setEditorMode('markdown')}
+                onClick={() => handleModeChange('markdown')}
                 className={`px-3 py-1 rounded-lg text-sm ${
                   editorMode === 'markdown'
                     ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
@@ -88,6 +119,18 @@ export const NoteEditor = memo(
               >
                 Markdown
               </button>
+              {editorMode === 'markdown' && (
+                <button
+                  onClick={() => setIsPreview(!isPreview)}
+                  className={`px-3 py-1 rounded-lg text-sm ${
+                    isPreview
+                      ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  {isPreview ? 'Edit' : 'Preview'}
+                </button>
+              )}
             </div>
             <input
               type='text'
@@ -99,11 +142,12 @@ export const NoteEditor = memo(
           </div>
           <div className='flex-1 overflow-hidden mt-4'>
             {editorMode === 'markdown' ? (
-              <div className='h-full [&_.w-md-editor-text]:!min-h-full [&_.w-md-editor]:!border-none [&_.w-md-editor-content]:!border-none [&_.w-md-editor-area]:!border-none [&_*]:!outline-none'>
+              <div className='h-full [&_.w-md-editor-text]:!min-h-full [&_.w-md-editor]:!border-none [&_.w-md-editor-content]:!border-none [&_.w-md-editor-area]:!border-none [&_*]:!outline-none [&_.w-md-editor-text-pre>code]:!text-base [&_.w-md-editor-text-input]:!text-base [&_.wmde-markdown-var]:!text-base [&_.wmde-markdown]:!text-base'>
                 <MDEditor
                   value={content}
-                  onChange={(val) => onContentChange(val || '')}
-                  preview='edit'
+                  onChange={(val) => handleContentChange(val || '')}
+                  preview={isPreview ? 'preview' : 'edit'}
+                  hideToolbar={isPreview}
                   className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200'
                   visibleDragbar={false}
                   data-color-mode={
@@ -121,6 +165,7 @@ export const NoteEditor = memo(
                       backgroundColor: 'transparent',
                       color: 'inherit',
                       outline: 'none',
+                      fontSize: '1rem'
                     },
                   }}
                 />
@@ -128,8 +173,8 @@ export const NoteEditor = memo(
             ) : (
               <textarea
                 value={convertMarkdownToPlainText(content)}
-                onChange={(e) => onContentChange(e.target.value)}
-                className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200'
+                onChange={(e) => handleContentChange(e.target.value)}
+                className='w-full h-full p-4 focus:outline-none resize-none text-left bg-transparent dark:text-gray-200 text-base'
                 placeholder='Start writing...'
                 style={{ textAlign: 'left' }}
               />

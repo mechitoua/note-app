@@ -1,20 +1,33 @@
-import { Archive, Clock, Tag, Trash2 } from 'lucide-react';
+import { Archive, Clock, Tag, Trash2, X } from 'lucide-react';
 import { Note } from '@/types/note';
 import { TagInput } from '../TagInput/TagInput';
 import { useNoteStore } from '@/store/useNoteStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NoteActionsProps {
   selectedNote: Note;
   onArchive: () => void;
   onDelete: () => void;
   onAddTags?: (tags: string[]) => void;
+  onUpdateTags?: (tags: string[]) => void;
   availableTags: string[];
 }
 
-export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, availableTags }: NoteActionsProps) => {
+export const NoteActions = ({ 
+  selectedNote, 
+  onArchive, 
+  onDelete, 
+  onAddTags, 
+  onUpdateTags,
+  availableTags 
+}: NoteActionsProps) => {
   // Local state to immediately reflect tag changes
   const [localTags, setLocalTags] = useState(selectedNote.tags || []);
+
+  // Sync local tags when selected note changes
+  useEffect(() => {
+    setLocalTags(selectedNote.tags || []);
+  }, [selectedNote]);
 
   const handleAddTag = async (tag: string) => {
     if (!onAddTags) return;
@@ -25,6 +38,17 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, avai
     
     // Update backend
     await onAddTags([tag]);
+  };
+
+  const handleRemoveTag = async (tagToRemove: string) => {
+    if (!onUpdateTags) return;
+    
+    // Update local state immediately
+    const newTags = localTags.filter(tag => tag !== tagToRemove);
+    setLocalTags(newTags);
+    
+    // Update backend with complete new tag list
+    await onUpdateTags(newTags);
   };
 
   return (
@@ -41,9 +65,18 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, avai
                   localTags.map((tag) => (
                     <span
                       key={tag}
-                      className='px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium truncate max-w-full'
+                      className='px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium truncate group flex items-center gap-1'
                     >
                       {tag}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveTag(tag);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3 hover:text-gray-900 dark:hover:text-gray-100" />
+                      </button>
                     </span>
                   ))
                 ) : (
@@ -70,7 +103,7 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, avai
           </div>
         </div>
 
-        <div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
+        <div className='pt-4'>
           <div className='space-y-2'>
             <button
               onClick={onArchive}
@@ -90,7 +123,7 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, avai
         </div>
 
         {onAddTags && (
-          <div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
+          <div className='pt-4'>
             <div className='space-y-2'>
               <TagInput
                 availableTags={availableTags}

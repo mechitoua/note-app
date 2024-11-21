@@ -24,12 +24,12 @@ export const NoteCard = ({ note, isSelected, onClick, className }: NoteCardProps
       )}
     >
       <div className="space-y-2">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-snug overflow-hidden whitespace-nowrap text-ellipsis max-w-full">
           {note.title || 'Untitled Note'}
         </h3>
         {note.content && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-            {note.content}
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 h-5">
+            {note.content.replace(/[#*`_[\]()]/g, '')}
           </p>
         )}
         {note.tags && note.tags.length > 0 && (

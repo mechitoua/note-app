@@ -130,14 +130,9 @@ export const NoteList: React.FC<NoteListProps> = ({
                           )}
                         </button>
                       </div>
-                      {note.content && (
-                        <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
-                          {note.content}
-                        </p>
-                      )}
                     </div>
                     {note.tags && note.tags.length > 0 && (
-                      <div className='flex flex-wrap gap-1.5'>
+                      <div className='flex flex-wrap gap-1.5 mt-2'>
                         {note.tags.map((tag) => (
                           <span
                             key={tag}

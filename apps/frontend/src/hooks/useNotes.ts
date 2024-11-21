@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useNoteSelection } from './notes/useNoteSelection';
+import { useEffect, useState } from 'react';
 import { useNoteOperations } from './notes/useNoteOperations';
-import { Note } from '@/types/note';
+import { useNoteSelection } from './notes/useNoteSelection';
 
 export const useNotes = () => {
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
-  
+
   const {
     notes,
     isLoading,
@@ -32,7 +31,15 @@ export const useNotes = () => {
     fetchNotes();
   }, [fetchNotes]);
 
-  const handleNewNote = async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
+  const handleNewNote = async ({
+    title,
+    content,
+    tags,
+  }: {
+    title: string;
+    content: string;
+    tags: string[];
+  }) => {
     const success = await createNote(title, content, tags);
     if (success) {
       setIsAddNoteModalOpen(false);
@@ -80,10 +87,14 @@ export const useNotes = () => {
 
   const handleAddTags = async (tags: string[]) => {
     if (!selectedNote) return;
-    const success = await updateNoteTags(selectedNote.id, [...(selectedNote.tags || []), ...tags]);
+    
+    // Update note tags with the new tag list
+    const success = await updateNoteTags(selectedNote.id, tags);
     if (success) {
       // Refresh notes to ensure consistency
       await fetchNotes();
+      // Sync tags with the store to update sidebar
+      syncTags(await noteService.getNotes());
     }
   };
 
@@ -92,9 +103,9 @@ export const useNotes = () => {
     if (success) {
       // Update the selected note if it's the one being modified
       if (selectedNote?.id === noteId) {
-        const updatedNote = await noteService.getNotes().then(notes => 
-          notes.find(note => note.id === noteId)
-        );
+        const updatedNote = await noteService
+          .getNotes()
+          .then((notes) => notes.find((note) => note.id === noteId));
         if (updatedNote) {
           setSelectedNote(updatedNote);
         }
@@ -104,7 +115,7 @@ export const useNotes = () => {
   };
 
   const getFilteredNotes = (archived: boolean) => {
-    return notes.filter(note => note.archived === archived);
+    return notes.filter((note) => note.archived === archived);
   };
 
   return {

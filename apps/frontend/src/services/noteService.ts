@@ -167,10 +167,9 @@ const updateNoteTags = async (noteId: string, tags: string[]): Promise<Note> => 
       throw new NoteServiceError('Note not found');
     }
 
-    const existingTags = notes[noteIndex].tags || [];
     const updatedNote = {
       ...notes[noteIndex],
-      tags: [...new Set([...existingTags, ...tags.map(tag => tag.trim())])],
+      tags: tags.map(tag => tag.trim()),
       updatedAt: new Date().toISOString()
     };
 

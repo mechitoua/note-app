@@ -38,6 +38,7 @@ function App() {
     handleUnarchiveNote: originalHandleUnarchiveNote,
     fetchNotes,
     handleUpdateNoteTags,
+    noteService,
   } = useNotes();
 
   const {
@@ -58,6 +59,13 @@ function App() {
   const handleLogoClick = () => {
     clearSelectedNote();
     setCurrentView('all-notes');
+    setSelectedTag(null);
+  };
+
+  const handleAllNotesClick = () => {
+    clearSelectedNote();
+    setCurrentView('all-notes');
+    setSelectedTag(null);
   };
 
   const handleNewNoteWithTags = (note: { title: string; content: string; tags: string[] }) => {
@@ -118,13 +126,13 @@ function App() {
   const handleAddTags = async (tags: string[]) => {
     if (!selectedNote) return;
     
-    // Update the note's tags
+    // Update note tags
     const success = await handleUpdateNoteTags(selectedNote.id, tags);
     if (success) {
-      // Refresh notes to update UI
+      // Refresh notes and sync tags
       await fetchNotes();
-      // Sync tags with the store
-      syncTags(await useNotes().noteService.getNotes());
+      const updatedNotes = await noteService.getNotes();
+      syncTags(updatedNotes);
     }
   };
 
@@ -136,7 +144,7 @@ function App() {
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={handleViewChange}
-            onAllNotesClick={handleLogoClick}
+            onAllNotesClick={handleAllNotesClick}
             tags={tags}
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
@@ -181,12 +189,14 @@ function App() {
                         onContentChange={handleContentChange}
                         onSave={handleSaveNote}
                         onCancel={() => handleCancelEdit()}
+                        selectedTag={selectedTag}
                       />
                       <NoteActions
                         selectedNote={selectedNote}
                         onArchive={handleArchiveNote}
                         onDelete={handleDeleteNote}
                         onAddTags={handleAddTags}
+                        onUpdateTags={handleAddTags}
                         availableTags={tags}
                       />
                     </div>
