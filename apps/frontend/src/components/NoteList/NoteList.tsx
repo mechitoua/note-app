@@ -1,14 +1,23 @@
 import { Note } from '@/types/note';
-import { Plus } from 'lucide-react';
+import { Plus, Archive, ArchiveRestore } from 'lucide-react';
 
 interface NoteListProps {
   notes: Note[];
-  selectedNoteId: string | undefined;
+  selectedNoteId?: string;
   onNoteSelect: (note: Note) => void;
-  onCreateNote: () => void;
+  onCreateNote?: () => void;
+  onArchive?: (noteId: string) => void;
+  onUnarchive?: (noteId: string) => void;
 }
 
-export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: NoteListProps) => {
+export const NoteList: React.FC<NoteListProps> = ({
+  notes,
+  selectedNoteId,
+  onNoteSelect,
+  onCreateNote,
+  onArchive,
+  onUnarchive
+}) => {
   return (
     <div className='col-span-1 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
@@ -80,14 +89,39 @@ export const NoteList = ({ notes, selectedNoteId, onNoteSelect, onCreateNote }: 
               >
                 <div className='flex justify-between items-start'>
                   <div className='space-y-2 flex-grow'>
-                    <h3 className='font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2'>
-                      {note.title || 'Untitled Note'}
-                    </h3>
-                    {note.content && (
-                      <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
-                        {note.content}
-                      </p>
-                    )}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
+                          {note.title || 'Untitled Note'}
+                          {note.archived && (
+                            <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                              Archived
+                            </span>
+                          )}
+                        </h3>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            note.archived 
+                              ? onUnarchive?.(note.id)
+                              : onArchive?.(note.id);
+                          }}
+                          className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          title={note.archived ? 'Unarchive note' : 'Archive note'}
+                        >
+                          {note.archived ? (
+                            <ArchiveRestore className="w-4 h-4" />
+                          ) : (
+                            <Archive className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      {note.content && (
+                        <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
+                          {note.content}
+                        </p>
+                      )}
+                    </div>
                     {note.tags && note.tags.length > 0 && (
                       <div className='flex flex-wrap gap-1.5'>
                         {note.tags.map((tag) => (

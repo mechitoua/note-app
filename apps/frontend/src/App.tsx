@@ -53,7 +53,7 @@ function App() {
 
   const handleLogoClick = () => {
     clearSelectedNote();
-    clearSelectedTag();
+    setCurrentView('all-notes');
   };
 
   const handleNewNoteWithTags = (note: { title: string; content: string; tags: string[] }) => {
@@ -65,12 +65,16 @@ function App() {
     addTags(note.tags);
   };
 
-  const filteredNotes = getFilteredNotes(currentView === 'archived').filter(note => {
-    // Filter by selected tag if one is selected (case insensitive)
-    return selectedTag 
-      ? note.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
-      : true;
-  });
+  const getFilteredNotesByTag = (notes: any[]) => {
+    if (!selectedTag) return notes;
+    return notes.filter(note => 
+      note.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+    );
+  };
+
+  const filteredNotes = selectedTag
+    ? getFilteredNotesByTag(notes) 
+    : getFilteredNotes(currentView === 'archived'); 
 
   const handleUnarchiveNote = async (noteId: string) => {
     const success = await originalHandleUnarchiveNote(noteId);
@@ -81,6 +85,11 @@ function App() {
     }
   };
 
+  const handleViewChange = (view: 'all-notes' | 'archived') => {
+    clearSelectedNote();
+    setCurrentView(view);
+  };
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -88,7 +97,7 @@ function App() {
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
-            onViewChange={setCurrentView}
+            onViewChange={handleViewChange}
             onAllNotesClick={handleLogoClick}
             tags={tags}
             selectedTag={selectedTag}
@@ -98,6 +107,10 @@ function App() {
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
+              selectedTag={selectedTag}
+              onTagSelect={setSelectedTag}
+              currentView={currentView}
+              onViewChange={handleViewChange}
               title={selectedTag ? `Tag: ${selectedTag}` : currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
               onLogoClick={handleLogoClick}
             />
@@ -116,6 +129,8 @@ function App() {
                       selectedNoteId={selectedNote?.id}
                       onNoteSelect={handleNoteSelect}
                       onCreateNote={() => setIsAddNoteModalOpen(true)}
+                      onArchive={handleArchiveNote}
+                      onUnarchive={handleUnarchiveNote}
                     />
                   )}
                 </Panel>
