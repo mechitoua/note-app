@@ -130,6 +130,34 @@ export const useNoteOperations = () => {
     }
   }, [state.notes]);
 
+  const deleteNote = useCallback(async (noteId: string) => {
+    const originalNotes = state.notes;
+    setState(prev => ({
+      ...prev,
+      notes: prev.notes.filter(note => note.id !== noteId),
+      isLoading: true,
+      error: null,
+    }));
+
+    try {
+      await noteService.deleteNote(noteId);
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+      }));
+      return true;
+    } catch (err) {
+      const error = handleError(err, 'Failed to delete note');
+      setState(prev => ({
+        ...prev,
+        notes: originalNotes,
+        isLoading: false,
+        error: error.message,
+      }));
+      return false;
+    }
+  }, [state.notes]);
+
   const archiveNote = useCallback(async (noteId: string) => {
     const originalNotes = state.notes;
     const noteIndex = originalNotes.findIndex(note => note.id === noteId);
@@ -175,40 +203,14 @@ export const useNoteOperations = () => {
     }
   }, [state.notes]);
 
-  const deleteNote = useCallback(async (noteId: string) => {
-    const originalNotes = state.notes;
-    setState(prev => ({
-      ...prev,
-      notes: prev.notes.filter(note => note.id !== noteId),
-      isLoading: true,
-      error: null,
-    }));
-
-    try {
-      await noteService.deleteNote(noteId);
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-      }));
-      return true;
-    } catch (err) {
-      const error = handleError(err, 'Failed to delete note');
-      setState(prev => ({
-        ...prev,
-        notes: originalNotes,
-        isLoading: false,
-        error: error.message,
-      }));
-      return false;
-    }
-  }, [state.notes]);
-
   return {
-    ...state,
+    notes: state.notes,
+    isLoading: state.isLoading,
+    error: state.error,
     fetchNotes,
     createNote,
     updateNote,
-    archiveNote,
     deleteNote,
+    archiveNote,
   };
 };
