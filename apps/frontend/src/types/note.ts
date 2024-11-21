@@ -5,5 +5,5 @@ export interface Note {
   tags: string[];
   createdAt: string;
   updatedAt: string;
-  isArchived: boolean;
+  archived: boolean;
 }

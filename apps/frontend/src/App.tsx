@@ -37,6 +37,7 @@ function App() {
     getFilteredNotes,
     handleUnarchiveNote: originalHandleUnarchiveNote,
     fetchNotes,
+    handleUpdateNoteTags,
   } = useNotes();
 
   const {
@@ -78,27 +79,27 @@ function App() {
   const filteredNotes = useMemo(() => {
     let filtered = notes;
 
-    // Apply search filter first (globally)
+    // Apply search filter first (across all notes)
     if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      filtered = notes.filter(note => 
-        note.title.toLowerCase().includes(searchLower) ||
-        note.content.toLowerCase().includes(searchLower) ||
-        note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        note =>
+          note.title.toLowerCase().includes(query) ||
+          note.content.toLowerCase().includes(query) ||
+          note.tags?.some(tag => tag.toLowerCase().includes(query))
       );
+    } else {
+      // Only filter by archive status if there's no search query
+      filtered = getFilteredNotes(currentView === 'archived');
     }
 
-    // Then apply tag filter if selected
+    // Apply tag filter
     if (selectedTag) {
-      filtered = getFilteredNotesByTag(filtered);
-    } 
-    // Only apply archive filter if there's no search query
-    else if (!searchQuery) {
-      filtered = filtered.filter(note => note.archived === (currentView === 'archived'));
+      filtered = filtered.filter(note => note.tags?.includes(selectedTag));
     }
 
     return filtered;
-  }, [notes, searchQuery, selectedTag, currentView]);
+  }, [notes, currentView, selectedTag, searchQuery, getFilteredNotes]);
 
   const handleUnarchiveNote = async (noteId: string) => {
     const success = await originalHandleUnarchiveNote(noteId);
@@ -112,6 +113,19 @@ function App() {
   const handleViewChange = (view: 'all-notes' | 'archived') => {
     clearSelectedNote();
     setCurrentView(view);
+  };
+
+  const handleAddTags = async (tags: string[]) => {
+    if (!selectedNote) return;
+    
+    // Update the note's tags
+    const success = await handleUpdateNoteTags(selectedNote.id, tags);
+    if (success) {
+      // Refresh notes to update UI
+      await fetchNotes();
+      // Sync tags with the store
+      syncTags(await useNotes().noteService.getNotes());
+    }
   };
 
   return (
@@ -158,7 +172,7 @@ function App() {
                 </Panel>
                 <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
                 <Panel minSize={30}>
-                  {selectedNote ? (
+                  {selectedNote && (
                     <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
                         title={editorContent.title}
@@ -170,11 +184,14 @@ function App() {
                       />
                       <NoteActions
                         selectedNote={selectedNote}
-                        onArchive={selectedNote.archived ? () => handleUnarchiveNote(selectedNote.id) : handleArchiveNote}
+                        onArchive={handleArchiveNote}
                         onDelete={handleDeleteNote}
+                        onAddTags={handleAddTags}
+                        availableTags={tags}
                       />
                     </div>
-                  ) : (
+                  )}
+                  {!selectedNote && (
                     <EmptyState />
                   )}
                 </Panel>

@@ -1,13 +1,32 @@
 import { Archive, Clock, Tag, Trash2 } from 'lucide-react';
 import { Note } from '@/types/note';
+import { TagInput } from '../TagInput/TagInput';
+import { useNoteStore } from '@/store/useNoteStore';
+import { useState } from 'react';
 
 interface NoteActionsProps {
   selectedNote: Note;
   onArchive: () => void;
   onDelete: () => void;
+  onAddTags?: (tags: string[]) => void;
+  availableTags: string[];
 }
 
-export const NoteActions = ({ selectedNote, onArchive, onDelete }: NoteActionsProps) => {
+export const NoteActions = ({ selectedNote, onArchive, onDelete, onAddTags, availableTags }: NoteActionsProps) => {
+  // Local state to immediately reflect tag changes
+  const [localTags, setLocalTags] = useState(selectedNote.tags || []);
+
+  const handleAddTag = async (tag: string) => {
+    if (!onAddTags) return;
+    
+    // Update local state immediately
+    const newTags = [...localTags, tag];
+    setLocalTags(newTags);
+    
+    // Update backend
+    await onAddTags([tag]);
+  };
+
   return (
     <div className='col-span-1 h-full border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'>
       <div className='h-full p-3 space-y-4'>
@@ -18,8 +37,8 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete }: NoteActionsPr
             <div className='flex-1 min-w-0'>
               <div className='text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5'>Tags</div>
               <div className='flex flex-wrap gap-1'>
-                {selectedNote.tags && selectedNote.tags.length > 0 ? (
-                  selectedNote.tags.map((tag) => (
+                {localTags.length > 0 ? (
+                  localTags.map((tag) => (
                     <span
                       key={tag}
                       className='px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium truncate max-w-full'
@@ -69,6 +88,17 @@ export const NoteActions = ({ selectedNote, onArchive, onDelete }: NoteActionsPr
             </button>
           </div>
         </div>
+
+        {onAddTags && (
+          <div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
+            <div className='space-y-2'>
+              <TagInput
+                availableTags={availableTags}
+                onAddTag={handleAddTag}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

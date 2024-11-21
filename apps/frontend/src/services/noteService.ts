@@ -11,10 +11,16 @@ class NoteServiceError extends Error {
 
 const getStorageData = (): Note[] => {
   try {
-    const notesJson = localStorage.getItem(STORAGE_KEY);
-    return notesJson ? JSON.parse(notesJson) : [];
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return [];
+    const notes = JSON.parse(data);
+    // Migrate old notes that use isArchived to archived
+    return notes.map((note: any) => ({
+      ...note,
+      archived: note.archived ?? note.isArchived ?? false,
+    }));
   } catch (error) {
-    console.error('Error parsing notes from storage:', error);
+    console.error('Error reading from localStorage:', error);
     return [];
   }
 };
@@ -47,7 +53,7 @@ const createNote = async (noteData: { title: string; content: string; tags: stri
       tags: [...new Set(noteData.tags.map(tag => tag.trim()))], // Remove duplicates and trim
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      isArchived: false
+      archived: false
     };
     
     notes.unshift(newNote);
@@ -110,15 +116,14 @@ const deleteNote = async (noteId: string): Promise<void> => {
 const archiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = getStorageData();
-    const noteIndex = notes.findIndex((note) => note.id === noteId);
-    
+    const noteIndex = notes.findIndex(note => note.id === noteId);
     if (noteIndex === -1) {
-      throw new NoteServiceError('Note not found', 'NOT_FOUND');
+      throw new NoteServiceError('Note not found');
     }
 
-    const updatedNote: Note = {
+    const updatedNote = {
       ...notes[noteIndex],
-      isArchived: true,
+      archived: true,
       updatedAt: new Date().toISOString()
     };
 
@@ -127,9 +132,6 @@ const archiveNote = async (noteId: string): Promise<Note> => {
     return updatedNote;
   } catch (error) {
     console.error('Error archiving note:', error);
-    if (error instanceof NoteServiceError) {
-      throw error;
-    }
     throw new NoteServiceError('Failed to archive note');
   }
 };
@@ -137,15 +139,14 @@ const archiveNote = async (noteId: string): Promise<Note> => {
 const unarchiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = getStorageData();
-    const noteIndex = notes.findIndex((note) => note.id === noteId);
-    
+    const noteIndex = notes.findIndex(note => note.id === noteId);
     if (noteIndex === -1) {
-      throw new NoteServiceError('Note not found', 'NOT_FOUND');
+      throw new NoteServiceError('Note not found');
     }
 
-    const updatedNote: Note = {
+    const updatedNote = {
       ...notes[noteIndex],
-      isArchived: false,
+      archived: false,
       updatedAt: new Date().toISOString()
     };
 
@@ -154,10 +155,31 @@ const unarchiveNote = async (noteId: string): Promise<Note> => {
     return updatedNote;
   } catch (error) {
     console.error('Error unarchiving note:', error);
-    if (error instanceof NoteServiceError) {
-      throw error;
-    }
     throw new NoteServiceError('Failed to unarchive note');
+  }
+};
+
+const updateNoteTags = async (noteId: string, tags: string[]): Promise<Note> => {
+  try {
+    const notes = getStorageData();
+    const noteIndex = notes.findIndex(note => note.id === noteId);
+    if (noteIndex === -1) {
+      throw new NoteServiceError('Note not found');
+    }
+
+    const existingTags = notes[noteIndex].tags || [];
+    const updatedNote = {
+      ...notes[noteIndex],
+      tags: [...new Set([...existingTags, ...tags.map(tag => tag.trim())])],
+      updatedAt: new Date().toISOString()
+    };
+
+    notes[noteIndex] = updatedNote;
+    setStorageData(notes);
+    return updatedNote;
+  } catch (error) {
+    console.error('Error updating note tags:', error);
+    throw new NoteServiceError('Failed to update note tags');
   }
 };
 
@@ -168,4 +190,5 @@ export const noteService = {
   deleteNote,
   archiveNote,
   unarchiveNote,
+  updateNoteTags,
 };

@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/atoms';
 import { Note } from '@/types/note';
-import { Archive, Save, Trash, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Archive, Save, Trash, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Categories, type Category } from '../Categories/Categories';
+import { cn } from '@/lib/utils';
 
 interface EditorProps {
   note: Note | null;
@@ -18,7 +20,16 @@ export const Editor = ({ note, content, onUpdate, onDelete, onArchive }: EditorP
   const [title, setTitle] = useState(content.title);
   const [noteContent, setNoteContent] = useState(content.content);
   const [isSaving, setIsSaving] = useState(false);
-  const [isActionsVisible, setIsActionsVisible] = useState(false);
+  const [isActionsVisible, setIsActionsVisible] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Sample categories - you can move this to your store later
+  const categories: Category[] = [
+    { id: '1', name: 'Personal', color: '#f87171' },
+    { id: '2', name: 'Work', color: '#60a5fa' },
+    { id: '3', name: 'Ideas', color: '#34d399' },
+    { id: '4', name: 'Tasks', color: '#fbbf24' },
+  ];
 
   useEffect(() => {
     setTitle(content.title);
@@ -91,6 +102,44 @@ export const Editor = ({ note, content, onUpdate, onDelete, onArchive }: EditorP
         </div>
       </div>
       <div className='flex-1 flex flex-col'>
+        <div className="flex flex-col space-y-2">
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start',
+              !isActionsVisible && !selectedCategory && 'bg-accent'
+            )}
+            onClick={() => {
+              setIsActionsVisible(false);
+              setSelectedCategory(null);
+            }}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            All Notes
+          </Button>
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start',
+              isActionsVisible && 'bg-accent'
+            )}
+            onClick={() => {
+              setIsActionsVisible(true);
+              setSelectedCategory(null);
+            }}
+          >
+            <Archive className="mr-2 h-4 w-4" />
+            Archived
+          </Button>
+          
+          <div className="pt-2">
+            <Categories
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+          </div>
+        </div>
         <textarea
           value={noteContent}
           onChange={(e) => setNoteContent(e.target.value)}

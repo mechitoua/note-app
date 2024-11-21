@@ -59,11 +59,12 @@ export const useNoteStore = create<NoteStore>()(
       },
 
       updateNote: (updatedNote) => {
-        set((state) => ({
-          notes: state.notes.map((note) =>
-            note.id === updatedNote.id ? updatedNote : note
-          )
-        }))
+        set((state) => {
+          const notes = state.notes.map((note) =>
+            note.id === updatedNote.id ? { ...note, ...updatedNote } : note
+          );
+          return { notes };
+        });
         get().syncTags()
       },
 

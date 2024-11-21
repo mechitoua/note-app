@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Note } from '@/types/note';
 import { DEFAULT_TAGS, isDefaultTag } from '@/constants/defaultTags';
 
@@ -49,33 +49,25 @@ export const useTags = () => {
     }
     const normalizedTag = normalizeTag(tag);
     setCustomTags(prev => prev.filter(t => normalizeTag(t) !== normalizedTag));
-    setSelectedTag(prev => prev && normalizeTag(prev) === normalizedTag ? null : prev);
-  }, []);
-
-  const syncTags = useCallback((notes: Note[]) => {
-    // Get all unique tags from existing notes (case insensitive)
-    const uniqueTags = new Map<string, string>(); // normalized -> original
-    notes.forEach(note => {
-      note.tags?.forEach(tag => {
-        // Only add non-default tags to the sync process
-        if (!isDefaultTag(tag)) {
-          uniqueTags.set(normalizeTag(tag), normalizeTag(tag));
-        }
-      });
-    });
-    
-    setCustomTags(Array.from(uniqueTags.values()));
-    // If selected tag is not a default tag and no longer exists, clear it
-    setSelectedTag(prev => {
-      if (prev && !isDefaultTag(prev) && !uniqueTags.has(normalizeTag(prev))) {
-        return null;
-      }
-      return prev;
-    });
   }, []);
 
   const clearSelectedTag = useCallback(() => {
     setSelectedTag(null);
+  }, []);
+
+  const syncTags = useCallback((notes: Note[]) => {
+    const allTags = new Set<string>();
+    
+    // Collect all unique tags from notes
+    notes.forEach(note => {
+      note.tags?.forEach(tag => {
+        if (!isDefaultTag(tag)) {
+          allTags.add(normalizeTag(tag));
+        }
+      });
+    });
+
+    setCustomTags(Array.from(allTags));
   }, []);
 
   return {
@@ -85,7 +77,7 @@ export const useTags = () => {
     addTag,
     addTags,
     removeTag,
-    syncTags,
     clearSelectedTag,
+    syncTags,
   };
 };

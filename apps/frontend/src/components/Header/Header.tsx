@@ -1,7 +1,7 @@
-import { Menu, Search, Settings } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useCallback, useRef } from 'react';
 import { useNoteStore } from '@/store/useNoteStore';
+import { Menu, Search } from 'lucide-react';
+import { useCallback, useRef } from 'react';
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -12,21 +12,24 @@ interface HeaderProps {
   totalResults?: number;
 }
 
-export const Header = ({ 
-  isSidebarOpen, 
-  setIsSidebarOpen, 
-  title, 
+export const Header = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  title,
   onLogoClick,
   isSearching,
-  totalResults 
+  totalResults,
 }: HeaderProps) => {
-  const searchQuery = useNoteStore(state => state.searchQuery);
-  const setSearchQuery = useNoteStore(state => state.setSearchQuery);
+  const searchQuery = useNoteStore((state) => state.searchQuery);
+  const setSearchQuery = useNoteStore((state) => state.setSearchQuery);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  }, [setSearchQuery]);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    [setSearchQuery]
+  );
 
   return (
     <header className='h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 flex items-center'>

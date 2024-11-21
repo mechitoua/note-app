@@ -13,6 +13,7 @@ export const useNotes = () => {
     fetchNotes,
     createNote,
     updateNote,
+    updateNoteTags,
     archiveNote,
     unarchiveNote,
     deleteNote,
@@ -77,6 +78,31 @@ export const useNotes = () => {
     clearSelection();
   };
 
+  const handleAddTags = async (tags: string[]) => {
+    if (!selectedNote) return;
+    const success = await updateNoteTags(selectedNote.id, [...(selectedNote.tags || []), ...tags]);
+    if (success) {
+      // Refresh notes to ensure consistency
+      await fetchNotes();
+    }
+  };
+
+  const handleUpdateNoteTags = async (noteId: string, tags: string[]) => {
+    const success = await updateNoteTags(noteId, tags);
+    if (success) {
+      // Update the selected note if it's the one being modified
+      if (selectedNote?.id === noteId) {
+        const updatedNote = await noteService.getNotes().then(notes => 
+          notes.find(note => note.id === noteId)
+        );
+        if (updatedNote) {
+          setSelectedNote(updatedNote);
+        }
+      }
+    }
+    return success;
+  };
+
   const getFilteredNotes = (archived: boolean) => {
     return notes.filter(note => note.archived === archived);
   };
@@ -100,5 +126,8 @@ export const useNotes = () => {
     handleCancelEdit,
     clearSelectedNote: clearSelection,
     getFilteredNotes,
+    fetchNotes,
+    handleAddTags,
+    handleUpdateNoteTags,
   };
 };
