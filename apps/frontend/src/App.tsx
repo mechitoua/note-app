@@ -11,8 +11,9 @@ import {
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
+import { useNoteStore } from '@/store/useNoteStore';
 import { CurrentView } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
@@ -47,6 +48,8 @@ function App() {
     clearSelectedTag,
   } = useTags();
 
+  const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
+
   useEffect(() => {
     syncTags(notes);
   }, [notes, syncTags]);
@@ -72,9 +75,30 @@ function App() {
     );
   };
 
-  const filteredNotes = selectedTag
-    ? getFilteredNotesByTag(notes) 
-    : getFilteredNotes(currentView === 'archived'); 
+  const filteredNotes = useMemo(() => {
+    let filtered = notes;
+
+    // Apply search filter first (globally)
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filtered = notes.filter(note => 
+        note.title.toLowerCase().includes(searchLower) ||
+        note.content.toLowerCase().includes(searchLower) ||
+        note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Then apply tag filter if selected
+    if (selectedTag) {
+      filtered = getFilteredNotesByTag(filtered);
+    } 
+    // Only apply archive filter if there's no search query
+    else if (!searchQuery) {
+      filtered = filtered.filter(note => note.archived === (currentView === 'archived'));
+    }
+
+    return filtered;
+  }, [notes, searchQuery, selectedTag, currentView]);
 
   const handleUnarchiveNote = async (noteId: string) => {
     const success = await originalHandleUnarchiveNote(noteId);
@@ -107,12 +131,10 @@ function App() {
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
-              selectedTag={selectedTag}
-              onTagSelect={setSelectedTag}
-              currentView={currentView}
-              onViewChange={handleViewChange}
               title={selectedTag ? `Tag: ${selectedTag}` : currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
               onLogoClick={handleLogoClick}
+              isSearching={!!searchQuery}
+              totalResults={filteredNotes.length}
             />
             <div className='flex-1 overflow-hidden'>
               <PanelGroup direction="horizontal">

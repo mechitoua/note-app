@@ -47,7 +47,7 @@ const createNote = async (noteData: { title: string; content: string; tags: stri
       tags: [...new Set(noteData.tags.map(tag => tag.trim()))], // Remove duplicates and trim
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      archived: false
+      isArchived: false
     };
     
     notes.unshift(newNote);
@@ -118,7 +118,7 @@ const archiveNote = async (noteId: string): Promise<Note> => {
 
     const updatedNote: Note = {
       ...notes[noteIndex],
-      archived: true,
+      isArchived: true,
       updatedAt: new Date().toISOString()
     };
 
@@ -145,7 +145,7 @@ const unarchiveNote = async (noteId: string): Promise<Note> => {
 
     const updatedNote: Note = {
       ...notes[noteIndex],
-      archived: false,
+      isArchived: false,
       updatedAt: new Date().toISOString()
     };
 

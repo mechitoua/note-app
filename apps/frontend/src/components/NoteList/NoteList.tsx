@@ -1,5 +1,6 @@
 import { Note } from '@/types/note';
 import { Plus, Archive, ArchiveRestore } from 'lucide-react';
+import { useNoteStore } from '@/store/useNoteStore';
 
 interface NoteListProps {
   notes: Note[];
@@ -18,6 +19,19 @@ export const NoteList: React.FC<NoteListProps> = ({
   onArchive,
   onUnarchive
 }) => {
+  const searchQuery = useNoteStore(state => state.searchQuery);
+
+  const filteredNotes = notes.filter(note => {
+    if (!searchQuery) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(searchLower) ||
+      note.content.toLowerCase().includes(searchLower) ||
+      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+    );
+  });
+
   return (
     <div className='col-span-1 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
@@ -71,13 +85,13 @@ export const NoteList: React.FC<NoteListProps> = ({
           `}
         </style>
         <div className='space-y-2'>
-          {notes.length === 0 ? (
+          {filteredNotes.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8 px-4 text-center'>
               <p className='text-gray-600 dark:text-gray-400 mb-2'>No notes created yet</p>
               <p className='text-sm text-gray-500 dark:text-gray-500'>Click the "Create New Note" button above to get started</p>
             </div>
           ) : (
-            notes.map((note) => (
+            filteredNotes.map((note) => (
               <div
                 key={note.id}
                 onClick={() => onNoteSelect(note)}

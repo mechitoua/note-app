@@ -1,80 +1,69 @@
-import { useNoteStore } from './useNoteStore'
-import { Note } from '@/types/note'
+import { useNoteStore } from './useNoteStore';
+import { Note } from '@/types/note';
 
-// Selectors for filtering notes
+// Get filtered notes based on current view, selected tag, and search query
 export const useFilteredNotes = () => {
-  return useNoteStore(state => {
-    const { notes, currentView, selectedTag } = state
-    
-    // First filter by view (archived/non-archived)
-    let filteredNotes = selectedTag
-      ? notes // When tag is selected, search through all notes
-      : notes.filter(note => note.archived === (currentView === 'archived'))
+  return useNoteStore((state) => {
+    let filteredNotes = [...state.notes];
 
-    // Then filter by tag if selected
-    if (selectedTag) {
-      filteredNotes = filteredNotes.filter(note =>
-        note.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
-      )
+    // Filter by view (all-notes or archived)
+    if (state.currentView === 'archived') {
+      filteredNotes = filteredNotes.filter((note) => note.isArchived);
+    } else {
+      filteredNotes = filteredNotes.filter((note) => !note.isArchived);
     }
 
-    return filteredNotes
-  })
-}
+    // Filter by selected tag
+    if (state.selectedTag) {
+      filteredNotes = filteredNotes.filter((note) =>
+        note.tags.includes(state.selectedTag!)
+      );
+    }
 
-// Selector for editor state
-export const useEditorState = () => {
-  return useNoteStore(state => ({
-    selectedNote: state.selectedNote,
-    editorContent: state.editorContent,
-    updateEditorContent: state.updateEditorContent,
-    clearSelectedNote: state.clearSelectedNote
-  }))
-}
+    // Filter by search query
+    if (state.searchQuery.trim()) {
+      const query = state.searchQuery.toLowerCase().trim();
+      filteredNotes = filteredNotes.filter((note) => {
+        const titleMatch = note.title.toLowerCase().includes(query);
+        const contentMatch = note.content.toLowerCase().includes(query);
+        const tagMatch = note.tags.some((tag) => tag.toLowerCase().includes(query));
+        return titleMatch || contentMatch || tagMatch;
+      });
+    }
 
-// Selector for note operations
-export const useNoteOperations = () => {
-  return useNoteStore(state => ({
-    createNote: state.createNote,
-    updateNote: state.updateNote,
-    archiveNote: state.archiveNote,
-    unarchiveNote: state.unarchiveNote,
-    deleteNote: state.deleteNote,
-    selectNote: state.selectNote
-  }))
-}
+    // Sort by updatedAt in descending order (newest first)
+    return filteredNotes.sort((a, b) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  });
+};
 
-// Selector for view state
-export const useViewState = () => {
-  return useNoteStore(state => ({
-    currentView: state.currentView,
-    setCurrentView: state.setCurrentView,
-    selectedTag: state.selectedTag,
-    setSelectedTag: state.setSelectedTag
-  }))
-}
+// Get all tags from notes
+export const useTags = () => {
+  return useNoteStore((state) => state.tags);
+};
 
-// Selector for tags
-export const useTagState = () => {
-  return useNoteStore(state => ({
-    tags: state.tags,
-    selectedTag: state.selectedTag,
-    setSelectedTag: state.setSelectedTag
-  }))
-}
+// Get current view
+export const useCurrentView = () => {
+  return useNoteStore((state) => state.currentView);
+};
 
-// Selector for loading and error states
-export const useNoteStatus = () => {
-  return useNoteStore(state => ({
-    isLoading: state.isLoading,
-    error: state.error
-  }))
-}
+// Get selected tag
+export const useSelectedTag = () => {
+  return useNoteStore((state) => state.selectedTag);
+};
 
-// Selector for modal state
-export const useModalState = () => {
-  return useNoteStore(state => ({
-    isAddNoteModalOpen: state.isAddNoteModalOpen,
-    setIsAddNoteModalOpen: state.setIsAddNoteModalOpen
-  }))
-}
+// Get selected note
+export const useSelectedNote = () => {
+  return useNoteStore((state) => state.selectedNote);
+};
+
+// Get editor content
+export const useEditorContent = () => {
+  return useNoteStore((state) => state.editorContent);
+};
+
+// Get search query
+export const useSearchQuery = () => {
+  return useNoteStore((state) => state.searchQuery);
+};

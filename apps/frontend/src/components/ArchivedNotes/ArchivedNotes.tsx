@@ -1,14 +1,28 @@
 import { Note } from '@/types/note';
 import { Archive, ArchiveRestore } from 'lucide-react';
+import { useNoteStore } from '@/store/useNoteStore';
 
 interface ArchivedNotesProps {
   notes: Note[];
   onNoteSelect: (note: Note) => void;
-  onUnarchive?: (noteId: string) => Promise<boolean>;
+  onUnarchive?: (noteId: string) => void;
 }
 
 export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNotesProps) => {
-  const handleUnarchive = async (note: Note, e: React.MouseEvent) => {
+  const searchQuery = useNoteStore(state => state.searchQuery);
+
+  const filteredNotes = notes.filter(note => {
+    if (!searchQuery) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(searchLower) ||
+      note.content.toLowerCase().includes(searchLower) ||
+      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const handleUnarchive = async (note: Note, e: React.PointerEvent) => {
     e.stopPropagation();
     if (onUnarchive) {
       await onUnarchive(note.id);
@@ -65,7 +79,7 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNote
           `}
         </style>
         <div className='space-y-2'>
-          {notes.length === 0 ? (
+          {filteredNotes.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8 px-4 text-center'>
               <Archive className='w-12 h-12 text-gray-400 dark:text-gray-600 mb-4' />
               <p className='text-gray-600 dark:text-gray-400 mb-2'>No archived notes</p>
@@ -74,7 +88,7 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNote
               </p>
             </div>
           ) : (
-            notes.map((note) => (
+            filteredNotes.map((note) => (
               <div
                 key={note.id}
                 onClick={() => onNoteSelect(note)}
