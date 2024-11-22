@@ -116,7 +116,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                   <div className='space-y-2 flex-grow'>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
                           {note.title || 'Untitled Note'}
                           {note.archived && (
                             <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
