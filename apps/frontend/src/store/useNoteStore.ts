@@ -52,9 +52,15 @@ export const useNoteStore = create<NoteStore>()(
       },
 
       addNote: (note) => {
-        set((state) => ({
-          notes: [note, ...state.notes]
-        }))
+        set((state) => {
+          // Reset search and tag filters when adding a new note
+          // This ensures the new note is visible
+          return {
+            notes: [note, ...state.notes],
+            searchQuery: '',
+            selectedTag: null
+          }
+        })
         get().syncTags()
       },
 
