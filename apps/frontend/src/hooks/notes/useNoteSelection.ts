@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
 import { Note } from '@/types/note';
+import { useCallback, useMemo, useState } from 'react';
 
 interface EditorContent {
   title: string;
@@ -58,7 +58,7 @@ export const useNoteSelection = () => {
 
   const hasUnsavedChanges = useMemo(() => {
     if (!selection.selectedNote) return false;
-    
+
     return (
       selection.editorContent.title !== selection.selectedNote.title ||
       selection.editorContent.content !== selection.selectedNote.content
@@ -72,5 +72,6 @@ export const useNoteSelection = () => {
     handleTitleChange,
     clearSelection,
     hasUnsavedChanges,
+    setSelection,
   };
 };

@@ -11,8 +11,9 @@ import {
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
+import { useNoteStore } from '@/store/useNoteStore';
 import { CurrentView } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
     getFilteredNotes,
     handleUnarchiveNote: originalHandleUnarchiveNote,
     fetchNotes,
+    handleUpdateNoteTags,
+    noteService,
   } = useNotes();
 
   const {
@@ -47,6 +50,8 @@ function App() {
     clearSelectedTag,
   } = useTags();
 
+  const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
+
   useEffect(() => {
     syncTags(notes);
   }, [notes, syncTags]);
@@ -54,6 +59,13 @@ function App() {
   const handleLogoClick = () => {
     clearSelectedNote();
     setCurrentView('all-notes');
+    setSelectedTag(null);
+  };
+
+  const handleAllNotesClick = () => {
+    clearSelectedNote();
+    setCurrentView('all-notes');
+    setSelectedTag(null);
   };
 
   const handleNewNoteWithTags = (note: { title: string; content: string; tags: string[] }) => {
@@ -72,9 +84,30 @@ function App() {
     );
   };
 
-  const filteredNotes = selectedTag
-    ? getFilteredNotesByTag(notes) 
-    : getFilteredNotes(currentView === 'archived'); 
+  const filteredNotes = useMemo(() => {
+    let filtered = notes;
+
+    // Apply search filter first (across all notes)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        note =>
+          note.title.toLowerCase().includes(query) ||
+          note.content.toLowerCase().includes(query) ||
+          note.tags?.some(tag => tag.toLowerCase().includes(query))
+      );
+    } else {
+      // Only filter by archive status if there's no search query
+      filtered = getFilteredNotes(currentView === 'archived');
+    }
+
+    // Apply tag filter
+    if (selectedTag) {
+      filtered = filtered.filter(note => note.tags?.includes(selectedTag));
+    }
+
+    return filtered;
+  }, [notes, currentView, selectedTag, searchQuery, getFilteredNotes]);
 
   const handleUnarchiveNote = async (noteId: string) => {
     const success = await originalHandleUnarchiveNote(noteId);
@@ -90,6 +123,19 @@ function App() {
     setCurrentView(view);
   };
 
+  const handleAddTags = async (tags: string[]) => {
+    if (!selectedNote) return;
+    
+    // Update note tags
+    const success = await handleUpdateNoteTags(selectedNote.id, tags);
+    if (success) {
+      // Refresh notes and sync tags
+      await fetchNotes();
+      const updatedNotes = await noteService.getNotes();
+      syncTags(updatedNotes);
+    }
+  };
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -98,7 +144,7 @@ function App() {
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={handleViewChange}
-            onAllNotesClick={handleLogoClick}
+            onAllNotesClick={handleAllNotesClick}
             tags={tags}
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
@@ -107,12 +153,10 @@ function App() {
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
-              selectedTag={selectedTag}
-              onTagSelect={setSelectedTag}
-              currentView={currentView}
-              onViewChange={handleViewChange}
               title={selectedTag ? `Tag: ${selectedTag}` : currentView === 'all-notes' ? 'All Notes' : 'Archived Notes'}
               onLogoClick={handleLogoClick}
+              isSearching={!!searchQuery}
+              totalResults={filteredNotes.length}
             />
             <div className='flex-1 overflow-hidden'>
               <PanelGroup direction="horizontal">
@@ -136,7 +180,7 @@ function App() {
                 </Panel>
                 <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
                 <Panel minSize={30}>
-                  {selectedNote ? (
+                  {selectedNote && (
                     <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
                         title={editorContent.title}
@@ -145,14 +189,19 @@ function App() {
                         onContentChange={handleContentChange}
                         onSave={handleSaveNote}
                         onCancel={() => handleCancelEdit()}
+                        selectedTag={selectedTag}
                       />
                       <NoteActions
                         selectedNote={selectedNote}
-                        onArchive={selectedNote.archived ? () => handleUnarchiveNote(selectedNote.id) : handleArchiveNote}
+                        onArchive={handleArchiveNote}
                         onDelete={handleDeleteNote}
+                        onAddTags={handleAddTags}
+                        onUpdateTags={handleAddTags}
+                        availableTags={tags}
                       />
                     </div>
-                  ) : (
+                  )}
+                  {!selectedNote && (
                     <EmptyState />
                   )}
                 </Panel>
@@ -164,8 +213,9 @@ function App() {
       <AddNoteModal
         isOpen={isAddNoteModalOpen}
         onClose={() => setIsAddNoteModalOpen(false)}
-        onSave={handleNewNoteWithTags}
+        onSave={handleNewNote}
         availableTags={tags}
+        existingNotes={notes}
       />
     </ThemeProvider>
   );

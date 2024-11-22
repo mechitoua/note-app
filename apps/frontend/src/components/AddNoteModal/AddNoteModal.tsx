@@ -1,39 +1,185 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
 import { Fragment, useState } from 'react';
+import { Feedback } from '../ui/Feedback';
 
 interface AddNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (note: { title: string; content: string; tags: string[] }) => void;
+  onSave: (note: { title: string; content: string; tags: string[] }) => Promise<void>;
   availableTags: string[];
+  existingNotes: { title: string }[];
 }
 
-export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNoteModalProps) => {
+interface ValidationState {
+  title: {
+    isValid: boolean;
+    message: string;
+  };
+  content: {
+    isValid: boolean;
+    message: string;
+  };
+}
+
+interface NoteServiceError {
+  type: 'VALIDATION_ERROR' | 'DUPLICATE_ERROR' | 'STORAGE_ERROR';
+  message: string;
+}
+
+const getErrorMessage = (error: unknown): { message: string; type: 'error' | 'warning' } => {
+  if (error instanceof NoteServiceError) {
+    switch (error.type) {
+      case 'VALIDATION_ERROR':
+        return {
+          message: `Please check your input: ${error.message}`,
+          type: 'warning'
+        };
+      case 'DUPLICATE_ERROR':
+        return {
+          message: error.message,
+          type: 'warning'
+        };
+      case 'STORAGE_ERROR':
+        return {
+          message: 'Unable to save note. Please try again.',
+          type: 'error'
+        };
+      default:
+        return {
+          message: error.message,
+          type: 'error'
+        };
+    }
+  }
+  return {
+    message: 'An unexpected error occurred. Please try again.',
+    type: 'error'
+  };
+};
+
+export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingNotes }: AddNoteModalProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [newTag, setNewTag] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [validation, setValidation] = useState<ValidationState>({
+    title: { isValid: true, message: '' },
+    content: { isValid: true, message: '' },
+  });
+  const [feedbackState, setFeedbackState] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning';
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    message: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = (): boolean => {
+    const newValidation: ValidationState = {
+      title: { isValid: true, message: '' },
+      content: { isValid: true, message: '' },
+    };
+
+    if (!title.trim()) {
+      newValidation.title = {
+        isValid: false,
+        message: 'Title is required',
+      };
+    }
+
+    const normalizedTitle = title.trim().toLowerCase();
+    const isDuplicate = existingNotes.some(
+      note => note.title.toLowerCase() === normalizedTitle
+    );
+    
+    if (isDuplicate) {
+      newValidation.title = {
+        isValid: false,
+        message: `A note with the title "${title.trim()}" already exists`,
+      };
+    }
+
+    if (!content.trim()) {
+      newValidation.content = {
+        isValid: false,
+        message: 'Content is required',
+      };
+    }
+
+    setValidation(newValidation);
+    return Object.values(newValidation).every((field) => field.isValid);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    
+    if (validation.title.message) {
+      setValidation(prev => ({
+        ...prev,
+        title: { isValid: true, message: '' }
+      }));
+    }
+  };
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setContent(newContent);
+    
+    if (validation.content.message) {
+      setValidation(prev => ({
+        ...prev,
+        content: { isValid: true, message: '' }
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title: title.trim() || 'Untitled Note',
-      content: content.trim(),
-      tags: selectedTags,
-    });
-    // Reset form
-    setTitle('');
-    setContent('');
-    setNewTag('');
-    setSelectedTags([]);
-    onClose();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      await onSave({
+        title: title.trim() || 'Untitled Note',
+        content: content.trim(),
+        tags: selectedTags,
+      });
+      
+      setFeedbackState({
+        show: true,
+        type: 'success',
+        message: 'Note saved successfully!',
+      });
+
+      setTimeout(() => {
+        setFeedbackState(prev => ({ ...prev, show: false }));
+        setTitle('');
+        setContent('');
+        setNewTag('');
+        setSelectedTags([]);
+        onClose();
+      }, 1500);
+    } catch (error) {
+      console.error('Failed to save note:', error);
+      const { message, type } = getErrorMessage(error);
+      setFeedbackState({
+        show: true,
+        type,
+        message,
+      });
+      setTimeout(() => setFeedbackState(prev => ({ ...prev, show: false })), 3000);
+    }
   };
 
   const handleTagInput = (value: string) => {
     setNewTag(value);
 
-    // If the input ends with a comma, add the tag(s)
     if (value.includes(',')) {
       const tagsToAdd = value
         .split(',')
@@ -133,11 +279,14 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                         type='text'
                         id='title'
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className='mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white'
+                        onChange={handleTitleChange}
+                        className={`mt-1 block w-full rounded-md border ${validation.title.isValid ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'} px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white`}
                         placeholder='Enter note title'
                         required
                       />
+                      {validation.title.message && (
+                        <p className='mt-1 text-sm text-red-500'>{validation.title.message}</p>
+                      )}
                     </div>
 
                     <div>
@@ -234,10 +383,13 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
                     <textarea
                       id='content'
                       value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      className='mt-1 block w-full h-[calc(100%-2rem)] rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white resize-none'
+                      onChange={handleContentChange}
+                      className={`mt-1 block w-full h-[calc(100%-2rem)] rounded-md border ${validation.content.isValid ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'} px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white resize-none`}
                       placeholder='Write your note content here...'
                     />
+                    {validation.content.message && (
+                      <p className='mt-1 text-sm text-red-500'>{validation.content.message}</p>
+                    )}
                   </div>
                 </form>
               </Dialog.Panel>
@@ -245,6 +397,11 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags }: AddNote
           </div>
         </div>
       </Dialog>
+      <Feedback
+        show={feedbackState.show}
+        type={feedbackState.type}
+        message={feedbackState.message}
+      />
     </Transition>
   );
 };

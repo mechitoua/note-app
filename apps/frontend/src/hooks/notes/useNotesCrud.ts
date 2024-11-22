@@ -30,17 +30,7 @@ export const useNotesCrud = () => {
   const createNote = useCallback(
     async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
       try {
-        const newNote = {
-          id: crypto.randomUUID(),
-          title,
-          content,
-          tags,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          archived: false,
-        };
-
-        await noteService.createNote(newNote);
+        const newNote = await noteService.createNote({ title, content, tags });
         setNotes([newNote, ...state.notes]);
         setSelectedNote(newNote); // This will update both selectedNote and editorContent
         setError(null);

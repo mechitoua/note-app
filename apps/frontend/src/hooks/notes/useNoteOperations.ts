@@ -78,6 +78,27 @@ export const useNoteOperations = () => {
     }
   }, []);
 
+  const updateNoteTags = useCallback(async (noteId: string, tags: string[]) => {
+    setState((prev) => ({ ...prev, isLoading: true }));
+    try {
+      const updatedNote = await noteService.updateNoteTags(noteId, tags);
+      setState((prev) => ({
+        ...prev,
+        notes: prev.notes.map((note) => (note.id === noteId ? updatedNote : note)),
+        isLoading: false,
+        error: null,
+      }));
+      return true;
+    } catch (err) {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: 'Failed to update note tags',
+      }));
+      return false;
+    }
+  }, []);
+
   const archiveNote = useCallback(async (noteId: string) => {
     setState((prev) => ({ ...prev, isLoading: true }));
     try {
@@ -158,5 +179,6 @@ export const useNoteOperations = () => {
     archiveNote,
     unarchiveNote,
     deleteNote,
+    updateNoteTags,
   };
 };
