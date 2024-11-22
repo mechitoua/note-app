@@ -1,6 +1,7 @@
 import { Settings } from 'lucide-react'
 import * as React from 'react'
 import { FontSelector } from './FontSelector'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export const SettingsMenu = () => {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -31,6 +32,10 @@ export const SettingsMenu = () => {
         <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="p-4 space-y-4">
             <div>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Theme</h3>
+              <ThemeToggle />
+            </div>
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Font</h3>
               <FontSelector />
             </div>

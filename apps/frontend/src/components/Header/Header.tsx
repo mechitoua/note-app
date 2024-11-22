@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { SettingsMenu } from '@/components/Settings/SettingsMenu';
 import { useNoteStore } from '@/store/useNoteStore';
 import { Menu, Search } from 'lucide-react';
@@ -76,7 +75,6 @@ export const Header = ({
       {/* Right section */}
       <div className='w-64 flex items-center justify-end'>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <SettingsMenu />
         </div>
       </div>
