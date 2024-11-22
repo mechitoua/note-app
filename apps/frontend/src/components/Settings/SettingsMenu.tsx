@@ -2,6 +2,7 @@ import { Settings } from 'lucide-react'
 import * as React from 'react'
 import { FontSelector } from './FontSelector'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { ColorThemeSelector } from './ColorThemeSelector'
 
 export const SettingsMenu = () => {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -55,8 +56,12 @@ export const SettingsMenu = () => {
         >
           <div className="p-4 space-y-4">
             <div role="menuitem">
-              <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Theme</h2>
+              <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Theme Mode</h2>
               <ThemeToggle />
+            </div>
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700" role="menuitem">
+              <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Color Theme</h2>
+              <ColorThemeSelector />
             </div>
             <div className="pt-2 border-t border-gray-200 dark:border-gray-700" role="menuitem">
               <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Font</h2>

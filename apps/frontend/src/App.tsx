@@ -11,12 +11,13 @@ import {
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
-import { useNoteStore } from '@/store/useNoteStore';
 import { useFontStore } from '@/store/useFontStore';
+import { useNoteStore } from '@/store/useNoteStore';
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { CurrentView } from '@/types';
+import { normalizeTag } from '@/utils/tagUtils';
 import { useEffect, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { normalizeTag } from '@/utils/tagUtils';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -48,6 +49,11 @@ function App() {
   const searchQuery = useNoteStore((state) => state.searchQuery); // Get the search query from the note store
 
   const { currentFont } = useFontStore();
+
+  const { currentTheme } = useThemeStore();
+
+  // Get theme with fallback to default ocean theme
+  const theme = defaultThemes[currentTheme] || defaultThemes.ocean;
 
   useEffect(() => {
     syncTags(notes);
@@ -137,8 +143,11 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-white dark:bg-gray-900" style={{ fontFamily: currentFont.fontFamily }}>
-        <div className="h-screen flex overflow-hidden">
+      <div
+        className={`min-h-screen ${theme.colors.background} transition-colors duration-200`}
+        style={{ fontFamily: currentFont.fontFamily }}
+      >
+        <div className='h-screen flex overflow-hidden'>
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
@@ -147,8 +156,9 @@ function App() {
             tags={tags}
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
+            className={theme.colors.surface}
           />
-          <main className="flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden">
+          <main className={`flex-1 flex flex-col ${theme.colors.surface} overflow-hidden`}>
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
@@ -163,8 +173,8 @@ function App() {
               isSearching={!!searchQuery}
               totalResults={filteredNotes.length}
             />
-            <div className="flex-1 overflow-hidden">
-              <PanelGroup direction="horizontal">
+            <div className='flex-1 overflow-hidden'>
+              <PanelGroup direction='horizontal'>
                 <Panel defaultSize={30} minSize={30}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
@@ -184,10 +194,10 @@ function App() {
                     />
                   )}
                 </Panel>
-                <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
+                <PanelResizeHandle className='w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors' />
                 <Panel minSize={40} defaultSize={80}>
                   {selectedNote && (
-                    <div className="h-full grid grid-cols-[1fr,250px]">
+                    <div className='h-full grid grid-cols-[1fr,250px]'>
                       <NoteEditor
                         title={editorContent.title}
                         content={editorContent.content}
