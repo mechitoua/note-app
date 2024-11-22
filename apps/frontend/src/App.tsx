@@ -213,8 +213,9 @@ function App() {
       <AddNoteModal
         isOpen={isAddNoteModalOpen}
         onClose={() => setIsAddNoteModalOpen(false)}
-        onSave={handleNewNoteWithTags}
+        onSave={handleNewNote}
         availableTags={tags}
+        existingNotes={notes}
       />
     </ThemeProvider>
   );
