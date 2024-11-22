@@ -24,7 +24,7 @@ export const Sidebar = ({
   return (
     <aside
       className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
-        isOpen ? 'w-52' : 'w-0'
+        isOpen ? 'w-64' : 'w-0'
       } transition-all duration-300 overflow-hidden flex flex-col`}
     >
       {/* Logo Section */}

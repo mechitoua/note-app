@@ -162,7 +162,7 @@ function App() {
             />
             <div className="flex-1 overflow-hidden">
               <PanelGroup direction="horizontal">
-                <Panel defaultSize={35} minSize={30}>
+                <Panel defaultSize={20} minSize={15}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
@@ -182,7 +182,7 @@ function App() {
                   )}
                 </Panel>
                 <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
-                <Panel minSize={30}>
+                <Panel minSize={40} defaultSize={80}>
                   {selectedNote && (
                     <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
