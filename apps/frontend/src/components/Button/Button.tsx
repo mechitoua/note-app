@@ -13,45 +13,44 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const { currentTheme } = useThemeStore();
     const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
-    const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+    const baseStyles = cn(
+      'inline-flex items-center justify-center',
+      'rounded-lg',
+      'font-medium',
+      'transition-all duration-200',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+      'disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed',
+      'select-none'
+    );
     
     const variantClassNames = {
       primary: cn(
-        'inline-flex items-center justify-center',
-        'rounded-md px-4 py-2',
-        'font-medium',
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        'transition-colors duration-200',
+        'shadow-sm',
+        'active:scale-[0.98] active:translate-y-[0.5px]',
         theme.colors.primary,
-        'text-white dark:text-slate-900' // Light text on rich bg (light mode), dark text on pastel bg (dark mode)
+        'text-white dark:text-white', // Always white text for primary buttons
+        'focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900'
       ),
       secondary: cn(
-        'inline-flex items-center justify-center',
-        'rounded-md px-4 py-2',
-        'font-medium',
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        'transition-colors duration-200',
-        theme.colors.secondary,
-        'text-white dark:text-slate-900' // Light text on rich bg (light mode), dark text on pastel bg (dark mode)
+        'bg-white dark:bg-slate-800',
+        'border border-slate-200 dark:border-slate-700',
+        'text-slate-900 dark:text-slate-100',
+        'hover:bg-slate-50 dark:hover:bg-slate-700',
+        'active:scale-[0.98] active:translate-y-[0.5px]',
+        'focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900'
       ),
       ghost: cn(
-        'inline-flex items-center justify-center',
-        'rounded-md px-4 py-2',
-        'font-medium',
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        'transition-colors duration-200',
-        theme.colors.hover,
-        theme.colors.accent // Using theme accent color which is already contrast-optimized
+        'text-slate-700 dark:text-slate-300',
+        'hover:bg-slate-100 dark:hover:bg-slate-800',
+        'active:scale-[0.98] active:translate-y-[0.5px]',
+        'focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900'
       ),
     };
 
     const sizes = {
-      sm: 'text-sm px-3 py-1.5',
-      md: 'text-sm px-4 py-2',
-      lg: 'text-base px-6 py-3',
+      sm: 'h-8 px-3 text-sm',
+      md: 'h-10 px-4 text-sm',
+      lg: 'h-11 px-6 text-base',
     };
 
     return (
@@ -62,9 +61,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variantClassNames[variant],
           sizes[size],
           fullWidth && 'w-full',
-          'focus:ring-opacity-50',
-          variant === 'primary' && `focus:ring-${theme.colors.accent.split('-')[1]}-500`,
-          variant === 'secondary' && `focus:ring-${theme.colors.accent.split('-')[1]}-400`,
+          'focus-visible:ring-opacity-50',
+          variant === 'primary' && `focus-visible:ring-${theme.colors.accent.split('-')[1]}-500`,
+          variant === 'secondary' && `focus-visible:ring-${theme.colors.accent.split('-')[1]}-400`,
           className
         )}
         {...props}

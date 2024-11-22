@@ -1,5 +1,6 @@
 import { SettingsMenu } from '@/components/Settings/SettingsMenu';
 import { useNoteStore } from '@/store/useNoteStore';
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { Menu, Search } from 'lucide-react';
 import { useCallback, useRef } from 'react';
 
@@ -23,6 +24,8 @@ export const Header = ({
   const searchRef = useRef<HTMLInputElement>(null);
   const searchQuery = useNoteStore((state) => state.searchQuery);
   const setSearchQuery = useNoteStore((state) => state.setSearchQuery);
+  const { currentTheme } = useThemeStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
   const handleSearchFocus = useCallback(() => {
     if (searchRef.current) {
@@ -31,7 +34,10 @@ export const Header = ({
   }, []);
 
   return (
-    <header className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700' role="banner">
+    <header
+      className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700'
+      role='banner'
+    >
       {/* Left section */}
       <div className='w-64 flex items-center gap-2'>
         <button
@@ -40,22 +46,22 @@ export const Header = ({
           aria-label={`${isSidebarOpen ? 'Close' : 'Open'} sidebar menu`}
           aria-expanded={isSidebarOpen}
         >
-          <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' aria-hidden="true" />
+          <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' aria-hidden='true' />
         </button>
 
         <button
           onClick={onLogoClick}
-          className='text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400'
-          aria-label="Go to home"
+          className={`text-lg font-semibold text-gray-900 dark:text-white hover:${theme.colors.accent}`}
+          aria-label='Go to home'
         >
           {title}
         </button>
       </div>
 
       {/* Center section */}
-      <div className='flex-1 flex justify-center' aria-live="polite">
+      <div className='flex-1 flex justify-center' aria-live='polite'>
         {isSearching && totalResults !== undefined && (
-          <div className='text-sm text-gray-500 dark:text-gray-400' role="status">
+          <div className='text-sm text-gray-500 dark:text-gray-400' role='status'>
             Found {totalResults} {totalResults === 1 ? 'result' : 'results'}
           </div>
         )}
@@ -71,12 +77,15 @@ export const Header = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={handleSearchFocus}
-            className='w-96 px-4 py-2 pl-10 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent'
-            aria-label="Search notes"
-            role="searchbox"
+            className={`w-96 px-4 py-2 pl-10 text-sm ${theme.colors.primaryLight} border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-current hover:bg-opacity-80 dark:hover:bg-opacity-40 transition-colors ${theme.colors.text} placeholder:text-gray-500 dark:placeholder:text-gray-400`}
+            aria-label='Search notes'
+            role='searchbox'
             aria-expanded={isSearching}
           />
-          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' aria-hidden="true" />
+          <Search
+            className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${theme.colors.accent}`}
+            aria-hidden='true'
+          />
         </div>
         <SettingsMenu />
       </div>

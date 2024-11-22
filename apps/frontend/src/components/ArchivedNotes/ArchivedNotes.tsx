@@ -1,4 +1,5 @@
 import { useNoteStore } from '@/store/useNoteStore';
+import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
 import { Note } from '@/types/note';
 import { Archive, ArchiveRestore } from 'lucide-react';
 
@@ -11,6 +12,11 @@ interface ArchivedNotesProps {
 
 export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive, selectedNoteId }: ArchivedNotesProps) => {
   const searchQuery = useNoteStore((state) => state.searchQuery);
+  const { currentTheme } = useThemeStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
+  const themeAccent = theme.colors.accent;
+  const themePrimaryLight = theme.colors.primaryLight;
+  const themeBorder = theme.colors.border;
 
   const filteredNotes = notes.filter((note) => {
     if (!searchQuery) return true;
@@ -34,7 +40,7 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive, selectedNoteId
     <div className='col-span-1 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
         <h2 className='text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2'>
-          <Archive className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
+          <Archive className={`w-5 h-5 ${themeAccent}`} />
           Archived Notes
         </h2>
       </div>
@@ -95,7 +101,7 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive, selectedNoteId
                 onClick={() => onNoteSelect(note)}
                 className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                   note.id === selectedNoteId
-                    ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50'
+                    ? `${themePrimaryLight} ${themeAccent} border-current`
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
@@ -122,7 +128,7 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive, selectedNoteId
                   </div>
                   <button
                     onClick={(e) => handleUnarchive(note, e)}
-                    className='p-2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-500 transition-colors'
+                    className={`p-2 text-gray-500 dark:text-gray-400 hover:${themeAccent} transition-colors`}
                     title='Unarchive note'
                   >
                     <ArchiveRestore className='w-5 h-5' />
