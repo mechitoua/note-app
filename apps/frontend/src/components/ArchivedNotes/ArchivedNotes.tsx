@@ -1,24 +1,25 @@
+import { useNoteStore } from '@/store/useNoteStore';
 import { Note } from '@/types/note';
 import { Archive, ArchiveRestore } from 'lucide-react';
-import { useNoteStore } from '@/store/useNoteStore';
 
 interface ArchivedNotesProps {
   notes: Note[];
   onNoteSelect: (note: Note) => void;
   onUnarchive?: (noteId: string) => void;
+  selectedNoteId: string;
 }
 
-export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNotesProps) => {
-  const searchQuery = useNoteStore(state => state.searchQuery);
+export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive, selectedNoteId }: ArchivedNotesProps) => {
+  const searchQuery = useNoteStore((state) => state.searchQuery);
 
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = notes.filter((note) => {
     if (!searchQuery) return true;
-    
+
     const searchLower = searchQuery.toLowerCase();
     return (
       note.title.toLowerCase().includes(searchLower) ||
       note.content.toLowerCase().includes(searchLower) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      note.tags.some((tag) => tag.toLowerCase().includes(searchLower))
     );
   });
 
@@ -92,18 +93,17 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNote
               <div
                 key={note.id}
                 onClick={() => onNoteSelect(note)}
-                className='p-4 rounded-lg border cursor-pointer transition-all duration-200 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                  note.id === selectedNoteId
+                    ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
               >
                 <div className='flex justify-between items-start'>
                   <div className='space-y-2 flex-grow'>
                     <h3 className='font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2'>
                       {note.title || 'Untitled Note'}
                     </h3>
-                    {note.content && (
-                      <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
-                        {note.content}
-                      </p>
-                    )}
                     {note.tags && note.tags.length > 0 && (
                       <div className='flex flex-wrap gap-1.5'>
                         {note.tags.map((tag) => (
@@ -116,6 +116,9 @@ export const ArchivedNotes = ({ notes, onNoteSelect, onUnarchive }: ArchivedNote
                         ))}
                       </div>
                     )}
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>
+                      {new Date(note.updatedAt).toLocaleDateString()}
+                    </div>
                   </div>
                   <button
                     onClick={(e) => handleUnarchive(note, e)}
