@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { SettingsMenu } from '@/components/Settings/SettingsMenu';
 import { useNoteStore } from '@/store/useNoteStore';
 import { Menu, Search } from 'lucide-react';
 import { useCallback, useRef } from 'react';
@@ -20,61 +20,59 @@ export const Header = ({
   isSearching,
   totalResults,
 }: HeaderProps) => {
+  const searchRef = useRef<HTMLInputElement>(null);
   const searchQuery = useNoteStore((state) => state.searchQuery);
   const setSearchQuery = useNoteStore((state) => state.setSearchQuery);
-  const searchRef = useRef<HTMLDivElement>(null);
 
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
-    },
-    [setSearchQuery]
-  );
+  const handleSearchFocus = useCallback(() => {
+    if (searchRef.current) {
+      searchRef.current.select();
+    }
+  }, []);
 
   return (
-    <header className='h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 flex items-center'>
+    <header className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700'>
       {/* Left section */}
-      <div className='w-64 flex items-center gap-3'>
+      <div className='w-64 flex items-center gap-2'>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className='p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors'
+          className='p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg'
         >
           <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' />
         </button>
+
         <button
           onClick={onLogoClick}
-          className='text-xl font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors'
+          className='text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400'
         >
           {title}
         </button>
       </div>
 
       {/* Center section */}
-      <div className='flex-1 flex justify-center items-center'>
-        <div ref={searchRef} className='relative w-96'>
-          <div className='relative flex items-center'>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder='Search by content, title or tag...'
-              className='w-full py-1.5 pl-3 pr-10 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:text-sm placeholder:font-normal'
-            />
-            <div className='absolute right-3 flex items-center'>
-              <Search className='h-4 w-4 text-gray-500 dark:text-gray-400' />
-            </div>
-            {isSearching && searchQuery && (
-              <div className='absolute right-10 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 rounded-full'>
-                {totalResults} {totalResults === 1 ? 'result' : 'results'}
-              </div>
-            )}
+      <div className='flex-1 flex justify-center'>
+        {isSearching && totalResults !== undefined && (
+          <div className='text-sm text-gray-500 dark:text-gray-400'>
+            Found {totalResults} {totalResults === 1 ? 'result' : 'results'}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Right section */}
-      <div className='w-64 flex items-center justify-end gap-2'>
-        <ThemeToggle />
+      <div className='w-auto flex items-center justify-end gap-3'>
+        <div className='relative'>
+          <input
+            ref={searchRef}
+            type='text'
+            placeholder='Search by content, title or tag...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={handleSearchFocus}
+            className='w-96 px-4 py-2 pl-10 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent'
+          />
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
+        </div>
+        <SettingsMenu />
       </div>
     </header>
   );

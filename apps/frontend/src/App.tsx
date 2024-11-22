@@ -12,6 +12,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { useNoteStore } from '@/store/useNoteStore';
+import { useFontStore } from '@/store/useFontStore';
 import { CurrentView } from '@/types';
 import { useEffect, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -44,6 +45,8 @@ function App() {
   const { tags, selectedTag, setSelectedTag, addTags, syncTags, clearSelectedTag } = useTags();
 
   const searchQuery = useNoteStore((state) => state.searchQuery); // Get the search query from the note store
+
+  const { currentFont } = useFontStore();
 
   useEffect(() => {
     syncTags(notes);
@@ -131,8 +134,8 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
-        <div className='h-screen flex overflow-hidden'>
+      <div className="min-h-screen bg-white dark:bg-gray-900" style={{ fontFamily: currentFont.fontFamily }}>
+        <div className="h-screen flex overflow-hidden">
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
@@ -142,7 +145,7 @@ function App() {
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
           />
-          <main className='flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden'>
+          <main className="flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden">
             <Header
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
@@ -157,8 +160,8 @@ function App() {
               isSearching={!!searchQuery}
               totalResults={filteredNotes.length}
             />
-            <div className='flex-1 overflow-hidden'>
-              <PanelGroup direction='horizontal'>
+            <div className="flex-1 overflow-hidden">
+              <PanelGroup direction="horizontal">
                 <Panel defaultSize={35} minSize={30}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
@@ -178,10 +181,10 @@ function App() {
                     />
                   )}
                 </Panel>
-                <PanelResizeHandle className='w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors' />
+                <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
                 <Panel minSize={30}>
                   {selectedNote && (
-                    <div className='h-full grid grid-cols-[1fr,250px]'>
+                    <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
                         title={editorContent.title}
                         content={editorContent.content}
