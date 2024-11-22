@@ -1,11 +1,33 @@
 import { noteService } from '@/services/noteService';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNoteOperations } from './notes/useNoteOperations';
 import { useNoteSelection } from './notes/useNoteSelection';
 import { useTags } from './useTags';
+import { useFeedback } from '@/contexts/FeedbackContext';
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof NoteServiceError) {
+    switch (error.type) {
+      case 'NOT_FOUND':
+        return error.message;
+      case 'VALIDATION_ERROR':
+        return `Validation error: ${error.message}`;
+      case 'DUPLICATE_ERROR':
+        return error.message;
+      case 'STORAGE_ERROR':
+        return 'There was a problem saving your changes. Please try again.';
+      case 'PERMISSION_ERROR':
+        return 'You do not have permission to perform this action.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
+    }
+  }
+  return 'An unexpected error occurred. Please try again.';
+};
 
 export const useNotes = () => {
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
+  const { showSuccess, showError } = useFeedback();
 
   const {
     notes,
@@ -45,43 +67,75 @@ export const useNotes = () => {
     content: string;
     tags: string[];
   }) => {
-    const success = await createNote(title, content, tags);
-    if (success) {
-      setIsAddNoteModalOpen(false);
+    try {
+      const success = await createNote(title, content, tags);
+      if (success) {
+        showSuccess('Note created successfully');
+        setIsAddNoteModalOpen(false);
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
   const handleSaveNote = async () => {
     if (!selectedNote) return;
-    const success = await updateNote(selectedNote.id, editorContent.title, editorContent.content);
-    if (success) {
-      clearSelection();
+    try {
+      const success = await updateNote(selectedNote.id, editorContent.title, editorContent.content);
+      if (success) {
+        showSuccess('Note updated successfully');
+        clearSelection();
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
   const handleArchiveNote = async () => {
     if (!selectedNote) return;
-    const success = await archiveNote(selectedNote.id);
-    if (success) {
-      clearSelection();
+    try {
+      const success = await archiveNote(selectedNote.id);
+      if (success) {
+        showSuccess(
+          selectedNote.archived 
+            ? 'Note unarchived successfully'
+            : 'Note archived successfully'
+        );
+        clearSelection();
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
-  const handleUnarchiveNote = async (noteId: string) => {
-    const success = await unarchiveNote(noteId);
-    if (success) {
-      clearSelection();
-      // Force a refresh of notes
-      await fetchNotes();
-    }
-    return success;
-  };
+  const handleUnarchiveNote = useCallback(
+    async (noteId: string) => {
+      try {
+        const success = await unarchiveNote(noteId);
+        if (success) {
+          showSuccess('Note unarchived successfully');
+          clearSelection();
+          await fetchNotes();
+        }
+        return success;
+      } catch (error) {
+        showError(getErrorMessage(error));
+        return false;
+      }
+    },
+    [unarchiveNote, clearSelection, fetchNotes, showSuccess, showError]
+  );
 
   const handleDeleteNote = async () => {
     if (!selectedNote) return;
-    const success = await deleteNote(selectedNote.id);
-    if (success) {
-      clearSelection();
+    try {
+      const success = await deleteNote(selectedNote.id);
+      if (success) {
+        showSuccess('Note deleted successfully');
+        clearSelection();
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
     }
   };
 
@@ -104,25 +158,32 @@ export const useNotes = () => {
   };
 
   const handleUpdateNoteTags = async (noteId: string, tags: string[]) => {
-    const success = await updateNoteTags(noteId, tags);
-    if (success) {
-      // Update the selected note if it's the one being modified
-      if (selectedNote?.id === noteId) {
-        const updatedNote = await noteService
-          .getNotes()
-          .then((notes) => notes.find((note) => note.id === noteId));
-        if (updatedNote) {
-          setSelection({
-            selectedNote: updatedNote,
-            editorContent: {
-              title: updatedNote.title,
-              content: updatedNote.content,
-            },
-          });
+    try {
+      const success = await updateNoteTags(noteId, tags);
+      if (success) {
+        showSuccess('Tags updated successfully');
+        if (selectedNote?.id === noteId) {
+          const updatedNote = await noteService
+            .getNotes()
+            .then((notes) => notes.find((note) => note.id === noteId));
+          if (updatedNote) {
+            setSelection({
+              selectedNote: updatedNote,
+              editorContent: {
+                title: updatedNote.title,
+                content: updatedNote.content,
+              },
+            });
+          }
         }
+      } else {
+        showError('Failed to update tags');
       }
+      return success;
+    } catch (error) {
+      showError(getErrorMessage(error));
+      return false;
     }
-    return success;
   };
 
   const getFilteredNotes = (archived: boolean) => {
