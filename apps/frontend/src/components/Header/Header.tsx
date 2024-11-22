@@ -31,28 +31,31 @@ export const Header = ({
   }, []);
 
   return (
-    <header className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700'>
+    <header className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700' role="banner">
       {/* Left section */}
       <div className='w-64 flex items-center gap-2'>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className='p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg'
+          aria-label={`${isSidebarOpen ? 'Close' : 'Open'} sidebar menu`}
+          aria-expanded={isSidebarOpen}
         >
-          <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' />
+          <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' aria-hidden="true" />
         </button>
 
         <button
           onClick={onLogoClick}
           className='text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400'
+          aria-label="Go to home"
         >
           {title}
         </button>
       </div>
 
       {/* Center section */}
-      <div className='flex-1 flex justify-center'>
+      <div className='flex-1 flex justify-center' aria-live="polite">
         {isSearching && totalResults !== undefined && (
-          <div className='text-sm text-gray-500 dark:text-gray-400'>
+          <div className='text-sm text-gray-500 dark:text-gray-400' role="status">
             Found {totalResults} {totalResults === 1 ? 'result' : 'results'}
           </div>
         )}
@@ -69,8 +72,11 @@ export const Header = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={handleSearchFocus}
             className='w-96 px-4 py-2 pl-10 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent'
+            aria-label="Search notes"
+            role="searchbox"
+            aria-expanded={isSearching}
           />
-          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' aria-hidden="true" />
         </div>
         <SettingsMenu />
       </div>
