@@ -1,6 +1,8 @@
 import MDEditor from '@uiw/react-md-editor';
 import { Save, X } from 'lucide-react';
-import { memo, useCallback, useState, useEffect } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
+import { Button } from '../Button/Button';
 
 interface NoteEditorProps {
   title: string;
@@ -13,10 +15,20 @@ interface NoteEditorProps {
 }
 
 export const NoteEditor = memo(
-  ({ title, content, onTitleChange, onContentChange, onSave, onCancel, selectedTag }: NoteEditorProps) => {
+  ({
+    title,
+    content,
+    onTitleChange,
+    onContentChange,
+    onSave,
+    onCancel,
+    selectedTag,
+  }: NoteEditorProps) => {
     // Initialize in markdown mode with preview
     const [editorMode, setEditorMode] = useState<'markdown' | 'plain'>('markdown');
     const [isPreview, setIsPreview] = useState(true);
+    const { currentTheme } = useThemeStore();
+    const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
     const handleModeChange = (mode: 'markdown' | 'plain') => {
       setEditorMode(mode);
@@ -86,50 +98,44 @@ export const NoteEditor = memo(
       return text;
     }, []);
 
-    const handleContentChange = useCallback((newContent: string) => {
-      if (editorMode === 'markdown') {
-        onContentChange(newContent);
-      } else {
-        onContentChange(convertPlainTextToMarkdown(newContent));
-      }
-    }, [editorMode, onContentChange, convertPlainTextToMarkdown]);
+    const handleContentChange = useCallback(
+      (newContent: string) => {
+        if (editorMode === 'markdown') {
+          onContentChange(newContent);
+        } else {
+          onContentChange(convertPlainTextToMarkdown(newContent));
+        }
+      },
+      [editorMode, onContentChange, convertPlainTextToMarkdown]
+    );
 
     return (
       <div className='h-full flex flex-col overflow-hidden bg-white dark:bg-gray-900'>
         <div className='p-6 flex-1 flex flex-col'>
           <div className='space-y-4'>
             <div className='flex justify-end gap-2'>
-              <button
+              <Button
+                variant={editorMode === 'plain' ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => handleModeChange('plain')}
-                className={`px-3 py-1 rounded-lg text-sm ${
-                  editorMode === 'plain'
-                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
               >
                 Plain Text
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={editorMode === 'markdown' ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => handleModeChange('markdown')}
-                className={`px-3 py-1 rounded-lg text-sm ${
-                  editorMode === 'markdown'
-                    ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
               >
                 Markdown
-              </button>
+              </Button>
               {editorMode === 'markdown' && (
-                <button
+                <Button
+                  variant={isPreview ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setIsPreview(!isPreview)}
-                  className={`px-3 py-1 rounded-lg text-sm ${
-                    isPreview
-                      ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
                 >
                   {isPreview ? 'Edit' : 'Preview'}
-                </button>
+                </Button>
               )}
             </div>
             <input
@@ -165,7 +171,7 @@ export const NoteEditor = memo(
                       backgroundColor: 'transparent',
                       color: 'inherit',
                       outline: 'none',
-                      fontSize: '1rem'
+                      fontSize: '1rem',
                     },
                   }}
                 />
@@ -181,20 +187,22 @@ export const NoteEditor = memo(
             )}
           </div>
           <div className='flex justify-start gap-2 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4'>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={onSave}
-              className='px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg transition-colors flex items-center gap-2'
             >
               <Save className='w-4 h-4' />
               Save
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onCancel}
-              className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-2'
             >
               <X className='w-4 h-4' />
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       </div>

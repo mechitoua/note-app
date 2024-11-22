@@ -1,7 +1,9 @@
-import { Note } from '@/types/note';
-import { Plus, Archive, ArchiveRestore } from 'lucide-react';
 import { useNoteStore } from '@/store/useNoteStore';
+import { Note } from '@/types/note';
 import { normalizeTag } from '@/utils/tagUtils';
+import { Archive, ArchiveRestore, Plus } from 'lucide-react';
+import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
+import { Button } from '../Button/Button';
 
 interface NoteListProps {
   notes: Note[];
@@ -20,39 +22,45 @@ export const NoteList: React.FC<NoteListProps> = ({
   onArchive,
   onUnarchive
 }) => {
-  const searchQuery = useNoteStore(state => state.searchQuery);
-  const selectedTag = useNoteStore(state => state.selectedTag);
-  const currentView = useNoteStore(state => state.currentView);
+  const searchQuery = useNoteStore((state) => state.searchQuery);
+  const selectedTag = useNoteStore((state) => state.selectedTag);
+  const currentView = useNoteStore((state) => state.currentView);
+  const { currentTheme } = useThemeStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = notes.filter((note) => {
     // Filter by archive status
     if (currentView === 'archived' && !note.archived) return false;
     if (currentView === 'all-notes' && note.archived) return false;
 
     // Filter by selected tag (case-insensitive)
-    if (selectedTag && !note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))) return false;
+    if (selectedTag && !note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag)))
+      return false;
 
     // Filter by search query
     if (!searchQuery) return true;
-    
+
     const searchLower = searchQuery.toLowerCase();
     return (
       note.title.toLowerCase().includes(searchLower) ||
       note.content.toLowerCase().includes(searchLower) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      note.tags.some((tag) => tag.toLowerCase().includes(searchLower))
     );
   });
 
   return (
     <div className='col-span-1 h-full w-70 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          fullWidth
           onClick={onCreateNote}
-          className='w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-indigo-600 dark:bg-indigo-500 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors'
+          className="flex items-center justify-center gap-2"
         >
-          <Plus className='w-4 h-4' />
+          <Plus className="w-4 h-4" />
           Create New Note
-        </button>
+        </Button>
       </div>
       <div
         className='h-[calc(100vh-8rem)] overflow-y-auto px-4 pb-4'
@@ -99,7 +107,9 @@ export const NoteList: React.FC<NoteListProps> = ({
           {filteredNotes.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8 px-4 text-center'>
               <p className='text-gray-600 dark:text-gray-400 mb-2'>No notes created yet</p>
-              <p className='text-sm text-gray-500 dark:text-gray-500'>Click the "Create New Note" button above to get started</p>
+              <p className='text-sm text-gray-500 dark:text-gray-500'>
+                Click the "Create New Note" button above to get started
+              </p>
             </div>
           ) : (
             filteredNotes.map((note) => (
@@ -108,38 +118,42 @@ export const NoteList: React.FC<NoteListProps> = ({
                 onClick={() => onNoteSelect(note)}
                 className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                   selectedNoteId === note.id
-                    ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50'
+                    ? `${theme.colors.primaryLight} border-current`
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
                 <div className='flex justify-between items-start'>
                   <div className='space-y-2 flex-grow'>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
+                    <div className='flex flex-col gap-1'>
+                      <div className='flex items-center justify-between'>
+                        <h3 className='text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center'>
                           {note.title || 'Untitled Note'}
                           {note.archived && (
-                            <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                            <span className='ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full'>
                               Archived
                             </span>
                           )}
                         </h3>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            note.archived 
-                              ? onUnarchive?.(note.id)
-                              : onArchive?.(note.id);
+                            note.archived ? onUnarchive?.(note.id) : onArchive?.(note.id);
                           }}
-                          className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className={`flex items-center gap-1.5 ${
+                            selectedNoteId === note.id
+                              ? 'text-current opacity-70 hover:opacity-100'
+                              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
                           title={note.archived ? 'Unarchive note' : 'Archive note'}
                         >
                           {note.archived ? (
-                            <ArchiveRestore className="w-4 h-4" />
+                            <ArchiveRestore className='w-3.5 h-3.5' />
                           ) : (
-                            <Archive className="w-4 h-4" />
+                            <Archive className='w-3.5 h-3.5' />
                           )}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                     {note.tags && note.tags.length > 0 && (
@@ -147,7 +161,11 @@ export const NoteList: React.FC<NoteListProps> = ({
                         {note.tags.map((tag) => (
                           <span
                             key={tag}
-                            className='px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium truncate max-w-full'
+                            className={`px-1.5 py-0.5 rounded text-xs font-medium truncate max-w-full ${
+                              selectedNoteId === note.id
+                                ? 'bg-white/20 text-current'
+                                : 'bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                            }`}
                           >
                             {tag}
                           </span>

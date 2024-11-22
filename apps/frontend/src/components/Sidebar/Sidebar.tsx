@@ -1,7 +1,8 @@
 import { CurrentView } from '@/types';
+import { normalizeTag } from '@/utils/tagUtils';
 import { Archive, ChevronRight, Feather, Home, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
-import { normalizeTag } from '@/utils/tagUtils';
+import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,6 +23,9 @@ export const Sidebar = ({
   onTagSelect,
   onAllNotesClick,
 }: SidebarProps) => {
+  const { currentTheme } = useThemeStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
+
   const isTagSelected = (tag: string) => {
     return selectedTag && normalizeTag(tag) === normalizeTag(selectedTag);
   };
@@ -33,17 +37,17 @@ export const Sidebar = ({
       } transition-all duration-300 overflow-hidden flex flex-col`}
     >
       {/* Logo Section */}
-      <div className='p-3 pt-4'>
-        <div className='flex items-center gap-2'>
-          <Feather className='w-5 h-5 text-indigo-600 dark:text-indigo-500 flex-shrink-0' />
-          <h1 className='text-lg font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-1.5'>
+      <div className="p-3 pt-4">
+        <div className="flex items-center gap-2">
+          <Feather className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-1.5">
             Notes
           </h1>
         </div>
       </div>
 
       {/* Navigation Buttons */}
-      <div className='p-3 space-y-2'>
+      <div className="p-4">
         <button
           onClick={() => {
             onViewChange('all-notes');
@@ -51,13 +55,15 @@ export const Sidebar = ({
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'all-notes' && !selectedTag
-              ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              ? `${theme.colors.primary} text-white`
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Home className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
+          <Home className={`w-5 h-5 ${currentView === 'all-notes' && !selectedTag ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
           <span>All Notes</span>
-          {currentView === 'all-notes' && !selectedTag && <ChevronRight className='w-4 h-4 ml-auto' />}
+          {currentView === 'all-notes' && !selectedTag && (
+            <ChevronRight className="w-4 h-4 ml-auto" />
+          )}
         </button>
         <button
           onClick={() => {
@@ -66,27 +72,29 @@ export const Sidebar = ({
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'archived'
-              ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              ? `${theme.colors.primary} text-white`
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Archive className='w-5 h-5 text-indigo-600 dark:text-indigo-500' />
+          <Archive className={`w-5 h-5 ${currentView === 'archived' ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
           <span>Archived</span>
-          {currentView === 'archived' && <ChevronRight className='w-4 h-4 ml-auto' />}
+          {currentView === 'archived' && <ChevronRight className="w-4 h-4 ml-auto" />}
         </button>
       </div>
 
       {/* Tags Section */}
-      <div className='flex-1 flex flex-col min-h-0 border-t border-gray-200 dark:border-gray-700'>
-        <div className='flex items-center justify-between p-3 px-6'>
-          <h2 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Tags</h2>
+      <div className="flex-1 flex flex-col min-h-0 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-3 px-6">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">Tags</h2>
         </div>
-        <div className='flex-1 overflow-y-auto px-3 pb-4' 
+        <div
+          className="flex-1 overflow-y-auto px-3 pb-4"
           style={{
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgb(156 163 175) transparent'
-          }}>
-          <div className='space-y-1'>
+            scrollbarColor: 'rgb(156 163 175) transparent',
+          }}
+        >
+          <div className="space-y-1">
             {tags.map((tag) => (
               <button
                 key={tag}
@@ -100,13 +108,15 @@ export const Sidebar = ({
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
                   isTagSelected(tag)
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                    ? `${theme.colors.primary} text-white`
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
-                <Tag className='w-3.5 h-3.5 text-indigo-600 dark:text-indigo-500' />
-                <span className='truncate text-sm font-medium'>{tag}</span>
-                {isTagSelected(tag) && <ChevronRight className='w-3.5 h-3.5 ml-auto flex-shrink-0' />}
+                <Tag className={`w-3.5 h-3.5 ${isTagSelected(tag) ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                <span className="truncate text-sm font-medium">{tag}</span>
+                {isTagSelected(tag) && (
+                  <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />
+                )}
               </button>
             ))}
           </div>
