@@ -1,83 +1,134 @@
 # Note App
 
-A modern, responsive note-taking application built with React and TypeScript. Features a clean, minimalist design with powerful organization capabilities.
+[![Version](https://img.shields.io/badge/version-0.0.0-blue)]()
 
-![Note App Screenshot](/public/light-note-app.jpg)
+A modern note-taking application built with React and TypeScript. Features a clean, minimalist design powered by Tailwind CSS.
 
-## Features
+![Note App Screenshot light](apps/frontend/public/screenshot-light.png)
 
-- 📝 Clean, distraction-free writing experience
-- 🏷️ Tag-based organization system
-- 🔍 Powerful search functionality
-- 📱 Responsive design
-- 🌓 Modern, light UI
-- 📁 Note archiving system
+![Note App Screenshot dark](/apps/frontend/public/screenshot-dark.png)
 
-## Tech Stack
+## ✨ Key Features
 
-- React
-- TypeScript
-- Tailwind CSS
-- Lucide Icons
+- 📝 **Modern Tech Stack**
+  - React with TypeScript
+  - Tailwind CSS for styling
+  - Vite for fast development
+  - ESLint + Prettier for code quality
 
-## Getting Started
+- 🏗️ **Project Structure**
+  - Monorepo setup with pnpm workspaces
+  - Shared packages for code reuse
+  - Organized frontend architecture
+
+## 🎯 Features
+
+### Note Management
+- Create, edit, and delete notes
+- Rich text editor with formatting options
+- Auto-save functionality
+- Note archiving system
+- Categories and tags for organization
+
+### User Interface
+- Clean, modern design
+- Responsive layout with resizable panels
+- Customizable themes (Light/Dark mode)
+- Adjustable font settings
+- Sidebar navigation
+
+### Organization
+- Tag-based note organization
+- Category management
+- Archive functionality
+- List and detail views
+- Quick actions menu
+
+### Settings & Customization
+- Theme customization
+- Font size adjustment
+- Layout preferences
+- Sidebar toggle
+- Panel size adjustment
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js
+- pnpm
+
+### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/note-app.git
 cd note-app
 ```
 
 2. Install dependencies:
+
 ```bash
-npm install
+pnpm install
 ```
 
 3. Start the development server:
+
 ```bash
-npm run dev
+pnpm dev
 ```
 
 4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-## Project Structure
+## 🏗️ Tech Stack
+
+- **Frontend:** React + TypeScript
+- **Styling:** Tailwind CSS
+- **Build Tool:** Vite
+- **Package Manager:** pnpm
+- **Code Quality:** ESLint + Prettier
+
+## 📁 Project Structure
 
 ```
 note-app/
-├── public/
-│   └── light-note-app.jpg
-├── src/
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── ...
+├── apps/
+│   └── frontend/           # Frontend application
+│       ├── public/        # Static assets
+│       ├── src/          # Source files
+│       └── vite.config.ts # Vite configuration
+├── packages/
+│   └── shared/           # Shared utilities and components
+├── .eslintrc.json       # ESLint configuration
+├── .prettierrc          # Prettier configuration
 ├── package.json
-└── README.md
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── tailwind.config.mjs
+└── tsconfig.base.json
 ```
 
-## Features in Detail
+## 🧑‍💻 Development
 
-### Note Management
-- Create, edit, and delete notes
-- Rich text editing capabilities
-- Auto-save functionality
-- Note preview in the sidebar
+### Available Scripts
 
-### Organization
-- Tag-based organization system
-- Archive functionality for completed notes
-- Quick search across all notes
-- Filter notes by tags
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint
+- `pnpm format` - Format code with Prettier
+- `pnpm clean` - Clean build artifacts
 
-### User Interface
-- Clean, modern design
-- Responsive layout
-- Intuitive navigation
-- Minimalist writing environment
+### Coding Standards
 
-## Contributing
+- ESLint for code linting
+- Prettier for code formatting
+- TypeScript for type safety
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 📄 License
 
-## License
+This project is open source and available under the MIT License.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
+
+Built with modern web technologies 🚀
