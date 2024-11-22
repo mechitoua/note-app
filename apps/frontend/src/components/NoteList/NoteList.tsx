@@ -44,7 +44,7 @@ export const NoteList: React.FC<NoteListProps> = ({
   });
 
   return (
-    <div className='col-span-1 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
+    <div className='col-span-1 h-full w-70 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
       <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
         <button
           onClick={onCreateNote}

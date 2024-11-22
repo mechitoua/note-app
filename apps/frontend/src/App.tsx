@@ -165,7 +165,7 @@ function App() {
             />
             <div className="flex-1 overflow-hidden">
               <PanelGroup direction="horizontal">
-                <Panel defaultSize={20} minSize={15}>
+                <Panel defaultSize={30} minSize={30}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
