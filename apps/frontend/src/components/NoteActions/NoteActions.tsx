@@ -3,6 +3,7 @@ import { Note } from '@/types/note';
 import { TagInput } from '../TagInput/TagInput';
 import { useNoteStore } from '@/store/useNoteStore';
 import { useState, useEffect } from 'react';
+import { formatTag, normalizeTag } from '@/utils/tagUtils';
 
 interface NoteActionsProps {
   selectedNote: Note;
@@ -22,29 +23,35 @@ export const NoteActions = ({
   availableTags 
 }: NoteActionsProps) => {
   // Local state to immediately reflect tag changes
-  const [localTags, setLocalTags] = useState(selectedNote.tags || []);
+  const [localTags, setLocalTags] = useState(selectedNote.tags?.map(formatTag) || []);
 
   // Sync local tags when selected note changes
   useEffect(() => {
-    setLocalTags(selectedNote.tags || []);
+    setLocalTags(selectedNote.tags?.map(formatTag) || []);
   }, [selectedNote]);
 
   const handleAddTag = async (tag: string) => {
     if (!onAddTags) return;
     
+    const formattedTag = formatTag(tag);
+    // Check if tag already exists (case-insensitive)
+    if (localTags.some(t => normalizeTag(t) === normalizeTag(formattedTag))) {
+      return;
+    }
+    
     // Update local state immediately
-    const newTags = [...localTags, tag];
+    const newTags = [...localTags, formattedTag];
     setLocalTags(newTags);
     
-    // Update backend
-    await onAddTags([tag]);
+    // Update backend with complete new tag list
+    await onAddTags(newTags);
   };
 
   const handleRemoveTag = async (tagToRemove: string) => {
     if (!onUpdateTags) return;
     
     // Update local state immediately
-    const newTags = localTags.filter(tag => tag !== tagToRemove);
+    const newTags = localTags.filter(tag => normalizeTag(tag) !== normalizeTag(tagToRemove));
     setLocalTags(newTags);
     
     // Update backend with complete new tag list

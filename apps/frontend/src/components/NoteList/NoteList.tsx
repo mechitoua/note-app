@@ -1,6 +1,7 @@
 import { Note } from '@/types/note';
 import { Plus, Archive, ArchiveRestore } from 'lucide-react';
 import { useNoteStore } from '@/store/useNoteStore';
+import { normalizeTag } from '@/utils/tagUtils';
 
 interface NoteListProps {
   notes: Note[];
@@ -20,8 +21,18 @@ export const NoteList: React.FC<NoteListProps> = ({
   onUnarchive
 }) => {
   const searchQuery = useNoteStore(state => state.searchQuery);
+  const selectedTag = useNoteStore(state => state.selectedTag);
+  const currentView = useNoteStore(state => state.currentView);
 
   const filteredNotes = notes.filter(note => {
+    // Filter by archive status
+    if (currentView === 'archived' && !note.archived) return false;
+    if (currentView === 'all-notes' && note.archived) return false;
+
+    // Filter by selected tag (case-insensitive)
+    if (selectedTag && !note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))) return false;
+
+    // Filter by search query
     if (!searchQuery) return true;
     
     const searchLower = searchQuery.toLowerCase();

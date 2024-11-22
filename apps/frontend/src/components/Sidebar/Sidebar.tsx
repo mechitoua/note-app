@@ -1,6 +1,7 @@
 import { CurrentView } from '@/types';
 import { Archive, ChevronRight, Feather, Home, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
+import { normalizeTag } from '@/utils/tagUtils';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +22,10 @@ export const Sidebar = ({
   onTagSelect,
   onAllNotesClick,
 }: SidebarProps) => {
+  const isTagSelected = (tag: string) => {
+    return selectedTag && normalizeTag(tag) === normalizeTag(selectedTag);
+  };
+
   return (
     <aside
       className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
@@ -86,7 +91,7 @@ export const Sidebar = ({
               <button
                 key={tag}
                 onClick={() => {
-                  if (selectedTag === tag) {
+                  if (isTagSelected(tag)) {
                     onTagSelect(null);
                   } else {
                     onTagSelect(tag);
@@ -94,14 +99,14 @@ export const Sidebar = ({
                   }
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
-                  selectedTag === tag
+                  isTagSelected(tag)
                     ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
                 <Tag className='w-3.5 h-3.5 text-indigo-600 dark:text-indigo-500' />
                 <span className='truncate text-sm font-medium'>{tag}</span>
-                {selectedTag === tag && <ChevronRight className='w-3.5 h-3.5 ml-auto flex-shrink-0' />}
+                {isTagSelected(tag) && <ChevronRight className='w-3.5 h-3.5 ml-auto flex-shrink-0' />}
               </button>
             ))}
           </div>

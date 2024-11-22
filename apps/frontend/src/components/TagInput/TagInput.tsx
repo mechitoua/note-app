@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { formatTag, normalizeTag } from '@/utils/tagUtils';
 
 interface TagInputProps {
   availableTags: string[];
@@ -21,9 +22,10 @@ export const TagInput = ({ availableTags, onAddTag, className = '' }: TagInputPr
       return;
     }
 
+    const normalizedInput = normalizeTag(inputValue);
     const filtered = availableTags.filter(tag =>
-      tag.toLowerCase().includes(inputValue.toLowerCase()) &&
-      tag.toLowerCase() !== inputValue.toLowerCase()
+      normalizeTag(tag).includes(normalizedInput) &&
+      normalizeTag(tag) !== normalizedInput
     );
     setSuggestions(filtered);
   }, [inputValue, availableTags]);
@@ -55,7 +57,7 @@ export const TagInput = ({ availableTags, onAddTag, className = '' }: TagInputPr
       if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
         handleAddTag(suggestions[selectedSuggestionIndex]);
       } else if (inputValue.trim()) {
-        handleAddTag(inputValue.trim());
+        handleAddTag(formatTag(inputValue));
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -72,7 +74,7 @@ export const TagInput = ({ availableTags, onAddTag, className = '' }: TagInputPr
   };
 
   const handleAddTag = (tag: string) => {
-    onAddTag(tag);
+    onAddTag(formatTag(tag));
     setInputValue('');
     setShowSuggestions(false);
     setSelectedSuggestionIndex(-1);

@@ -16,6 +16,7 @@ import { useFontStore } from '@/store/useFontStore';
 import { CurrentView } from '@/types';
 import { useEffect, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { normalizeTag } from '@/utils/tagUtils';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -76,7 +77,7 @@ function App() {
   const getFilteredNotesByTag = (notes: any[]) => {
     if (!selectedTag) return notes;
     return notes.filter((note) =>
-      note.tags.some((tag) => tag.toLowerCase() === selectedTag.toLowerCase())
+      note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag))
     );
   };
 
@@ -99,11 +100,13 @@ function App() {
 
     // Apply tag filter
     if (selectedTag) {
-      filtered = filtered.filter((note) => note.tags?.includes(selectedTag));
+      filtered = filtered.filter((note) =>
+        note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag))
+      );
     }
 
     return filtered;
-  }, [notes, currentView, selectedTag, searchQuery, getFilteredNotes]);
+  }, [notes, searchQuery, currentView, selectedTag, getFilteredNotes]);
 
   const handleUnarchiveNote = async (noteId: string) => {
     const success = await originalHandleUnarchiveNote(noteId);

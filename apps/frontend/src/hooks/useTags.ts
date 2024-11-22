@@ -1,9 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Note } from '@/types/note';
 import { DEFAULT_TAGS, isDefaultTag } from '@/constants/defaultTags';
-
-// Helper function to normalize tag case
-const normalizeTag = (tag: string) => tag.toLowerCase().trim();
+import { normalizeTag, formatTag } from '@/utils/tagUtils';
 
 export const useTags = () => {
   const [customTags, setCustomTags] = useState<string[]>([]);
@@ -13,17 +11,17 @@ export const useTags = () => {
   const tags = [...DEFAULT_TAGS, ...customTags];
 
   const addTag = useCallback((tag: string) => {
-    const normalizedTag = normalizeTag(tag);
+    const normalized = normalizeTag(tag);
     // Don't add if it's a default tag or already exists (case insensitive)
-    if (isDefaultTag(tag) || customTags.some(t => normalizeTag(t) === normalizedTag)) {
+    if (isDefaultTag(tag) || customTags.some(t => normalizeTag(t) === normalized)) {
       return;
     }
-    setCustomTags(prev => [...prev.filter(t => normalizeTag(t) !== normalizedTag), normalizedTag]);
+    setCustomTags(prev => [...prev.filter(t => normalizeTag(t) !== normalized), formatTag(tag)]);
   }, [customTags]);
 
   const addTags = useCallback((newTags: string[]) => {
     setCustomTags(prev => {
-      const uniqueTags = new Map<string, string>(); // normalized -> original
+      const uniqueTags = new Map<string, string>(); // normalized -> formatted
       
       // Add existing tags first
       prev.forEach(tag => {
@@ -32,9 +30,9 @@ export const useTags = () => {
 
       // Add new tags, skipping duplicates and default tags
       newTags.forEach(tag => {
-        const normalizedTag = normalizeTag(tag);
-        if (!isDefaultTag(tag) && !uniqueTags.has(normalizedTag)) {
-          uniqueTags.set(normalizedTag, normalizedTag);
+        const normalized = normalizeTag(tag);
+        if (!isDefaultTag(tag) && !uniqueTags.has(normalized)) {
+          uniqueTags.set(normalized, formatTag(tag));
         }
       });
 
@@ -47,8 +45,8 @@ export const useTags = () => {
     if (isDefaultTag(tag)) {
       return;
     }
-    const normalizedTag = normalizeTag(tag);
-    setCustomTags(prev => prev.filter(t => normalizeTag(t) !== normalizedTag));
+    const normalized = normalizeTag(tag);
+    setCustomTags(prev => prev.filter(t => normalizeTag(t) !== normalized));
   }, []);
 
   const clearSelectedTag = useCallback(() => {
@@ -56,18 +54,21 @@ export const useTags = () => {
   }, []);
 
   const syncTags = useCallback((notes: Note[]) => {
-    const allTags = new Set<string>();
+    const uniqueTags = new Map<string, string>(); // normalized -> formatted
     
     // Collect all unique tags from notes
     notes.forEach(note => {
       note.tags?.forEach(tag => {
         if (!isDefaultTag(tag)) {
-          allTags.add(normalizeTag(tag));
+          const normalized = normalizeTag(tag);
+          if (!uniqueTags.has(normalized)) {
+            uniqueTags.set(normalized, formatTag(tag));
+          }
         }
       });
     });
 
-    setCustomTags(Array.from(allTags));
+    setCustomTags(Array.from(uniqueTags.values()));
   }, []);
 
   return {
