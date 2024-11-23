@@ -1,7 +1,10 @@
+import { NoteServiceError } from '@/services/noteService';
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
 import { Fragment, useState } from 'react';
 import { Feedback } from '../ui/Feedback';
+import { useFontStore } from '@/store/useFontStore';
 
 interface AddNoteModalProps {
   isOpen: boolean;
@@ -22,43 +25,48 @@ interface ValidationState {
   };
 }
 
-interface NoteServiceError {
-  type: 'VALIDATION_ERROR' | 'DUPLICATE_ERROR' | 'STORAGE_ERROR';
-  message: string;
-}
-
 const getErrorMessage = (error: unknown): { message: string; type: 'error' | 'warning' } => {
   if (error instanceof NoteServiceError) {
     switch (error.type) {
       case 'VALIDATION_ERROR':
         return {
           message: `Please check your input: ${error.message}`,
-          type: 'warning'
+          type: 'warning',
         };
       case 'DUPLICATE_ERROR':
         return {
           message: error.message,
-          type: 'warning'
+          type: 'warning',
         };
       case 'STORAGE_ERROR':
         return {
           message: 'Unable to save note. Please try again.',
-          type: 'error'
+          type: 'error',
         };
       default:
         return {
           message: error.message,
-          type: 'error'
+          type: 'error',
         };
     }
   }
   return {
     message: 'An unexpected error occurred. Please try again.',
-    type: 'error'
+    type: 'error',
   };
 };
 
-export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingNotes }: AddNoteModalProps) => {
+export const AddNoteModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  availableTags,
+  existingNotes,
+}: AddNoteModalProps) => {
+  const { currentTheme } = useThemeStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
+  const { currentFont } = useFontStore();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [newTag, setNewTag] = useState('');
@@ -91,10 +99,8 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
     }
 
     const normalizedTitle = title.trim().toLowerCase();
-    const isDuplicate = existingNotes.some(
-      note => note.title.toLowerCase() === normalizedTitle
-    );
-    
+    const isDuplicate = existingNotes.some((note) => note.title.toLowerCase() === normalizedTitle);
+
     if (isDuplicate) {
       newValidation.title = {
         isValid: false,
@@ -116,11 +122,11 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    
+
     if (validation.title.message) {
-      setValidation(prev => ({
+      setValidation((prev) => ({
         ...prev,
-        title: { isValid: true, message: '' }
+        title: { isValid: true, message: '' },
       }));
     }
   };
@@ -128,18 +134,18 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     setContent(newContent);
-    
+
     if (validation.content.message) {
-      setValidation(prev => ({
+      setValidation((prev) => ({
         ...prev,
-        content: { isValid: true, message: '' }
+        content: { isValid: true, message: '' },
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -150,7 +156,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
         content: content.trim(),
         tags: selectedTags,
       });
-      
+
       setFeedbackState({
         show: true,
         type: 'success',
@@ -158,7 +164,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
       });
 
       setTimeout(() => {
-        setFeedbackState(prev => ({ ...prev, show: false }));
+        setFeedbackState((prev) => ({ ...prev, show: false }));
         setTitle('');
         setContent('');
         setNewTag('');
@@ -173,7 +179,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
         type,
         message,
       });
-      setTimeout(() => setFeedbackState(prev => ({ ...prev, show: false })), 3000);
+      setTimeout(() => setFeedbackState((prev) => ({ ...prev, show: false })), 3000);
     }
   };
 
@@ -250,7 +256,10 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
               leaveFrom='opacity-100 scale-100'
               leaveTo='opacity-0 scale-95'
             >
-              <Dialog.Panel className='w-full max-w-5xl transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl transition-all'>
+              <Dialog.Panel
+                className='w-full max-w-5xl transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl transition-all'
+                style={{ fontFamily: currentFont.fontFamily }}
+              >
                 <div className='flex items-center justify-between mb-4'>
                   <Dialog.Title className='text-lg font-medium text-gray-900 dark:text-white'>
                     Add New Note
@@ -258,14 +267,18 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                   <button
                     type='button'
                     onClick={onClose}
-                    aria-label="Close modal"
+                    aria-label='Close modal'
                     className='text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
                   >
                     <X className='h-5 w-5' />
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit} role="form" className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                <form
+                  onSubmit={handleSubmit}
+                  role='form'
+                  className='grid grid-cols-1 md:grid-cols-2 gap-6'
+                >
                   {/* Left Column: Title and Tags */}
                   <div className='space-y-4'>
                     <div>
@@ -280,7 +293,11 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                         id='title'
                         value={title}
                         onChange={handleTitleChange}
-                        className={`mt-1 block w-full rounded-md border ${validation.title.isValid ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'} px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white`}
+                        className={`mt-1 block w-full rounded-md border ${
+                          validation.title.isValid
+                            ? 'border-gray-300 dark:border-gray-600'
+                            : 'border-red-500'
+                        } px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 ${theme.colors.ring} dark:bg-gray-800 bg-white transition-colors duration-200`}
                         placeholder='Enter note title'
                         required
                       />
@@ -300,7 +317,7 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                             value={newTag}
                             onChange={(e) => handleTagInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            className='flex-1 w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white'
+                            className={`flex-1 w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 ${theme.colors.ring} dark:bg-gray-800 bg-white transition-colors duration-200`}
                             placeholder='Type tags separated by commas (e.g., work, todo, important)'
                           />
                           <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
@@ -314,13 +331,13 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                             {selectedTags.map((tag) => (
                               <span
                                 key={tag}
-                                className='inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
+                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${theme.colors.primaryLight} text-gray-900 dark:text-gray-100`}
                               >
                                 {tag}
                                 <button
                                   type='button'
                                   onClick={() => removeTag(tag)}
-                                  className='w-3.5 h-3.5 rounded hover:bg-indigo-200 dark:hover:bg-indigo-800 inline-flex items-center justify-center'
+                                  className={`w-3.5 h-3.5 rounded hover:bg-opacity-80 dark:hover:bg-opacity-40 inline-flex items-center justify-center`}
                                 >
                                   <X className='w-2.5 h-2.5' />
                                 </button>
@@ -359,13 +376,13 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                       <button
                         type='button'
                         onClick={onClose}
-                        className='flex-1 inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
+                        className={`flex-1 inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-current focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${theme.colors.accent}`}
                       >
                         Cancel
                       </button>
                       <button
                         type='submit'
-                        className='flex-1 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
+                        className={`flex-1 inline-flex justify-center rounded-md border border-transparent ${theme.colors.primary} px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-current focus:ring-offset-2 dark:focus:ring-offset-gray-800`}
                       >
                         Save Note
                       </button>
@@ -384,7 +401,11 @@ export const AddNoteModal = ({ isOpen, onClose, onSave, availableTags, existingN
                       id='content'
                       value={content}
                       onChange={handleContentChange}
-                      className={`mt-1 block w-full h-[calc(100%-2rem)] rounded-md border ${validation.content.isValid ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'} px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 bg-white resize-none`}
+                      className={`mt-1 block w-full h-[calc(100%-2rem)] rounded-md border ${
+                        validation.content.isValid
+                          ? 'border-gray-300 dark:border-gray-600'
+                          : 'border-red-500'
+                      } px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 ${theme.colors.ring} dark:bg-gray-800 bg-white resize-none transition-colors duration-200`}
                       placeholder='Write your note content here...'
                     />
                     {validation.content.message && (

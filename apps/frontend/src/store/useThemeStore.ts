@@ -15,6 +15,7 @@ export type Theme = {
     textSecondary: string;
     hover: string;
     border: string;
+    ring: string;
   };
 };
 
@@ -32,6 +33,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-blue-100',
       border: 'border-blue-200',
+      ring: 'ring-blue-500/50',
     },
   },
   forest: {
@@ -47,6 +49,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-emerald-100',
       border: 'border-emerald-200',
+      ring: 'ring-emerald-500/50',
     },
   },
   sunset: {
@@ -62,6 +65,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-orange-100',
       border: 'border-orange-200',
+      ring: 'ring-orange-500/50',
     },
   },
   lavender: {
@@ -77,6 +81,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-purple-100',
       border: 'border-purple-200',
+      ring: 'ring-purple-500/50',
     },
   },
   rose: {
@@ -92,6 +97,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-pink-100',
       border: 'border-pink-200',
+      ring: 'ring-pink-500/50',
     },
   },
   slate: {
@@ -107,6 +113,7 @@ export const defaultThemes: Record<ThemeName, Theme> = {
       textSecondary: 'text-slate-600 dark:text-slate-400',
       hover: 'hover:bg-slate-100',
       border: 'border-slate-200',
+      ring: 'ring-slate-500/50',
     },
   },
 };
