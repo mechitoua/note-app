@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   AddNoteModal,
   ArchivedNotes,
@@ -9,7 +8,6 @@ import {
   NoteList,
   Sidebar,
 } from '@/components';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
@@ -18,6 +16,8 @@ import { useNoteStore } from '@/store/useNoteStore';
 import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { CurrentView } from '@/types';
 import { normalizeTag } from '@/utils/tagUtils';
+import { useEffect, useMemo, useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -43,7 +43,7 @@ function App() {
     handleUpdateNoteTags,
   } = useNotes();
 
-  const { tags, selectedTag, setSelectedTag, addTags, syncTags, clearSelectedTag } = useTags();
+  const { tags, selectedTag, setSelectedTag, syncTags } = useTags();
 
   const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
 
@@ -59,12 +59,6 @@ function App() {
   }, [notes, syncTags]);
 
   const handleLogoClick = () => {
-    clearSelectedNote();
-    setCurrentView('all-notes');
-    setSelectedTag(null);
-  };
-
-  const handleAllNotesClick = () => {
     clearSelectedNote();
     setCurrentView('all-notes');
     setSelectedTag(null);
@@ -138,7 +132,10 @@ function App() {
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={handleViewChange}
-            onAllNotesClick={() => setCurrentView('all-notes')}
+            onAllNotesClick={() => {
+              setCurrentView('all-notes');
+              setSelectedTag(null);
+            }}
             tags={tags}
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
@@ -167,7 +164,7 @@ function App() {
                       notes={filteredNotes}
                       onNoteSelect={handleNoteSelect}
                       onUnarchive={handleUnarchiveNote}
-                      selectedNoteId={selectedNote?.id ?? null}
+                      selectedNoteId={selectedNote?.id ?? ''}
                     />
                   ) : (
                     <NoteList

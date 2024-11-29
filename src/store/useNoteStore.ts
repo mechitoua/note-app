@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { Note } from '@/types/note';
 import { EditorContent } from '@/types/editor';
+import { Note } from '@/types/note';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface NoteStore {
@@ -97,7 +97,9 @@ export const useNoteStore = create<NoteStore>()(
 
       updateEditorContent: content => {
         set(state => ({
-          editorContent: state.editorContent ? { ...state.editorContent, ...content } : content,
+          editorContent: state.editorContent
+            ? { ...state.editorContent, ...content }
+            : { title: '', content: '', tags: [], ...content },
         }));
       },
 

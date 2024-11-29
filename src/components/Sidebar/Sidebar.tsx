@@ -1,8 +1,8 @@
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { CurrentView } from '@/types';
 import { normalizeTag } from '@/utils/tagUtils';
 import { Archive, ChevronRight, Feather, Home, Tag } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
-import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +12,7 @@ interface SidebarProps {
   selectedTag: string | null;
   onTagSelect: (tag: string | null) => void;
   onAllNotesClick: () => void;
+  className?: string;
 }
 
 export const Sidebar = ({
@@ -22,6 +23,7 @@ export const Sidebar = ({
   selectedTag,
   onTagSelect,
   onAllNotesClick,
+  className,
 }: SidebarProps) => {
   const { currentTheme } = useThemeStore();
   const theme = defaultThemes[currentTheme] || defaultThemes.navy;
@@ -32,7 +34,7 @@ export const Sidebar = ({
 
   return (
     <aside
-      className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
+      className={`${className || ''} bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
         isOpen ? 'w-64' : 'w-0'
       } transition-all duration-300 overflow-hidden flex flex-col`}
     >

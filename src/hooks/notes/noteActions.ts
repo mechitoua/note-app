@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction } from 'react';
-import { Note } from '@/types/note';
 import { noteService } from '@/services/noteService';
+import { Note } from '@/types/note';
+import { Dispatch, SetStateAction } from 'react';
+import { setError, updateNoteInState } from './noteState';
 import { NoteState } from './types';
-import { clearEditorContent, setError, updateNoteInState } from './noteState';
 
 export const createNote = async (
   setState: Dispatch<SetStateAction<NoteState>>,
@@ -94,7 +94,7 @@ export const archiveNote = async (setState: Dispatch<SetStateAction<NoteState>>,
       updatedAt: new Date().toISOString(),
     };
 
-    await noteService.updateNote(updatedNote);
+    await noteService.updateNote(note.id, updatedNote);
     setState(prevState => ({
       ...prevState,
       notes: updateNoteInState(prevState.notes, updatedNote),
