@@ -3,13 +3,7 @@ import { useNoteStore } from '@/store/useNoteStore';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 export const useKeyboardShortcuts = () => {
-  const {
-    notes,
-    selectedNote,
-    handleNoteSelect,
-    handleDeleteNote,
-    clearSelection: clearSelectedNote,
-  } = useNotes();
+  const { notes, selectedNote, handleNoteSelect, handleDeleteNote, clearSelectedNote } = useNotes();
 
   const { currentView, setCurrentView, setSearchQuery, setIsAddNoteModalOpen } = useNoteStore();
 
