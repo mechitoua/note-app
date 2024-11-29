@@ -2,7 +2,7 @@
 
 A modern note-taking application built with React and TypeScript, featuring a clean UI and powerful markdown editing capabilities.
 
-![Note App Logo](/public/light-note-app.jpg)
+![Note App Logo](/public/screenshot-dark.png)
 
 ## Features
 
@@ -27,11 +27,13 @@ A modern note-taking application built with React and TypeScript, featuring a cl
 ## Quick Start
 
 1. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 2. Start the development server:
+
 ```bash
 pnpm dev
 ```
@@ -66,6 +68,7 @@ src/
 ## Key Dependencies
 
 ### Core
+
 - `react` & `react-dom` (v18)
 - `typescript` (v5)
 - `vite` (v5)
@@ -73,6 +76,7 @@ src/
 - `@uiw/react-md-editor` - Markdown editor
 
 ### UI Components
+
 - `@headlessui/react` - Unstyled, accessible components
 - `@heroicons/react` - Beautiful icons
 - `@radix-ui/react-separator` - UI primitives
@@ -80,6 +84,7 @@ src/
 - `react-resizable-panels` - Resizable layout panels
 
 ### Development
+
 - `@swc/core` - Fast TypeScript/JavaScript compiler
 - `eslint` - Code linting
 - `prettier` - Code formatting
@@ -90,10 +95,10 @@ src/
 The project uses path aliases for clean imports:
 
 ```typescript
-import { Component } from '@/components'
-import { useNotesCrud } from '@/hooks/notes'
-import { noteService } from '@/services'
-import { Note } from '@/types'
+import { Component } from '@/components';
+import { useNotesCrud } from '@/hooks/notes';
+import { noteService } from '@/services';
+import { Note } from '@/types';
 ```
 
 ## Contributing

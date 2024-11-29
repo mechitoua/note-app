@@ -1,7 +1,8 @@
 import { useNoteStore } from '@/store/useNoteStore';
-import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { Note } from '@/types/note';
 import { Archive, ArchiveRestore } from 'lucide-react';
+import React from 'react';
 
 interface ArchivedNotesProps {
   notes: Note[];
@@ -21,7 +22,6 @@ export const ArchivedNotes = ({
   const theme = defaultThemes[currentTheme] || defaultThemes.navy;
   const themeAccent = theme.colors.accent;
   const themePrimaryLight = theme.colors.primaryLight;
-  const themeBorder = theme.colors.border;
 
   const filteredNotes = notes.filter(note => {
     if (!searchQuery) return true;
@@ -90,7 +90,7 @@ export const ArchivedNotes = ({
             }
           `}
         </style>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {filteredNotes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
               <Archive className="w-12 h-12 text-gray-400 dark:text-gray-600 mb-4" />
@@ -101,50 +101,58 @@ export const ArchivedNotes = ({
             </div>
           ) : (
             filteredNotes.map(note => (
-              <div
-                key={note.id}
-                onClick={() => onNoteSelect(note)}
-                className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                  note.id === selectedNoteId
-                    ? `${themePrimaryLight} ${themeAccent} border-current`
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2 flex-grow">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-snug line-clamp-2">
-                      {note.title || 'Untitled Note'}
-                    </h3>
-                    {note.tags && note.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {note.tags.map(tag => (
-                          <span
-                            key={tag}
-                            className="px-1.5 py-0.5 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs font-medium truncate max-w-full"
+              <React.Fragment key={note.id}>
+                <div
+                  onClick={() => onNoteSelect(note)}
+                  className={`p-4 rounded-lg transition-all duration-200 cursor-pointer ${
+                    note.id === selectedNoteId
+                      ? `${themePrimaryLight}`
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-3 flex-grow">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1">
+                            {note.title || 'Untitled Note'}
+                          </h3>
+                          <button
+                            onClick={e => handleUnarchive(note, e)}
+                            className={`p-2 text-gray-500 dark:text-gray-400 hover:${themeAccent} transition-colors`}
+                            title="Unarchive note"
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            <ArchiveRestore className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {note.tags && note.tags.length > 0 && (
+                          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            {note.tags.map(tag => (
+                              <span
+                                key={tag}
+                                className="px-1.5 py-0.5 text-xs font-medium truncate max-w-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(note.updatedAt).toLocaleDateString()}
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                        {note.content || 'No content'}
+                      </p>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(note.updatedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (onUnarchive) {
-                        onUnarchive(note.id);
-                      }
-                    }}
-                    className={`p-2 text-gray-500 dark:text-gray-400 hover:${themeAccent} transition-colors`}
-                    title="Unarchive note"
-                  >
-                    <ArchiveRestore className="w-5 h-5" />
-                  </button>
                 </div>
-              </div>
+                <div className="h-px bg-gray-100 dark:bg-gray-800" />
+              </React.Fragment>
             ))
           )}
         </div>

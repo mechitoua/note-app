@@ -9,6 +9,7 @@ import {
   Sidebar,
 } from '@/components';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { useFontStore } from '@/store/useFontStore';
@@ -44,7 +45,7 @@ function App() {
   } = useNotes();
 
   const { tags, selectedTag, setSelectedTag, syncTags } = useTags();
-
+  useKeyboardShortcuts();
   const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
 
   const { currentFont } = useFontStore();
@@ -158,7 +159,7 @@ function App() {
             />
             <div className="flex-1 overflow-hidden">
               <PanelGroup direction="horizontal">
-                <Panel defaultSize={30} minSize={30}>
+                <Panel defaultSize={30} minSize={20}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
@@ -178,7 +179,7 @@ function App() {
                   )}
                 </Panel>
                 <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
-                <Panel minSize={40} defaultSize={80}>
+                <Panel minSize={30} defaultSize={70}>
                   {selectedNote && (
                     <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
@@ -189,6 +190,12 @@ function App() {
                         onSave={handleSaveNote}
                         onCancel={() => handleCancelEdit()}
                         selectedTag={selectedTag}
+                        tags={selectedNote.tags}
+                        lastEdited={new Date(selectedNote.updatedAt).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
                       />
                       <NoteActions
                         selectedNote={selectedNote}

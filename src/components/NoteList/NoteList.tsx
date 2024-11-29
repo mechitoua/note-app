@@ -1,8 +1,9 @@
 import { useNoteStore } from '@/store/useNoteStore';
+import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { Note } from '@/types/note';
 import { normalizeTag } from '@/utils/tagUtils';
 import { Archive, ArchiveRestore, Plus } from 'lucide-react';
-import { useThemeStore, defaultThemes } from '@/store/useThemeStore';
+import React from 'react';
 import { Button } from '../Button/Button';
 
 interface NoteListProps {
@@ -50,15 +51,15 @@ export const NoteList: React.FC<NoteListProps> = ({
 
   return (
     <div className="col-span-1 h-full w-70 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
-      <div className="sticky top-0 bg-white dark:bg-gray-900 p-4 z-10">
+      <div className="sticky top-0 bg-white dark:bg-gray-900 py-6 px-4 z-10">
         <Button
           variant="primary"
-          size="sm"
+          size="md"
           fullWidth
           onClick={onCreateNote}
-          className="flex items-center justify-center gap-2"
+          className="flex items-center justify-center gap-2 py-3"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           Create New Note
         </Button>
       </div>
@@ -103,85 +104,86 @@ export const NoteList: React.FC<NoteListProps> = ({
             }
           `}
         </style>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {filteredNotes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-2">No notes created yet</p>
               <p className="text-sm text-gray-500 dark:text-gray-500">
-                Click the "Create New Note" button above to get started
+                Click the Create New Note button above to get started
               </p>
             </div>
           ) : (
             filteredNotes.map(note => (
-              <div
-                key={note.id}
-                onClick={() => onNoteSelect(note)}
-                className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                  selectedNoteId === note.id
-                    ? `${theme.colors.primaryLight} border-current`
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2 flex-grow">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
-                          {note.title || 'Untitled Note'}
-                          {note.archived && (
-                            <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
-                              Archived
-                            </span>
-                          )}
-                        </h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={e => {
-                            e.stopPropagation();
-                            note.archived ? onUnarchive?.(note.id) : onArchive?.(note.id);
-                          }}
-                          className={`flex items-center gap-1.5 ${
-                            selectedNoteId === note.id
-                              ? 'text-current opacity-70 hover:opacity-100'
-                              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          }`}
-                          title={note.archived ? 'Unarchive note' : 'Archive note'}
-                        >
-                          {note.archived ? (
-                            <ArchiveRestore className="w-3.5 h-3.5" />
-                          ) : (
-                            <Archive className="w-3.5 h-3.5" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                    {note.tags && note.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {note.tags.map(tag => (
-                          <span
-                            key={tag}
-                            className={`px-1.5 py-0.5 rounded text-xs font-medium truncate max-w-full ${
+              <React.Fragment key={note.id}>
+                <div
+                  onClick={() => onNoteSelect(note)}
+                  className={`p-4 rounded-lg transition-all duration-200 cursor-pointer ${
+                    selectedNoteId === note.id
+                      ? `${theme.colors.primaryLight}`
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-3 flex-grow">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
+                            {note.title || 'Untitled Note'}
+                            {note.archived && (
+                              <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                                Archived
+                              </span>
+                            )}
+                          </h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={e => {
+                              e.stopPropagation();
+                              note.archived ? onUnarchive?.(note.id) : onArchive?.(note.id);
+                            }}
+                            className={`flex items-center gap-1.5 ${
                               selectedNoteId === note.id
-                                ? 'bg-white/20 text-current'
-                                : 'bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                                ? 'text-current opacity-75'
+                                : 'text-gray-500 dark:text-gray-400'
                             }`}
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            {note.archived ? (
+                              <ArchiveRestore className="w-4 h-4" />
+                            ) : (
+                              <Archive className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                        {note.tags && note.tags.length > 0 && (
+                          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            {note.tags.map(tag => (
+                              <span
+                                key={tag}
+                                className={`px-1.5 py-0.5 rounded text-xs font-medium truncate max-w-full ${
+                                  selectedNoteId === note.id
+                                    ? 'bg-white/20 text-current'
+                                    : 'bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                                }`}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                          {new Date(note.updatedAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </div>
                       </div>
-                    )}
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(note.updatedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
                     </div>
                   </div>
                 </div>
-              </div>
+                <div className="h-px bg-gray-100 dark:bg-gray-800" />
+              </React.Fragment>
             ))
           )}
         </div>

@@ -41,8 +41,8 @@ export const Sidebar = ({
       {/* Logo Section */}
       <div className="p-3 pt-4">
         <div className="flex items-center gap-2">
-          <Feather className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white font-borel leading-none flex items-center mt-1.5">
+          <Feather className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-1" />
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white font-borel">
             Notes
           </h1>
         </div>
@@ -57,16 +57,20 @@ export const Sidebar = ({
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'all-notes' && !selectedTag
-              ? `${theme.colors.primary} text-white`
+              ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Home
-            className={`w-5 h-5 ${currentView === 'all-notes' && !selectedTag ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+            className={`w-5 h-5 ${
+              currentView === 'all-notes' && !selectedTag 
+                ? 'text-gray-900 dark:text-white' 
+                : 'text-gray-600 dark:text-gray-400'
+            }`}
           />
           <span>All Notes</span>
           {currentView === 'all-notes' && !selectedTag && (
-            <ChevronRight className="w-4 h-4 ml-auto" />
+            <ChevronRight className="w-4 h-4 ml-auto text-gray-900 dark:text-white" />
           )}
         </button>
         <button
@@ -76,15 +80,21 @@ export const Sidebar = ({
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium ${
             currentView === 'archived'
-              ? `${theme.colors.primary} text-white`
+              ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Archive
-            className={`w-5 h-5 ${currentView === 'archived' ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+            className={`w-5 h-5 ${
+              currentView === 'archived' 
+                ? 'text-gray-900 dark:text-white' 
+                : 'text-gray-600 dark:text-gray-400'
+            }`}
           />
           <span>Archived</span>
-          {currentView === 'archived' && <ChevronRight className="w-4 h-4 ml-auto" />}
+          {currentView === 'archived' && (
+            <ChevronRight className="w-4 h-4 ml-auto text-gray-900 dark:text-white" />
+          )}
         </button>
       </div>
 

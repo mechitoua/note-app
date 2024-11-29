@@ -1,5 +1,4 @@
 import { useNoteStore } from './useNoteStore';
-import { Note } from '@/types/note';
 
 // Get filtered notes based on current view, selected tag, and search query
 export const useFilteredNotes = () => {
