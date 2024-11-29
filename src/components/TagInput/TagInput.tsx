@@ -23,9 +23,8 @@ export const TagInput = ({ availableTags, onAddTag, className = '' }: TagInputPr
     }
 
     const normalizedInput = normalizeTag(inputValue);
-    const filtered = availableTags.filter(tag =>
-      normalizeTag(tag).includes(normalizedInput) &&
-      normalizeTag(tag) !== normalizedInput
+    const filtered = availableTags.filter(
+      tag => normalizeTag(tag).includes(normalizedInput) && normalizeTag(tag) !== normalizedInput
     );
     setSuggestions(filtered);
   }, [inputValue, availableTags]);
@@ -61,9 +60,7 @@ export const TagInput = ({ availableTags, onAddTag, className = '' }: TagInputPr
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedSuggestionIndex(prev =>
-        prev < suggestions.length - 1 ? prev + 1 : prev
-      );
+      setSelectedSuggestionIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedSuggestionIndex(prev => (prev > 0 ? prev - 1 : -1));

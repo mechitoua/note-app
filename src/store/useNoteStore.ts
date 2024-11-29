@@ -1,33 +1,33 @@
-import { create } from 'zustand'
-import { Note } from '@/types/note'
-import { EditorContent } from '@/types/editor'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
+import { Note } from '@/types/note';
+import { EditorContent } from '@/types/editor';
+import { persist } from 'zustand/middleware';
 
 interface NoteStore {
   // State
-  notes: Note[]
-  selectedNote: Note | null
-  editorContent: EditorContent | null
-  currentView: 'all-notes' | 'archived'
-  selectedTag: string | null
-  searchQuery: string
-  tags: string[]
-  isLoading: boolean
-  error: string | null
-  isAddNoteModalOpen: boolean
+  notes: Note[];
+  selectedNote: Note | null;
+  editorContent: EditorContent | null;
+  currentView: 'all-notes' | 'archived';
+  selectedTag: string | null;
+  searchQuery: string;
+  tags: string[];
+  isLoading: boolean;
+  error: string | null;
+  isAddNoteModalOpen: boolean;
 
   // Actions
-  setNotes: (notes: Note[]) => void
-  addNote: (note: Note) => void
-  updateNote: (note: Note) => void
-  deleteNote: (noteId: string) => void
-  setSelectedNote: (note: Note | null) => void
-  updateEditorContent: (content: Partial<EditorContent>) => void
-  setCurrentView: (view: 'all-notes' | 'archived') => void
-  setSelectedTag: (tag: string | null) => void
-  setSearchQuery: (query: string) => void
-  setIsAddNoteModalOpen: (isOpen: boolean) => void
-  syncTags: () => void
+  setNotes: (notes: Note[]) => void;
+  addNote: (note: Note) => void;
+  updateNote: (note: Note) => void;
+  deleteNote: (noteId: string) => void;
+  setSelectedNote: (note: Note | null) => void;
+  updateEditorContent: (content: Partial<EditorContent>) => void;
+  setCurrentView: (view: 'all-notes' | 'archived') => void;
+  setSelectedTag: (tag: string | null) => void;
+  setSearchQuery: (query: string) => void;
+  setIsAddNoteModalOpen: (isOpen: boolean) => void;
+  syncTags: () => void;
 }
 
 export const useNoteStore = create<NoteStore>()(
@@ -46,91 +46,91 @@ export const useNoteStore = create<NoteStore>()(
       isAddNoteModalOpen: false,
 
       // Actions
-      setNotes: (notes) => {
-        set({ notes })
-        get().syncTags()
+      setNotes: notes => {
+        set({ notes });
+        get().syncTags();
       },
 
-      addNote: (note) => {
-        set((state) => {
+      addNote: note => {
+        set(state => {
           // Reset search and tag filters when adding a new note
           // This ensures the new note is visible
           return {
             notes: [note, ...state.notes],
             searchQuery: '',
-            selectedTag: null
-          }
-        })
-        get().syncTags()
+            selectedTag: null,
+          };
+        });
+        get().syncTags();
       },
 
-      updateNote: (updatedNote) => {
-        set((state) => {
-          const notes = state.notes.map((note) =>
+      updateNote: updatedNote => {
+        set(state => {
+          const notes = state.notes.map(note =>
             note.id === updatedNote.id ? { ...note, ...updatedNote } : note
           );
           return { notes };
         });
-        get().syncTags()
+        get().syncTags();
       },
 
-      deleteNote: (noteId) => {
-        set((state) => ({
-          notes: state.notes.filter((note) => note.id !== noteId),
-          selectedNote: state.selectedNote?.id === noteId ? null : state.selectedNote
-        }))
-        get().syncTags()
+      deleteNote: noteId => {
+        set(state => ({
+          notes: state.notes.filter(note => note.id !== noteId),
+          selectedNote: state.selectedNote?.id === noteId ? null : state.selectedNote,
+        }));
+        get().syncTags();
       },
 
-      setSelectedNote: (note) => {
-        set({ 
+      setSelectedNote: note => {
+        set({
           selectedNote: note,
-          editorContent: note ? {
-            title: note.title,
-            content: note.content,
-            tags: note.tags
-          } : null
-        })
+          editorContent: note
+            ? {
+                title: note.title,
+                content: note.content,
+                tags: note.tags,
+              }
+            : null,
+        });
       },
 
-      updateEditorContent: (content) => {
-        set((state) => ({
-          editorContent: state.editorContent
-            ? { ...state.editorContent, ...content }
-            : content
-        }))
+      updateEditorContent: content => {
+        set(state => ({
+          editorContent: state.editorContent ? { ...state.editorContent, ...content } : content,
+        }));
       },
 
-      setCurrentView: (view) => {
-        set({ currentView: view })
+      setCurrentView: view => {
+        set({ currentView: view });
       },
 
-      setSelectedTag: (tag) => {
-        set({ selectedTag: tag })
+      setSelectedTag: tag => {
+        set({ selectedTag: tag });
       },
 
-      setSearchQuery: (query) => {
-        set({ searchQuery: query })
+      setSearchQuery: query => {
+        set({ searchQuery: query });
       },
 
-      setIsAddNoteModalOpen: (isOpen) => {
-        set({ isAddNoteModalOpen: isOpen })
+      setIsAddNoteModalOpen: isOpen => {
+        set({ isAddNoteModalOpen: isOpen });
       },
 
       syncTags: () => {
-        const allTags = new Set<string>()
+        const allTags = new Set<string>();
         get().notes.forEach(note => {
-          note.tags.forEach(tag => allTags.add(tag))
-        })
-        set({ tags: Array.from(allTags).sort() })
-      }
+          note.tags.forEach(tag => allTags.add(tag));
+        });
+        set({ tags: Array.from(allTags).sort() });
+      },
     }),
     {
       name: 'note-store',
-      partialize: (state) => ({
+      partialize: state => ({
         notes: state.notes,
-        tags: state.tags
-      })
+        tags: state.tags,
+      }),
     }
   )
-)
+);

@@ -33,7 +33,7 @@ export const useNoteSelection = () => {
   }, []);
 
   const handleContentChange = useCallback((content: string) => {
-    setSelection((prev) => ({
+    setSelection(prev => ({
       ...prev,
       editorContent: {
         ...prev.editorContent,
@@ -43,7 +43,7 @@ export const useNoteSelection = () => {
   }, []);
 
   const handleTitleChange = useCallback((title: string) => {
-    setSelection((prev) => ({
+    setSelection(prev => ({
       ...prev,
       editorContent: {
         ...prev.editorContent,

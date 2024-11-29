@@ -23,23 +23,23 @@ export const NoteCard = ({ note, isSelected, onClick, className }: NoteCardProps
         className
       )}
     >
-      <div className='space-y-2'>
-        <h3 className='font-semibold text-gray-900 dark:text-white text-base leading-snug overflow-hidden whitespace-nowrap text-ellipsis max-w-full'>
+      <div className="space-y-2">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-snug overflow-hidden whitespace-nowrap text-ellipsis max-w-full">
           {note.title || 'Untitled Note'}
         </h3>
         {!note.archived && note.content && (
-          <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-1 h-5'>
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 h-5">
             {note.content.replace(/[#*`_[\]()]/g, '')}
           </p>
         )}
         {note.tags && note.tags.length > 0 && (
-          <div className='flex flex-wrap gap-1.5'>
-            {note.tags.map((tag) => (
+          <div className="flex flex-wrap gap-1.5">
+            {note.tags.map(tag => (
               <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}
-        <div className='text-xs text-gray-500 dark:text-gray-400'>
+        <div className="text-xs text-gray-500 dark:text-gray-400">
           {new Date(note.updatedAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',

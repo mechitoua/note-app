@@ -59,7 +59,9 @@ export const Sidebar = ({
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Home className={`w-5 h-5 ${currentView === 'all-notes' && !selectedTag ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+          <Home
+            className={`w-5 h-5 ${currentView === 'all-notes' && !selectedTag ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+          />
           <span>All Notes</span>
           {currentView === 'all-notes' && !selectedTag && (
             <ChevronRight className="w-4 h-4 ml-auto" />
@@ -76,7 +78,9 @@ export const Sidebar = ({
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          <Archive className={`w-5 h-5 ${currentView === 'archived' ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+          <Archive
+            className={`w-5 h-5 ${currentView === 'archived' ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+          />
           <span>Archived</span>
           {currentView === 'archived' && <ChevronRight className="w-4 h-4 ml-auto" />}
         </button>
@@ -95,7 +99,7 @@ export const Sidebar = ({
           }}
         >
           <div className="space-y-1">
-            {tags.map((tag) => (
+            {tags.map(tag => (
               <button
                 key={tag}
                 onClick={() => {
@@ -112,7 +116,9 @@ export const Sidebar = ({
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
-                <Tag className={`w-3.5 h-3.5 ${isTagSelected(tag) ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                <Tag
+                  className={`w-3.5 h-3.5 ${isTagSelected(tag) ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                />
                 <span className="truncate text-sm font-medium">{tag}</span>
                 {isTagSelected(tag) && (
                   <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />

@@ -34,11 +34,11 @@ export const TagInput = ({
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    onTagsChange(tags.filter((tag) => tag !== tagToRemove));
+    onTagsChange(tags.filter(tag => tag !== tagToRemove));
   };
 
   const filteredSuggestions = suggestions.filter(
-    (suggestion) =>
+    suggestion =>
       suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
       !tags.includes(suggestion.toLowerCase())
   );
@@ -49,7 +49,7 @@ export const TagInput = ({
         <Input
           label={label}
           value={inputValue}
-          onChange={(e) => {
+          onChange={e => {
             setInputValue(e.target.value);
             setShowSuggestions(true);
           }}
@@ -61,7 +61,7 @@ export const TagInput = ({
         {showSuggestions && filteredSuggestions.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
             <ul className="py-1">
-              {filteredSuggestions.map((suggestion) => (
+              {filteredSuggestions.map(suggestion => (
                 <li
                   key={suggestion}
                   className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
@@ -81,11 +81,8 @@ export const TagInput = ({
         )}
       </div>
       <div className="flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <Tag
-            key={tag}
-            onRemove={() => handleRemoveTag(tag)}
-          >
+        {tags.map(tag => (
+          <Tag key={tag} onRemove={() => handleRemoveTag(tag)}>
             {tag}
           </Tag>
         ))}

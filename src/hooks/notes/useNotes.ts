@@ -5,19 +5,9 @@ import { useNotesFilter } from './useNotesFilter';
 import { useNotesState } from './useNotesState';
 
 export const useNotes = () => {
-  const {
-    state,
-    isAddNoteModalOpen,
-    setIsAddNoteModalOpen,
-  } = useNotesState();
+  const { state, isAddNoteModalOpen, setIsAddNoteModalOpen } = useNotesState();
 
-  const {
-    fetchNotes,
-    createNote,
-    deleteNote,
-    archiveNote,
-    unarchiveNote,
-  } = useNotesCrud();
+  const { fetchNotes, createNote, deleteNote, archiveNote, unarchiveNote } = useNotesCrud();
 
   const {
     showArchived,

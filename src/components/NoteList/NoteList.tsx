@@ -20,21 +20,21 @@ export const NoteList: React.FC<NoteListProps> = ({
   onNoteSelect,
   onCreateNote,
   onArchive,
-  onUnarchive
+  onUnarchive,
 }) => {
-  const searchQuery = useNoteStore((state) => state.searchQuery);
-  const selectedTag = useNoteStore((state) => state.selectedTag);
-  const currentView = useNoteStore((state) => state.currentView);
+  const searchQuery = useNoteStore(state => state.searchQuery);
+  const selectedTag = useNoteStore(state => state.selectedTag);
+  const currentView = useNoteStore(state => state.currentView);
   const { currentTheme } = useThemeStore();
   const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
-  const filteredNotes = notes.filter((note) => {
+  const filteredNotes = notes.filter(note => {
     // Filter by archive status
     if (currentView === 'archived' && !note.archived) return false;
     if (currentView === 'all-notes' && note.archived) return false;
 
     // Filter by selected tag (case-insensitive)
-    if (selectedTag && !note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag)))
+    if (selectedTag && !note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag)))
       return false;
 
     // Filter by search query
@@ -44,13 +44,13 @@ export const NoteList: React.FC<NoteListProps> = ({
     return (
       note.title.toLowerCase().includes(searchLower) ||
       note.content.toLowerCase().includes(searchLower) ||
-      note.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
     );
   });
 
   return (
-    <div className='col-span-1 h-full w-70 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'>
-      <div className='sticky top-0 bg-white dark:bg-gray-900 p-4 z-10'>
+    <div className="col-span-1 h-full w-70 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+      <div className="sticky top-0 bg-white dark:bg-gray-900 p-4 z-10">
         <Button
           variant="primary"
           size="sm"
@@ -63,7 +63,7 @@ export const NoteList: React.FC<NoteListProps> = ({
         </Button>
       </div>
       <div
-        className='h-[calc(100vh-8rem)] overflow-y-auto px-4 pb-4'
+        className="h-[calc(100vh-8rem)] overflow-y-auto px-4 pb-4"
         style={
           {
             '--scrollbar-width': '8px',
@@ -103,16 +103,16 @@ export const NoteList: React.FC<NoteListProps> = ({
             }
           `}
         </style>
-        <div className='space-y-2'>
+        <div className="space-y-2">
           {filteredNotes.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-8 px-4 text-center'>
-              <p className='text-gray-600 dark:text-gray-400 mb-2'>No notes created yet</p>
-              <p className='text-sm text-gray-500 dark:text-gray-500'>
+            <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-2">No notes created yet</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">
                 Click the "Create New Note" button above to get started
               </p>
             </div>
           ) : (
-            filteredNotes.map((note) => (
+            filteredNotes.map(note => (
               <div
                 key={note.id}
                 onClick={() => onNoteSelect(note)}
@@ -122,14 +122,14 @@ export const NoteList: React.FC<NoteListProps> = ({
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <div className='flex justify-between items-start'>
-                  <div className='space-y-2 flex-grow'>
-                    <div className='flex flex-col gap-1'>
-                      <div className='flex items-center justify-between'>
-                        <h3 className='text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center'>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2 flex-grow">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 flex items-center">
                           {note.title || 'Untitled Note'}
                           {note.archived && (
-                            <span className='ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full'>
+                            <span className="ml-2 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
                               Archived
                             </span>
                           )}
@@ -137,7 +137,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             note.archived ? onUnarchive?.(note.id) : onArchive?.(note.id);
                           }}
@@ -149,16 +149,16 @@ export const NoteList: React.FC<NoteListProps> = ({
                           title={note.archived ? 'Unarchive note' : 'Archive note'}
                         >
                           {note.archived ? (
-                            <ArchiveRestore className='w-3.5 h-3.5' />
+                            <ArchiveRestore className="w-3.5 h-3.5" />
                           ) : (
-                            <Archive className='w-3.5 h-3.5' />
+                            <Archive className="w-3.5 h-3.5" />
                           )}
                         </Button>
                       </div>
                     </div>
                     {note.tags && note.tags.length > 0 && (
-                      <div className='flex flex-wrap gap-1.5 mt-2'>
-                        {note.tags.map((tag) => (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {note.tags.map(tag => (
                           <span
                             key={tag}
                             className={`px-1.5 py-0.5 rounded text-xs font-medium truncate max-w-full ${
@@ -172,7 +172,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                         ))}
                       </div>
                     )}
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(note.updatedAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',

@@ -24,19 +24,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   useEffect(() => {
     function applyTheme() {
       const root = window.document.documentElement;
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
       const activeTheme = theme === 'system' ? systemTheme : theme;
-      
+
       // Remove both classes first
       root.classList.remove('light', 'dark');
       // Add the appropriate class
       root.classList.add(activeTheme);
-      
+
       // Update meta theme-color
-      document.querySelector('meta[name="theme-color"]')?.setAttribute(
-        'content',
-        activeTheme === 'dark' ? '#1a1a1a' : '#ffffff'
-      );
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', activeTheme === 'dark' ? '#1a1a1a' : '#ffffff');
     }
 
     applyTheme();

@@ -22,7 +22,7 @@ export const createNote = async (
     };
 
     await noteService.createNote(newNote);
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
       notes: [newNote, ...prevState.notes],
       selectedNote: newNote,
@@ -42,22 +42,14 @@ export const createNote = async (
 
 export const updateNote = async (
   setState: Dispatch<SetStateAction<NoteState>>,
-  note: Note,
-  title: string,
-  content: string
+  noteId: string,
+  data: { title: string; content: string; tags?: string[] }
 ) => {
   try {
-    const updatedNote = {
-      ...note,
-      title,
-      content,
-      updatedAt: new Date().toISOString(),
-    };
-
-    await noteService.updateNote(updatedNote);
-    setState((prevState) => ({
+    const updatedNote = await noteService.updateNote(noteId, data);
+    setState(prevState => ({
       ...prevState,
-      notes: updateNoteInState(prevState.notes, updatedNote),
+      notes: prevState.notes.map(note => (note.id === noteId ? updatedNote : note)),
       selectedNote: null,
       editorContent: {
         title: '',
@@ -73,34 +65,28 @@ export const updateNote = async (
   }
 };
 
-export const deleteNote = async (
-  setState: Dispatch<SetStateAction<NoteState>>,
-  note: Note
-) => {
+export const deleteNote = async (setState: Dispatch<SetStateAction<NoteState>>, noteId: string) => {
   try {
-    await noteService.deleteNote(note.id);
-    setState((prevState) => ({
+    await noteService.deleteNote(noteId);
+    setState(prevState => ({
       ...prevState,
-      notes: prevState.notes.filter((n) => n.id !== note.id),
+      notes: prevState.notes.filter(n => n.id !== noteId),
       selectedNote: null,
       editorContent: {
         title: '',
         content: '',
+        tags: [],
       },
       error: null,
     }));
-
-    return true;
-  } catch (err) {
-    setError(setState, 'Failed to delete note');
-    return false;
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting note:', error);
+    return { success: false, error };
   }
 };
 
-export const archiveNote = async (
-  setState: Dispatch<SetStateAction<NoteState>>,
-  note: Note
-) => {
+export const archiveNote = async (setState: Dispatch<SetStateAction<NoteState>>, note: Note) => {
   try {
     const updatedNote = {
       ...note,
@@ -109,7 +95,7 @@ export const archiveNote = async (
     };
 
     await noteService.updateNote(updatedNote);
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
       notes: updateNoteInState(prevState.notes, updatedNote),
       selectedNote: null,

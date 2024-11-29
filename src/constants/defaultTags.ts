@@ -7,10 +7,10 @@ export const DEFAULT_TAGS = [
   'Ideas',
   'Project',
   'Learning',
-  'Reference'
+  'Reference',
 ] as const;
 
-export type DefaultTag = typeof DEFAULT_TAGS[number];
+export type DefaultTag = (typeof DEFAULT_TAGS)[number];
 
 // Function to check if a tag is a default tag
 export const isDefaultTag = (tag: string): tag is DefaultTag => {

@@ -39,13 +39,19 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, 3000);
   }, []);
 
-  const showSuccess = useCallback((message: string) => {
-    showFeedback('success', message);
-  }, [showFeedback]);
+  const showSuccess = useCallback(
+    (message: string) => {
+      showFeedback('success', message);
+    },
+    [showFeedback]
+  );
 
-  const showError = useCallback((message: string) => {
-    showFeedback('error', message);
-  }, [showFeedback]);
+  const showError = useCallback(
+    (message: string) => {
+      showFeedback('error', message);
+    },
+    [showFeedback]
+  );
 
   return (
     <FeedbackContext.Provider value={{ showSuccess, showError }}>

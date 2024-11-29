@@ -127,11 +127,11 @@ type ThemeStore = {
 
 export const useThemeStore = create<ThemeStore>()(
   persist(
-    (set) => ({
+    set => ({
       isDark: false,
       currentTheme: 'navy', // Default theme
-      setIsDark: (isDark) => set({ isDark }),
-      setCurrentTheme: (theme) => {
+      setIsDark: isDark => set({ isDark }),
+      setCurrentTheme: theme => {
         // Only set theme if it exists in defaultThemes
         if (defaultThemes[theme]) {
           set({ currentTheme: theme });
@@ -142,7 +142,7 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'theme-storage',
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         // Validate theme on storage rehydration
         if (state && !defaultThemes[state.currentTheme]) {
           state.currentTheme = 'navy';

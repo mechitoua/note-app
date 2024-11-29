@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   AddNoteModal,
   ArchivedNotes,
@@ -8,6 +9,7 @@ import {
   NoteList,
   Sidebar,
 } from '@/components';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
@@ -16,8 +18,6 @@ import { useNoteStore } from '@/store/useNoteStore';
 import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
 import { CurrentView } from '@/types';
 import { normalizeTag } from '@/utils/tagUtils';
-import { useEffect, useMemo, useState } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -41,7 +41,6 @@ function App() {
     handleUnarchiveNote: originalHandleUnarchiveNote,
     fetchNotes,
     handleUpdateNoteTags,
-    noteService,
   } = useNotes();
 
   const { tags, selectedTag, setSelectedTag, addTags, syncTags, clearSelectedTag } = useTags();
@@ -69,22 +68,6 @@ function App() {
     clearSelectedNote();
     setCurrentView('all-notes');
     setSelectedTag(null);
-  };
-
-  const handleNewNoteWithTags = (note: { title: string; content: string; tags: string[] }) => {
-    handleNewNote({
-      title: note.title,
-      content: note.content,
-      tags: note.tags,
-    });
-    addTags(note.tags);
-  };
-
-  const getFilteredNotesByTag = (notes: any[]) => {
-    if (!selectedTag) return notes;
-    return notes.filter(note =>
-      note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))
-    );
   };
 
   const filteredNotes = useMemo(() => {
@@ -123,9 +106,13 @@ function App() {
     }
   };
 
-  const handleViewChange = (view: 'all-notes' | 'archived') => {
-    clearSelectedNote();
-    setCurrentView(view);
+  const handleViewChange = (value: CurrentView | ((prev: CurrentView) => CurrentView)) => {
+    if (typeof value === 'function') {
+      setCurrentView(value);
+    } else {
+      setCurrentView(value);
+      clearSelectedNote();
+    }
   };
 
   const handleAddTags = async (tags: string[]) => {
@@ -136,8 +123,7 @@ function App() {
     if (success) {
       // Refresh notes and sync tags
       await fetchNotes();
-      const updatedNotes = await noteService.getNotes();
-      syncTags(updatedNotes);
+      syncTags(notes);
     }
   };
 
@@ -152,7 +138,7 @@ function App() {
             isOpen={isSidebarOpen}
             currentView={currentView}
             onViewChange={handleViewChange}
-            onAllNotesClick={handleAllNotesClick}
+            onAllNotesClick={() => setCurrentView('all-notes')}
             tags={tags}
             selectedTag={selectedTag}
             onTagSelect={setSelectedTag}
@@ -175,18 +161,18 @@ function App() {
             />
             <div className="flex-1 overflow-hidden">
               <PanelGroup direction="horizontal">
-                <Panel defaultSize={30} minSize={20}>
+                <Panel defaultSize={30} minSize={30}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
                       onNoteSelect={handleNoteSelect}
                       onUnarchive={handleUnarchiveNote}
-                      selectedNoteId={selectedNote?.id!}
+                      selectedNoteId={selectedNote?.id ?? null}
                     />
                   ) : (
                     <NoteList
                       notes={filteredNotes}
-                      selectedNoteId={selectedNote?.id}
+                      selectedNoteId={selectedNote?.id ?? ''}
                       onNoteSelect={handleNoteSelect}
                       onCreateNote={() => setIsAddNoteModalOpen(true)}
                       onArchive={handleArchiveNote}
@@ -195,7 +181,7 @@ function App() {
                   )}
                 </Panel>
                 <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
-                <Panel minSize={40} defaultSize={70}>
+                <Panel minSize={40} defaultSize={80}>
                   {selectedNote && (
                     <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor

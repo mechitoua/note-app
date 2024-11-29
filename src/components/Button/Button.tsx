@@ -22,7 +22,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       'disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed',
       'select-none'
     );
-    
+
     const variantClassNames = {
       primary: cn(
         'shadow-sm',

@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Note } from '@/types/note';
 import { DEFAULT_TAGS, isDefaultTag } from '@/constants/defaultTags';
-import { normalizeTag, formatTag } from '@/utils/tagUtils';
+import { Note } from '@/types/note';
+import { formatTag, normalizeTag } from '@/utils/tagUtils';
+import { useCallback, useState } from 'react';
 
 export const useTags = () => {
   const [customTags, setCustomTags] = useState<string[]>([]);
@@ -10,19 +10,22 @@ export const useTags = () => {
   // Combine default and custom tags
   const tags = [...DEFAULT_TAGS, ...customTags];
 
-  const addTag = useCallback((tag: string) => {
-    const normalized = normalizeTag(tag);
-    // Don't add if it's a default tag or already exists (case insensitive)
-    if (isDefaultTag(tag) || customTags.some(t => normalizeTag(t) === normalized)) {
-      return;
-    }
-    setCustomTags(prev => [...prev.filter(t => normalizeTag(t) !== normalized), formatTag(tag)]);
-  }, [customTags]);
+  const addTag = useCallback(
+    (tag: string) => {
+      const normalized = normalizeTag(tag);
+      // Don't add if it's a default tag or already exists (case insensitive)
+      if (isDefaultTag(tag) || customTags.some(t => normalizeTag(t) === normalized)) {
+        return;
+      }
+      setCustomTags(prev => [...prev.filter(t => normalizeTag(t) !== normalized), formatTag(tag)]);
+    },
+    [customTags]
+  );
 
   const addTags = useCallback((newTags: string[]) => {
     setCustomTags(prev => {
       const uniqueTags = new Map<string, string>(); // normalized -> formatted
-      
+
       // Add existing tags first
       prev.forEach(tag => {
         uniqueTags.set(normalizeTag(tag), tag);
@@ -55,7 +58,7 @@ export const useTags = () => {
 
   const syncTags = useCallback((notes: Note[]) => {
     const uniqueTags = new Map<string, string>(); // normalized -> formatted
-    
+
     // Collect all unique tags from notes
     notes.forEach(note => {
       note.tags?.forEach(tag => {

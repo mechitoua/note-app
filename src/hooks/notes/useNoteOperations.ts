@@ -16,17 +16,17 @@ export const useNoteOperations = () => {
   });
 
   const fetchNotes = useCallback(async () => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const notes = await noteService.getNotes();
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         notes,
         isLoading: false,
         error: null,
       }));
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to fetch notes',
@@ -35,10 +35,10 @@ export const useNoteOperations = () => {
   }, []);
 
   const createNote = useCallback(async (title: string, content: string, tags: string[]) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const newNote = await noteService.createNote({ title, content, tags });
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         notes: [newNote, ...prev.notes],
         isLoading: false,
@@ -46,7 +46,7 @@ export const useNoteOperations = () => {
       }));
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to create note',
@@ -56,20 +56,18 @@ export const useNoteOperations = () => {
   }, []);
 
   const updateNote = useCallback(async (noteId: string, title: string, content: string) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const updatedNote = await noteService.updateNote(noteId, { title, content });
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
-        notes: prev.notes.map((note) => 
-          note.id === noteId ? updatedNote : note
-        ),
+        notes: prev.notes.map(note => (note.id === noteId ? updatedNote : note)),
         isLoading: false,
         error: null,
       }));
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to update note',
@@ -79,18 +77,18 @@ export const useNoteOperations = () => {
   }, []);
 
   const updateNoteTags = useCallback(async (noteId: string, tags: string[]) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const updatedNote = await noteService.updateNoteTags(noteId, tags);
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
-        notes: prev.notes.map((note) => (note.id === noteId ? updatedNote : note)),
+        notes: prev.notes.map(note => (note.id === noteId ? updatedNote : note)),
         isLoading: false,
         error: null,
       }));
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to update note tags',
@@ -100,12 +98,12 @@ export const useNoteOperations = () => {
   }, []);
 
   const archiveNote = useCallback(async (noteId: string) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const archivedNote = await noteService.archiveNote(noteId);
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
-        notes: prev.notes.map((note) =>
+        notes: prev.notes.map(note =>
           note.id === noteId ? { ...archivedNote, archived: true } : note
         ),
         isLoading: false,
@@ -113,7 +111,7 @@ export const useNoteOperations = () => {
       }));
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to archive note',
@@ -123,13 +121,13 @@ export const useNoteOperations = () => {
   }, []);
 
   const unarchiveNote = useCallback(async (noteId: string) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       // First update localStorage
       const unarchivedNote = await noteService.unarchiveNote(noteId);
-      
+
       // Then update state immediately
-      setState((prev) => {
+      setState(prev => {
         // Remove the note from the current list
         const updatedNotes = prev.notes.filter(note => note.id !== noteId);
         return {
@@ -141,7 +139,7 @@ export const useNoteOperations = () => {
       });
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to unarchive note',
@@ -151,18 +149,18 @@ export const useNoteOperations = () => {
   }, []);
 
   const deleteNote = useCallback(async (noteId: string) => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       await noteService.deleteNote(noteId);
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
-        notes: prev.notes.filter((note) => note.id !== noteId),
+        notes: prev.notes.filter(note => note.id !== noteId),
         isLoading: false,
         error: null,
       }));
       return true;
     } catch (err) {
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Failed to delete note',

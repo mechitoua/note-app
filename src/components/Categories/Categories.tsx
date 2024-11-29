@@ -27,19 +27,17 @@ export const Categories = ({ categories, selectedCategory, onSelectCategory }: C
           <FolderIcon className="w-4 h-4" />
           <span>Categories</span>
         </div>
-        {isExpanded ? (
-          <ChevronUp className="w-4 h-4" />
-        ) : (
-          <ChevronDown className="w-4 h-4" />
-        )}
+        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
       {isExpanded && (
         <div className="flex flex-col space-y-1 mt-1">
-          {categories.map((category) => (
+          {categories.map(category => (
             <button
               key={category.id}
-              onClick={() => onSelectCategory(category.id === selectedCategory ? null : category.id)}
+              onClick={() =>
+                onSelectCategory(category.id === selectedCategory ? null : category.id)
+              }
               className={cn(
                 'flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-colors',
                 'hover:bg-gray-100 dark:hover:bg-gray-800',

@@ -7,14 +7,14 @@ export const useTags = () => {
 
   const syncTags = useCallback((notes: Note[]) => {
     const uniqueTags = new Set<string>();
-    notes.forEach((note) => {
-      note.tags?.forEach((tag) => uniqueTags.add(tag));
+    notes.forEach(note => {
+      note.tags?.forEach(tag => uniqueTags.add(tag));
     });
     setTags(Array.from(uniqueTags));
   }, []);
 
   const addTags = useCallback((newTags: string[]) => {
-    setTags((prevTags) => {
+    setTags(prevTags => {
       const uniqueTags = new Set([...prevTags, ...newTags]);
       return Array.from(uniqueTags);
     });

@@ -28,7 +28,9 @@ export const Tag = ({ className, children, onRemove, variant = 'default', ...pro
         <button
           type="button"
           onClick={onRemove}
-          className={cn('w-3.5 h-3.5 rounded hover:bg-black/10 dark:hover:bg-white/10 inline-flex items-center justify-center')}
+          className={cn(
+            'w-3.5 h-3.5 rounded hover:bg-black/10 dark:hover:bg-white/10 inline-flex items-center justify-center'
+          )}
         >
           <X className="w-2.5 h-2.5" />
         </button>

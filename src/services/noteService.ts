@@ -3,7 +3,7 @@ import { Note } from '@/types/note';
 const STORAGE_KEY = 'notes';
 
 // Error types
-export type NoteServiceErrorType = 
+export type NoteServiceErrorType =
   | 'NOT_FOUND'
   | 'VALIDATION_ERROR'
   | 'STORAGE_ERROR'
@@ -57,25 +57,25 @@ const getNotes = async (): Promise<Note[]> => {
 
 const validateNote = (note: Partial<Note>): void => {
   if (!note.title?.trim()) {
-    throw new NoteServiceError(
-      'Note title cannot be empty',
-      'VALIDATION_ERROR',
-      { field: 'title' }
-    );
+    throw new NoteServiceError('Note title cannot be empty', 'VALIDATION_ERROR', {
+      field: 'title',
+    });
   }
   if (!note.content?.trim()) {
-    throw new NoteServiceError(
-      'Note content cannot be empty',
-      'VALIDATION_ERROR',
-      { field: 'content' }
-    );
+    throw new NoteServiceError('Note content cannot be empty', 'VALIDATION_ERROR', {
+      field: 'content',
+    });
   }
 };
 
-const createNote = async (noteData: { title: string; content: string; tags: string[] }): Promise<Note> => {
+const createNote = async (noteData: {
+  title: string;
+  content: string;
+  tags: string[];
+}): Promise<Note> => {
   try {
     validateNote(noteData);
-    
+
     const notes = getStorageData();
 
     const newNote: Note = {
@@ -100,25 +100,25 @@ const createNote = async (noteData: { title: string; content: string; tags: stri
   }
 };
 
-const updateNote = async (noteId: string, noteData: { title: string; content: string }): Promise<Note> => {
+const updateNote = async (
+  noteId: string,
+  noteData: { title: string; content: string }
+): Promise<Note> => {
   try {
     validateNote(noteData);
-    
+
     const notes = getStorageData();
-    const existingNoteIndex = notes.findIndex((n) => n.id === noteId);
+    const existingNoteIndex = notes.findIndex(n => n.id === noteId);
 
     if (existingNoteIndex === -1) {
-      throw new NoteServiceError(
-        `Note with ID "${noteId}" not found`,
-        'NOT_FOUND'
-      );
+      throw new NoteServiceError(`Note with ID "${noteId}" not found`, 'NOT_FOUND');
     }
 
     const updatedNote: Note = {
       ...notes[existingNoteIndex],
       title: noteData.title.trim(),
       content: noteData.content.trim(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     notes[existingNoteIndex] = updatedNote;
@@ -136,15 +136,15 @@ const updateNote = async (noteId: string, noteData: { title: string; content: st
 const deleteNote = async (noteId: string): Promise<void> => {
   try {
     const notes = getStorageData();
-    const noteIndex = notes.findIndex((note) => note.id === noteId);
-    
+    const noteIndex = notes.findIndex(note => note.id === noteId);
+
     if (noteIndex === -1) {
       throw new NoteServiceError(
         `Cannot delete note: Note with ID "${noteId}" not found`,
         'NOT_FOUND'
       );
     }
-    
+
     notes.splice(noteIndex, 1);
     setStorageData(notes);
   } catch (error) {
@@ -159,8 +159,8 @@ const deleteNote = async (noteId: string): Promise<void> => {
 const archiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = getStorageData();
-    const noteIndex = notes.findIndex((note) => note.id === noteId);
-    
+    const noteIndex = notes.findIndex(note => note.id === noteId);
+
     if (noteIndex === -1) {
       throw new NoteServiceError(
         `Cannot archive note: Note with ID "${noteId}" not found`,
@@ -171,7 +171,7 @@ const archiveNote = async (noteId: string): Promise<Note> => {
     const updatedNote: Note = {
       ...notes[noteIndex],
       archived: true,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     notes[noteIndex] = updatedNote;
@@ -189,8 +189,8 @@ const archiveNote = async (noteId: string): Promise<Note> => {
 const unarchiveNote = async (noteId: string): Promise<Note> => {
   try {
     const notes = getStorageData();
-    const noteIndex = notes.findIndex((note) => note.id === noteId);
-    
+    const noteIndex = notes.findIndex(note => note.id === noteId);
+
     if (noteIndex === -1) {
       throw new NoteServiceError(
         `Cannot unarchive note: Note with ID "${noteId}" not found`,
@@ -201,7 +201,7 @@ const unarchiveNote = async (noteId: string): Promise<Note> => {
     const updatedNote: Note = {
       ...notes[noteIndex],
       archived: false,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     notes[noteIndex] = updatedNote;
@@ -227,7 +227,7 @@ const updateNoteTags = async (noteId: string, tags: string[]): Promise<Note> => 
     const updatedNote = {
       ...notes[noteIndex],
       tags: tags.map(tag => tag.trim()),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     notes[noteIndex] = updatedNote;

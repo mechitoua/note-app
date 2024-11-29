@@ -22,8 +22,8 @@ export const Header = ({
   totalResults,
 }: HeaderProps) => {
   const searchRef = useRef<HTMLInputElement>(null);
-  const searchQuery = useNoteStore((state) => state.searchQuery);
-  const setSearchQuery = useNoteStore((state) => state.setSearchQuery);
+  const searchQuery = useNoteStore(state => state.searchQuery);
+  const setSearchQuery = useNoteStore(state => state.setSearchQuery);
   const { currentTheme } = useThemeStore();
   const theme = defaultThemes[currentTheme] || defaultThemes.navy;
 
@@ -35,56 +35,56 @@ export const Header = ({
 
   return (
     <header
-      className='sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700'
-      role='banner'
+      className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 border-b bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+      role="banner"
     >
       {/* Left section */}
-      <div className='w-64 flex items-center gap-2'>
+      <div className="w-64 flex items-center gap-2">
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className='p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg'
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           aria-label={`${isSidebarOpen ? 'Close' : 'Open'} sidebar menu`}
           aria-expanded={isSidebarOpen}
         >
-          <Menu className='w-5 h-5 text-gray-600 dark:text-gray-400' aria-hidden='true' />
+          <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
         </button>
 
         <button
           onClick={onLogoClick}
           className={`text-lg font-semibold text-gray-900 dark:text-white hover:${theme.colors.accent}`}
-          aria-label='Go to home'
+          aria-label="Go to home"
         >
           {title}
         </button>
       </div>
 
       {/* Center section */}
-      <div className='flex-1 flex justify-center' aria-live='polite'>
+      <div className="flex-1 flex justify-center" aria-live="polite">
         {isSearching && totalResults !== undefined && (
-          <div className='text-sm text-gray-500 dark:text-gray-400' role='status'>
+          <div className="text-sm text-gray-500 dark:text-gray-400" role="status">
             Found {totalResults} {totalResults === 1 ? 'result' : 'results'}
           </div>
         )}
       </div>
 
       {/* Right section */}
-      <div className='w-auto flex items-center justify-end gap-3'>
-        <div className='relative'>
+      <div className="w-auto flex items-center justify-end gap-3">
+        <div className="relative">
           <input
             ref={searchRef}
-            type='text'
-            placeholder='Search by content, title or tag...'
+            type="text"
+            placeholder="Search by content, title or tag..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             onFocus={handleSearchFocus}
             className={`w-96 px-4 py-2 pl-10 text-sm ${theme.colors.primaryLight} border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-current hover:bg-opacity-80 dark:hover:bg-opacity-40 transition-colors ${theme.colors.text} placeholder:text-gray-500 dark:placeholder:text-gray-400`}
-            aria-label='Search notes'
-            role='searchbox'
+            aria-label="Search notes"
+            role="searchbox"
             aria-expanded={isSearching}
           />
           <Search
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${theme.colors.accent}`}
-            aria-hidden='true'
+            aria-hidden="true"
           />
         </div>
         <SettingsMenu />
