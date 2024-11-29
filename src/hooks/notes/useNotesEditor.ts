@@ -1,15 +1,10 @@
 import { Note } from '@/types/note';
 import { useCallback } from 'react';
-import { useNotesState } from './useNotesState';
 import { useNotesCrud } from './useNotesCrud';
+import { useNotesState } from './useNotesState';
 
 export const useNotesEditor = () => {
-  const {
-    state,
-    setSelectedNote,
-    updateEditorContent,
-    clearEditor,
-  } = useNotesState();
+  const { state, setSelectedNote, updateEditorContent, clearEditor } = useNotesState();
 
   const { updateNote } = useNotesCrud();
 
@@ -46,6 +41,10 @@ export const useNotesEditor = () => {
     await updateNote(updatedNote);
   }, [state.selectedNote, state.editorContent, updateNote]);
 
+  const clearSelection = useCallback(() => {
+    setSelectedNote(null);
+  }, [setSelectedNote]);
+
   const handleCancelEdit = useCallback(() => {
     clearEditor();
   }, [clearEditor]);
@@ -58,5 +57,6 @@ export const useNotesEditor = () => {
     handleTitleChange,
     handleSaveNote,
     handleCancelEdit,
+    clearSelection,
   };
 };

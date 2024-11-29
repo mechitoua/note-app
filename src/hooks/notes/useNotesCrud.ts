@@ -49,12 +49,8 @@ export const useNotesCrud = () => {
           ...noteToUpdate,
           updatedAt: new Date().toISOString(),
         };
-        await noteService.updateNote(updatedNote);
-        setNotes(
-          state.notes.map((note) =>
-            note.id === updatedNote.id ? updatedNote : note
-          )
-        );
+        await noteService.updateNote(noteToUpdate.id, updatedNote);
+        setNotes(state.notes.map(note => (note.id === updatedNote.id ? updatedNote : note)));
         clearEditor();
         setError(null);
       } catch (err) {
@@ -68,7 +64,7 @@ export const useNotesCrud = () => {
     async (noteId: string) => {
       try {
         await noteService.deleteNote(noteId);
-        setNotes(state.notes.filter((note) => note.id !== noteId));
+        setNotes(state.notes.filter(note => note.id !== noteId));
         clearEditor();
         setError(null);
       } catch (err) {
@@ -80,7 +76,7 @@ export const useNotesCrud = () => {
 
   const archiveNote = useCallback(
     async (noteId: string) => {
-      const noteToArchive = state.notes.find((note) => note.id === noteId);
+      const noteToArchive = state.notes.find(note => note.id === noteId);
       if (!noteToArchive) return;
 
       try {
@@ -89,12 +85,8 @@ export const useNotesCrud = () => {
           archived: !noteToArchive.archived,
           updatedAt: new Date().toISOString(),
         };
-        await noteService.updateNote(updatedNote);
-        setNotes(
-          state.notes.map((note) =>
-            note.id === updatedNote.id ? updatedNote : note
-          )
-        );
+        await noteService.updateNote(noteToArchive.id, updatedNote);
+        setNotes(state.notes.map(note => (note.id === updatedNote.id ? updatedNote : note)));
         clearEditor();
         setError(null);
       } catch (err) {
@@ -106,7 +98,7 @@ export const useNotesCrud = () => {
 
   const unarchiveNote = useCallback(
     async (noteId: string) => {
-      const noteToUnarchive = state.notes.find((note) => note.id === noteId);
+      const noteToUnarchive = state.notes.find(note => note.id === noteId);
       if (!noteToUnarchive) return false;
 
       try {
@@ -115,12 +107,8 @@ export const useNotesCrud = () => {
           archived: false,
           updatedAt: new Date().toISOString(),
         };
-        await noteService.updateNote(updatedNote);
-        setNotes(
-          state.notes.map((note) =>
-            note.id === updatedNote.id ? updatedNote : note
-          )
-        );
+        await noteService.updateNote(noteToUnarchive.id, updatedNote);
+        setNotes(state.notes.map(note => (note.id === updatedNote.id ? updatedNote : note)));
         clearEditor();
         setError(null);
         return true;

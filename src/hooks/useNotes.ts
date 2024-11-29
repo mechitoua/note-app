@@ -1,9 +1,9 @@
-import { noteService } from '@/services/noteService';
-import { useEffect, useState, useCallback } from 'react';
+import { useFeedback } from '@/contexts/FeedbackContext';
+import { noteService, NoteServiceError } from '@/services/noteService';
+import { useCallback, useEffect, useState } from 'react';
 import { useNoteOperations } from './notes/useNoteOperations';
 import { useNoteSelection } from './notes/useNoteSelection';
 import { useTags } from './useTags';
-import { useFeedback } from '@/contexts/FeedbackContext';
 
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof NoteServiceError) {
@@ -97,9 +97,7 @@ export const useNotes = () => {
       const success = await archiveNote(selectedNote.id);
       if (success) {
         showSuccess(
-          selectedNote.archived 
-            ? 'Note unarchived successfully'
-            : 'Note archived successfully'
+          selectedNote.archived ? 'Note unarchived successfully' : 'Note archived successfully'
         );
         clearSelection();
       }
@@ -165,7 +163,7 @@ export const useNotes = () => {
         if (selectedNote?.id === noteId) {
           const updatedNote = await noteService
             .getNotes()
-            .then((notes) => notes.find((note) => note.id === noteId));
+            .then(notes => notes.find(note => note.id === noteId));
           if (updatedNote) {
             setSelection({
               selectedNote: updatedNote,
@@ -187,7 +185,7 @@ export const useNotes = () => {
   };
 
   const getFilteredNotes = (archived: boolean) => {
-    return notes.filter((note) => note.archived === archived);
+    return notes.filter(note => note.archived === archived);
   };
 
   return {

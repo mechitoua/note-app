@@ -46,7 +46,7 @@ function App() {
 
   const { tags, selectedTag, setSelectedTag, addTags, syncTags, clearSelectedTag } = useTags();
 
-  const searchQuery = useNoteStore((state) => state.searchQuery); // Get the search query from the note store
+  const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
 
   const { currentFont } = useFontStore();
 
@@ -82,8 +82,8 @@ function App() {
 
   const getFilteredNotesByTag = (notes: any[]) => {
     if (!selectedTag) return notes;
-    return notes.filter((note) =>
-      note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag))
+    return notes.filter(note =>
+      note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))
     );
   };
 
@@ -94,10 +94,10 @@ function App() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (note) =>
+        note =>
           note.title.toLowerCase().includes(query) ||
           note.content.toLowerCase().includes(query) ||
-          note.tags?.some((tag) => tag.toLowerCase().includes(query))
+          note.tags?.some(tag => tag.toLowerCase().includes(query))
       );
     } else {
       // Only filter by archive status if there's no search query
@@ -106,8 +106,8 @@ function App() {
 
     // Apply tag filter
     if (selectedTag) {
-      filtered = filtered.filter((note) =>
-        note.tags.some((tag) => normalizeTag(tag) === normalizeTag(selectedTag))
+      filtered = filtered.filter(note =>
+        note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))
       );
     }
 
@@ -147,7 +147,7 @@ function App() {
         className={`min-h-screen ${theme.colors.background} transition-colors duration-200`}
         style={{ fontFamily: currentFont.fontFamily }}
       >
-        <div className='h-screen flex overflow-hidden'>
+        <div className="h-screen flex overflow-hidden">
           <Sidebar
             isOpen={isSidebarOpen}
             currentView={currentView}
@@ -173,15 +173,15 @@ function App() {
               isSearching={!!searchQuery}
               totalResults={filteredNotes.length}
             />
-            <div className='flex-1 overflow-hidden'>
-              <PanelGroup direction='horizontal'>
-                <Panel defaultSize={30} minSize={30}>
+            <div className="flex-1 overflow-hidden">
+              <PanelGroup direction="horizontal">
+                <Panel defaultSize={30} minSize={20}>
                   {currentView === 'archived' ? (
                     <ArchivedNotes
                       notes={filteredNotes}
                       onNoteSelect={handleNoteSelect}
                       onUnarchive={handleUnarchiveNote}
-                      selectedNoteId={selectedNote?.id}
+                      selectedNoteId={selectedNote?.id!}
                     />
                   ) : (
                     <NoteList
@@ -194,10 +194,10 @@ function App() {
                     />
                   )}
                 </Panel>
-                <PanelResizeHandle className='w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors' />
-                <Panel minSize={40} defaultSize={80}>
+                <PanelResizeHandle className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" />
+                <Panel minSize={40} defaultSize={70}>
                   {selectedNote && (
-                    <div className='h-full grid grid-cols-[1fr,250px]'>
+                    <div className="h-full grid grid-cols-[1fr,250px]">
                       <NoteEditor
                         title={editorContent.title}
                         content={editorContent.content}

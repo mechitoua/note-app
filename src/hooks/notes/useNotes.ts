@@ -1,8 +1,8 @@
-import { useEffect, useCallback } from 'react';
-import { useNotesState } from './useNotesState';
+import { useCallback, useEffect } from 'react';
 import { useNotesCrud } from './useNotesCrud';
-import { useNotesFilter } from './useNotesFilter';
 import { useNotesEditor } from './useNotesEditor';
+import { useNotesFilter } from './useNotesFilter';
+import { useNotesState } from './useNotesState';
 
 export const useNotes = () => {
   const {
