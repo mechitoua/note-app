@@ -1,134 +1,97 @@
-# Note App
+# Note App Frontend
 
-[![Version](https://img.shields.io/badge/version-0.0.0-blue)]()
+This is the frontend application for the Note App, built with React, TypeScript, and Tailwind CSS.
 
-A modern note-taking application built with React and TypeScript. Features a clean, minimalist design powered by Tailwind CSS.
+![Note App Logo](/apps/frontend/public/light-note-app.jpg)
 
-![Note App Screenshot light](apps/frontend/public/screenshot-light.png)
+## Tech Stack
 
-![Note App Screenshot dark](/apps/frontend/public/screenshot-dark.png)
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Markdown Editor (@uiw/react-md-editor)
 
-## ✨ Key Features
+## Setup and Installation
 
-- 📝 **Modern Tech Stack**
-  - React with TypeScript
-  - Tailwind CSS for styling
-  - Vite for fast development
-  - ESLint + Prettier for code quality
-
-- 🏗️ **Project Structure**
-  - Monorepo setup with pnpm workspaces
-  - Shared packages for code reuse
-  - Organized frontend architecture
-
-## 🎯 Features
-
-### Note Management
-- Create, edit, and delete notes
-- Rich text editor with formatting options
-- Auto-save functionality
-- Note archiving system
-- Categories and tags for organization
-
-### User Interface
-- Clean, modern design
-- Responsive layout with resizable panels
-- Customizable themes (Light/Dark mode)
-- Adjustable font settings
-- Sidebar navigation
-
-### Organization
-- Tag-based note organization
-- Category management
-- Archive functionality
-- List and detail views
-- Quick actions menu
-
-### Settings & Customization
-- Theme customization
-- Font size adjustment
-- Layout preferences
-- Sidebar toggle
-- Panel size adjustment
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js
-- pnpm
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/note-app.git
-cd note-app
-```
-
-2. Install dependencies:
+1. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-3. Start the development server:
+2. Start the development server:
 
 ```bash
 pnpm dev
 ```
 
-4. Open [http://localhost:5173](http://localhost:5173) in your browser.
+The application will be available at `http://localhost:3000`.
 
-## 🏗️ Tech Stack
+## Project Structure
 
-- **Frontend:** React + TypeScript
-- **Styling:** Tailwind CSS
-- **Build Tool:** Vite
-- **Package Manager:** pnpm
-- **Code Quality:** ESLint + Prettier
+- `src/` - Source code directory
+  - `components/` - Reusable UI components
+  - `hooks/` - Custom React hooks
+  - `utils/` - Utility functions and helpers
+  - `types/` - TypeScript type definitions
+  - `pages/` - Page components
+  - `assets/` - Static assets (images, fonts, etc.)
+  - `layouts/` - Layout components
+  - `lib/` - Third-party library configurations
+  - `styles/` - Global styles and CSS modules
+  - `features/` - Feature-specific components and logic
+  - `App.tsx` - Main application component
+  - `main.tsx` - Application entry point
+  - `index.css` - Global styles and Tailwind imports
+- `public/` - Static assets directory
+  - `light-note-app.jpg` - Application logo/banner image
 
-## 📁 Project Structure
+## Path Aliases
 
+The project uses path aliases for cleaner imports. Available aliases:
+
+```typescript
+import Component from '@components/Component';
+import { useHook } from '@hooks/useHook';
+import { utility } from '@utils/utility';
+import { Type } from '@types/types';
+import Page from '@pages/Page';
+import image from '@assets/image';
+import Layout from '@layouts/Layout';
+import lib from '@lib/lib';
+import '@styles/style.css';
+import Feature from '@features/Feature';
 ```
-note-app/
-├── apps/
-│   └── frontend/           # Frontend application
-│       ├── public/        # Static assets
-│       ├── src/          # Source files
-│       └── vite.config.ts # Vite configuration
-├── packages/
-│   └── shared/           # Shared utilities and components
-├── .eslintrc.json       # ESLint configuration
-├── .prettierrc          # Prettier configuration
-├── package.json
-├── pnpm-workspace.yaml
-├── postcss.config.mjs
-├── tailwind.config.mjs
-└── tsconfig.base.json
-```
 
-## 🧑‍💻 Development
+## Configuration Files
 
-### Available Scripts
+- `tsconfig.json` - TypeScript configuration
+- `tsconfig.node.json` - TypeScript configuration for Node.js environment
+- `vite.config.ts` - Vite bundler configuration
+- `postcss.config.js` - PostCSS configuration for Tailwind CSS
+- `tailwind.config.js` - Tailwind CSS configuration
+
+## Available Scripts
 
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
+- `pnpm preview` - Preview production build
 - `pnpm lint` - Run ESLint
-- `pnpm format` - Format code with Prettier
 - `pnpm clean` - Clean build artifacts
 
-### Coding Standards
+## Dependencies
 
+### Production Dependencies
+
+- `@note-app/shared` - Shared package (workspace dependency)
+- `@uiw/react-md-editor` - Markdown editor component
+- `lucide-react` - Icon library
+- `react` and `react-dom` - React framework
+
+### Development Dependencies
+
+- TypeScript and React type definitions
+- Vite and related plugins
+- Tailwind CSS and PostCSS
 - ESLint for code linting
-- Prettier for code formatting
-- TypeScript for type safety
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
-
-Built with modern web technologies 🚀
