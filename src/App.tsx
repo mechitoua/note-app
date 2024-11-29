@@ -194,7 +194,7 @@ function App() {
                         lastEdited={new Date(selectedNote.updatedAt).toLocaleDateString('en-US', {
                           day: 'numeric',
                           month: 'short',
-                          year: 'numeric'
+                          year: 'numeric',
                         })}
                       />
                       <NoteActions

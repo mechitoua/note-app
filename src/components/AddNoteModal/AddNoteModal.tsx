@@ -234,7 +234,9 @@ export const AddNoteModal = ({
                             value={title}
                             onChange={handleTitleChange}
                             className={`mt-1 block w-full rounded-md border ${
-                              !validation.title.isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                              !validation.title.isValid
+                                ? 'border-red-500'
+                                : 'border-gray-300 dark:border-gray-600'
                             } bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:${
                               theme.colors.ring
                             } dark:bg-gray-700 dark:text-gray-100 sm:text-sm`}
@@ -260,7 +262,9 @@ export const AddNoteModal = ({
                             value={content}
                             onChange={handleContentChange}
                             className={`mt-1 block w-full rounded-md border ${
-                              !validation.content.isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                              !validation.content.isValid
+                                ? 'border-red-500'
+                                : 'border-gray-300 dark:border-gray-600'
                             } bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:${
                               theme.colors.ring
                             } dark:bg-gray-700 dark:text-gray-100 sm:text-sm`}
