@@ -42,9 +42,7 @@ export const Sidebar = ({
       <div className="p-3 pt-4">
         <div className="flex items-center gap-2">
           <Feather className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-1" />
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white font-borel">
-            Notes
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white font-borel">Notes</h1>
         </div>
       </div>
 
@@ -63,8 +61,8 @@ export const Sidebar = ({
         >
           <Home
             className={`w-5 h-5 ${
-              currentView === 'all-notes' && !selectedTag 
-                ? 'text-gray-900 dark:text-white' 
+              currentView === 'all-notes' && !selectedTag
+                ? 'text-gray-900 dark:text-white'
                 : 'text-gray-600 dark:text-gray-400'
             }`}
           />
@@ -86,8 +84,8 @@ export const Sidebar = ({
         >
           <Archive
             className={`w-5 h-5 ${
-              currentView === 'archived' 
-                ? 'text-gray-900 dark:text-white' 
+              currentView === 'archived'
+                ? 'text-gray-900 dark:text-white'
                 : 'text-gray-600 dark:text-gray-400'
             }`}
           />

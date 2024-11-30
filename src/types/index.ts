@@ -6,4 +6,4 @@ export interface Note {
   createdAt: string;
 }
 
-export type CurrentView = 'all-notes' | 'archived' | 'editor';
+export type CurrentView = 'all-notes' | 'archived' | 'editor' | 'search' | 'new-note';

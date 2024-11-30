@@ -1,122 +1,149 @@
-import {
-  ArchivedNotes,
-  EmptyState,
-  Header,
-  NoteActions,
-  NoteEditor,
-  NoteList,
-  Sidebar,
-} from '@/components';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
+import { noteService } from '@/services/noteService';
 import { useFontStore } from '@/store/useFontStore';
 import { useNoteStore } from '@/store/useNoteStore';
-import { defaultThemes, useThemeStore } from '@/store/useThemeStore';
+import { useThemeStore } from '@/store/useThemeStore';
 import { CurrentView } from '@/types';
-import { normalizeTag } from '@/utils/tagUtils';
+import { defaultThemes } from '@/types/theme';
 import { useEffect, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { AddNoteModal } from './AddNoteModal';
+import { ArchivedNotes } from './ArchivedNotes';
+import { EmptyState } from './EmptyState/EmptyState';
+import { Header } from './Header/Header';
+import { NoteActions } from './NoteActions';
+import { NoteEditor } from './NoteEditor';
+import { NoteList } from './NoteList';
+import { Sidebar } from './Sidebar';
 
-function Desktop() {
+export const Desktop = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentView, setCurrentView] = useState<CurrentView>('all-notes');
+  const { notes, selectedNote, handleNoteSelect, clearSelectedNote, fetchNotes } = useNotes();
+  const { tags, selectedTag, setSelectedTag } = useTags();
   const {
-    notes,
-    selectedNote,
-    editorContent,
-    handleNoteSelect,
-    handleContentChange,
+    searchQuery,
+    setSearchQuery,
     handleTitleChange,
+    handleContentChange,
     handleSaveNote,
-    handleCancelEdit,
-    handleArchiveNote,
     handleDeleteNote,
-    clearSelectedNote,
-    getFilteredNotes,
-    handleUnarchiveNote: originalHandleUnarchiveNote,
-    fetchNotes,
-  } = useNotes();
+    editorContent,
+  } = useNoteStore();
+  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
+  const currentFont = useFontStore(state => state.currentFont);
 
-  const { tags, selectedTag, setSelectedTag, syncTags } = useTags();
+  const theme = defaultThemes[useThemeStore(state => state.currentTheme)] || defaultThemes.navy;
+
   useKeyboardShortcuts();
-  const searchQuery = useNoteStore(state => state.searchQuery); // Get the search query from the note store
-
-  const { currentFont } = useFontStore();
-
-  const { currentTheme } = useThemeStore();
-
-  // Get theme with fallback to default ocean theme
-  const theme = defaultThemes[currentTheme] || defaultThemes.ocean;
 
   useEffect(() => {
-    syncTags(notes);
-  }, [notes, syncTags]);
+    if (selectedTag) {
+      setCurrentView('all-notes');
+    }
+  }, [selectedTag]);
+
+  const showSuccess = (message: string) => {
+    // TODO: Implement toast or notification system
+    console.log('Success:', message);
+  };
+
+  const showError = (message: string) => {
+    // TODO: Implement toast or notification system
+    console.error('Error:', message);
+  };
+
+  const handleViewChange = (view: CurrentView) => {
+    setCurrentView(view);
+    setSelectedTag(null);
+  };
 
   const handleLogoClick = () => {
-    clearSelectedNote();
     setCurrentView('all-notes');
     setSelectedTag(null);
+    clearSelectedNote();
+  };
+
+  const handleArchiveNote = async (noteId: string) => {
+    try {
+      await noteService.archiveNote(noteId);
+      showSuccess('Note archived successfully');
+      if (selectedNote?.id === noteId) {
+        clearSelectedNote();
+      }
+      fetchNotes();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to archive note';
+      showError(errorMessage);
+    }
+  };
+
+  const handleUnarchiveNote = async (noteId: string) => {
+    try {
+      await noteService.unarchiveNote(noteId);
+      showSuccess('Note unarchived successfully');
+      if (selectedNote?.id === noteId) {
+        clearSelectedNote();
+      }
+      fetchNotes();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to unarchive note';
+      showError(errorMessage);
+    }
+  };
+
+  const handleNewNote = async (data: { title: string; content: string; tags: string[] }) => {
+    try {
+      await noteService.createNote(data);
+      showSuccess('Note created successfully');
+      setIsAddNoteModalOpen(false);
+      fetchNotes();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create note';
+      showError(errorMessage);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    clearSelectedNote();
+  };
+
+  const handleAddTags = async (noteId: string, tags: string[]) => {
+    try {
+      await noteService.updateNoteTags(noteId, tags);
+      showSuccess('Tags updated successfully');
+      fetchNotes();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update tags';
+      showError(errorMessage);
+    }
   };
 
   const filteredNotes = useMemo(() => {
     let filtered = notes;
 
-    // Apply search filter first (across all notes)
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
+      filtered = notes.filter(
         note =>
-          note.title.toLowerCase().includes(query) ||
-          note.content.toLowerCase().includes(query) ||
-          note.tags?.some(tag => tag.toLowerCase().includes(query))
+          note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    } else {
-      // Only filter by archive status if there's no search query
-      filtered = getFilteredNotes(currentView === 'archived');
     }
 
-    // Apply tag filter
     if (selectedTag) {
-      filtered = filtered.filter(note =>
-        note.tags.some(tag => normalizeTag(tag) === normalizeTag(selectedTag))
-      );
+      filtered = filtered.filter(note => note.tags.includes(selectedTag));
+    }
+
+    if (currentView === 'archived') {
+      filtered = filtered.filter(note => note.archived);
+    } else {
+      filtered = filtered.filter(note => !note.archived);
     }
 
     return filtered;
-  }, [notes, searchQuery, currentView, selectedTag, getFilteredNotes]);
-
-  const handleUnarchiveNote = async (noteId: string) => {
-    const success = await originalHandleUnarchiveNote(noteId);
-    if (success) {
-      // Switch to all notes view after unarchiving
-      setCurrentView('all-notes');
-      clearSelectedNote();
-    }
-  };
-
-  const handleViewChange = (value: CurrentView | ((prev: CurrentView) => CurrentView)) => {
-    if (typeof value === 'function') {
-      setCurrentView(value);
-    } else {
-      setCurrentView(value);
-      clearSelectedNote();
-    }
-  };
-
-  const handleAddTags = async (tags: string[]) => {
-    if (!selectedNote) return;
-
-    // Update note tags
-    const success = await useNotes().handleUpdateNoteTags(selectedNote.id, tags);
-    if (success) {
-      // Refresh notes and sync tags
-      await fetchNotes();
-      syncTags(notes);
-    }
-  };
+  }, [notes, searchQuery, selectedTag, currentView]);
 
   return (
     <div
@@ -167,7 +194,7 @@ function Desktop() {
                     notes={filteredNotes}
                     selectedNoteId={selectedNote?.id ?? ''}
                     onNoteSelect={handleNoteSelect}
-                    onCreateNote={() => useNotes().setIsAddNoteModalOpen(true)}
+                    onCreateNote={() => setIsAddNoteModalOpen(true)}
                     onArchive={handleArchiveNote}
                     onUnarchive={handleUnarchiveNote}
                   />
@@ -178,8 +205,8 @@ function Desktop() {
                 {selectedNote && (
                   <div className="h-full grid grid-cols-[1fr,250px]">
                     <NoteEditor
-                      title={editorContent.title}
-                      content={editorContent.content}
+                      title={editorContent?.title ?? ''}
+                      content={editorContent?.content ?? ''}
                       onTitleChange={handleTitleChange}
                       onContentChange={handleContentChange}
                       onSave={handleSaveNote}
@@ -208,20 +235,14 @@ function Desktop() {
           </div>
         </main>
       </div>
+
+      <AddNoteModal
+        isOpen={isAddNoteModalOpen}
+        onClose={() => setIsAddNoteModalOpen(false)}
+        onSave={handleNewNote}
+        availableTags={tags}
+        existingNotes={notes}
+      />
     </div>
   );
-}
-
-import { Mobile } from '@/mobile';
-
-const App = () => {
-  const isMobile = useMediaQuery('(max-width: 768px)');
-
-  return (
-    <ThemeProvider>
-      <div className="h-screen w-screen overflow-hidden">{isMobile ? <Mobile /> : <Desktop />}</div>
-    </ThemeProvider>
-  );
 };
-
-export default App;
