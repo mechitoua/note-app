@@ -1,6 +1,6 @@
-import { Note } from '@/types';
-import { CurrentView } from '@/types';
+import { CurrentView, Note } from '@/types';
 import { ArchiveRestore } from 'lucide-react';
+import { MobileHeader } from './MobileHeader';
 
 interface MobileArchivedViewProps {
   notes: Note[];
@@ -9,18 +9,15 @@ interface MobileArchivedViewProps {
   onNoteSelect: (note: Note) => void;
 }
 
-export const MobileArchivedView = ({ 
-  notes, 
-  onUnarchive, 
-  onNavigate,
-  onNoteSelect 
+export const MobileArchivedView = ({
+  notes,
+  onUnarchive,
+  onNoteSelect,
 }: MobileArchivedViewProps) => {
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-border px-4 py-3">
-        <h1 className="text-lg font-semibold">Archived Notes</h1>
-      </div>
-      <div className="flex-1 overflow-y-auto">
+      <MobileHeader title="Archived" />
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {notes.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-muted-foreground">No archived notes</p>

@@ -46,13 +46,13 @@ export const MobileNavigation = ({ currentView, onNavigate }: MobileNavigationPr
               onClick={() => onNavigate(view)}
               className={`relative flex flex-1 flex-col items-center py-3 transition-colors ${
                 isActive
-                  ? 'bg-accent/50 text-primary'
+                  ? 'text-blue-500'
                   : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
               }`}
             >
               <Icon className="h-5 w-5" />
               <span className="mt-1 text-xs">{label}</span>
-              {isActive && <div className="absolute bottom-0 h-0.5 w-1/2 bg-primary" />}
+              {isActive && <div className="absolute bottom-0 h-0.5 w-1/2 bg-blue-500" />}
             </button>
           );
         })}

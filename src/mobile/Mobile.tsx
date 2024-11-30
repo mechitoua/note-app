@@ -1,15 +1,19 @@
 import { AddNoteModal } from '@/components';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
-import { noteService } from '@/services/noteService';
 import { useNoteStore } from '@/store/useNoteStore';
+import { useThemeStore } from '@/store/useThemeStore';
+import { useFontStore } from '@/store/useFontStore';
 import { CurrentView, Note } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MobileArchivedView } from './components/MobileArchivedView';
 import { MobileNavigation } from './components/MobileNavigation';
 import { MobileNoteEditor } from './components/MobileNoteEditor';
 import { MobileNoteList } from './components/MobileNoteList';
 import { MobileSearchView } from './components/MobileSearchView';
+import { MobileSettingsView } from './components/MobileSettingsView';
+import { Feather } from 'lucide-react';
+import { defaultThemes } from '@/store/useThemeStore';
 
 export const Mobile = () => {
   const [currentView, setCurrentView] = useState<CurrentView>('all-notes');
@@ -17,40 +21,44 @@ export const Mobile = () => {
   const {
     notes,
     selectedNote,
-    clearSelectedNote,
-    fetchNotes,
-    handleNoteSelect,
-    handleTitleChange,
-    handleContentChange,
-    handleSaveNote,
-    handleDeleteNote,
-    handleArchiveNote,
-    handleUnarchiveNote,
     editorContent,
+    handleNoteSelect,
+    handleContentChange,
+    handleTitleChange,
+    handleSaveNote,
+    handleCancelEdit,
+    handleArchiveNote,
+    handleDeleteNote,
+    clearSelectedNote,
+    getFilteredNotes,
+    handleUnarchiveNote,
+    handleNewNote,
+    setSelection,
   } = useNotes();
-  const { tags, selectedTag } = useTags();
+  const { tags, selectedTag, setSelectedTag } = useTags();
   const { searchQuery, setSearchQuery } = useNoteStore();
+  const { isDark, currentTheme } = useThemeStore();
+  const { currentFont } = useFontStore();
+  const theme = defaultThemes[currentTheme] || defaultThemes.navy;
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    root.style.fontFamily = currentFont.fontFamily;
+  }, [isDark, currentFont]);
 
   const showSuccess = (message: string) => {
     // TODO: Implement toast or notification system
     console.log('Success:', message);
   };
 
-  const showError = (message: string) => {
-    // TODO: Implement toast or notification system
-    console.error('Error:', message);
-  };
-
-  const handleNewNote = async (data: { title: string; content: string; tags: string[] }) => {
-    try {
-      await noteService.createNote(data);
-      showSuccess('Note created successfully');
-      setIsAddNoteModalOpen(false);
-      fetchNotes();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create note';
-      showError(errorMessage);
-    }
+  const handleMobileNoteSelect = (note: Note) => {
+    handleNoteSelect(note);
+    setCurrentView('editor');
   };
 
   const handleMobileNavigation = (view: CurrentView) => {
@@ -62,94 +70,110 @@ export const Mobile = () => {
     }
   };
 
-  const handleMobileNoteSelect = (note: Note) => {
-    handleNoteSelect(note);
-    setCurrentView('editor');
-  };
-
-  const handleBackFromEditor = () => {
-    clearSelectedNote();
+  const handleMobileArchiveNote = async (note: Note) => {
+    await handleArchiveNote(note);
+    showSuccess('Note archived');
     setCurrentView('all-notes');
   };
 
-  const getFilteredNotes = () => {
-    let filteredNotes = [...notes];
+  const handleMobileDeleteNote = async (note: Note) => {
+    await handleDeleteNote(note);
+    showSuccess('Note deleted');
+    setCurrentView('all-notes');
+  };
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filteredNotes = filteredNotes.filter(
-        note =>
-          note.title.toLowerCase().includes(query) ||
-          note.content.toLowerCase().includes(query) ||
-          note.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
+  const handleMobileUnarchiveNote = async (note: Note) => {
+    await handleUnarchiveNote(note);
+    showSuccess('Note unarchived');
+    setCurrentView('all-notes');
+  };
 
-    if (selectedTag) {
-      filteredNotes = filteredNotes.filter(note => note.tags.includes(selectedTag));
-    }
+  const handleNewNoteSubmit = async (data: { title: string; content: string; tags: string[] }) => {
+    await handleNewNote(data);
+    setIsAddNoteModalOpen(false);
+    setCurrentView('all-notes');
+  };
 
-    if (currentView === 'archived') {
-      filteredNotes = filteredNotes.filter(note => note.archived);
-    } else if (currentView !== 'search') {
-      filteredNotes = filteredNotes.filter(note => !note.archived);
+  const handleTagSelect = (tag: string) => {
+    if (selectedTag === tag) {
+      setSelectedTag(null);
+    } else {
+      setSelectedTag(tag);
     }
+  };
+
+  const getViewNotes = () => {
+    const filteredNotes = notes.filter(note => {
+      // Filter by archive status
+      if (currentView === 'archived') {
+        return note.archived;
+      }
+      if (!note.archived) {
+        // Filter by search query
+        const matchesSearch = searchQuery
+          ? note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+          : true;
+
+        // Filter by selected tag
+        const matchesTag = selectedTag ? note.tags.includes(selectedTag) : true;
+
+        return matchesSearch && matchesTag;
+      }
+      return false;
+    });
 
     return filteredNotes;
   };
 
-  if (currentView === 'editor' && selectedNote) {
+  if (selectedNote && currentView === 'editor') {
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground">
-        <div className="flex-1 overflow-hidden">
-          <MobileNoteEditor
-            note={selectedNote}
-            content={{
-              title: selectedNote.title || '',
-              content: editorContent || selectedNote.content || '',
-            }}
-            onTitleChange={handleTitleChange}
-            onContentChange={handleContentChange}
-            onSave={handleSaveNote}
-            onDelete={() => handleDeleteNote()}
-            onArchive={() => handleArchiveNote()}
-            onBack={handleBackFromEditor}
-          />
-        </div>
-        <MobileNavigation currentView={currentView} onNavigate={handleMobileNavigation} />
+      <div className="h-screen flex flex-col bg-background text-foreground" style={{ fontFamily: currentFont.fontFamily }}>
+        <MobileNoteEditor
+          note={selectedNote}
+          content={editorContent}
+          onTitleChange={handleTitleChange}
+          onContentChange={handleContentChange}
+          onSave={handleSaveNote}
+          onDelete={() => handleMobileDeleteNote(selectedNote)}
+          onArchive={() => handleMobileArchiveNote(selectedNote)}
+          onBack={() => {
+            handleCancelEdit();
+            setCurrentView('all-notes');
+          }}
+        />
       </div>
     );
   }
 
-  if (currentView === 'editor') {
-    setCurrentView('all-notes');
-    return null;
-  }
-
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
+    <div className="h-full flex flex-col bg-background text-foreground" style={{ fontFamily: currentFont.fontFamily }}>
       <div className="flex-1 overflow-hidden">
-        <div className="h-screen flex flex-col">
+        <div className="h-full flex flex-col">
           {currentView === 'search' ? (
             <MobileSearchView
               onNavigate={handleMobileNavigation}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              notes={getFilteredNotes()}
+              notes={getViewNotes()}
               onNoteSelect={handleMobileNoteSelect}
+              tags={tags}
+              selectedTag={selectedTag}
+              onTagSelect={handleTagSelect}
             />
           ) : currentView === 'archived' ? (
             <MobileArchivedView
-              notes={getFilteredNotes()}
-              onUnarchive={handleUnarchiveNote}
-              onNavigate={handleMobileNavigation}
+              notes={getViewNotes()}
+              onUnarchive={handleMobileUnarchiveNote}
               onNoteSelect={handleMobileNoteSelect}
             />
+          ) : currentView === 'settings' ? (
+            <MobileSettingsView />
           ) : (
             <MobileNoteList
-              notes={getFilteredNotes()}
-              onDelete={handleDeleteNote}
-              onArchive={handleArchiveNote}
+              notes={getViewNotes()}
+              onArchive={handleMobileArchiveNote}
               onNavigate={handleMobileNavigation}
               onNoteSelect={handleMobileNoteSelect}
             />
@@ -160,7 +184,7 @@ export const Mobile = () => {
       <AddNoteModal
         isOpen={isAddNoteModalOpen}
         onClose={() => setIsAddNoteModalOpen(false)}
-        onSave={handleNewNote}
+        onSave={handleNewNoteSubmit}
         availableTags={tags}
         existingNotes={notes}
       />

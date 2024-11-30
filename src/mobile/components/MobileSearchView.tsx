@@ -1,5 +1,6 @@
 import { CurrentView, Note } from '@/types';
 import { Search, X } from 'lucide-react';
+import { MobileHeader } from './MobileHeader';
 
 interface MobileSearchViewProps {
   notes: Note[];
@@ -7,6 +8,9 @@ interface MobileSearchViewProps {
   onSearchChange: (query: string) => void;
   onNavigate: (view: CurrentView) => void;
   onNoteSelect: (note: Note) => void;
+  tags: string[];
+  selectedTag: string | null;
+  onTagSelect: (tag: string) => void;
 }
 
 export const MobileSearchView = ({
@@ -15,12 +19,16 @@ export const MobileSearchView = ({
   onSearchChange,
   onNavigate,
   onNoteSelect,
+  tags,
+  selectedTag,
+  onTagSelect,
 }: MobileSearchViewProps) => {
   const filteredNotes = notes.filter(
     note =>
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (selectedTag && note.tags.includes(selectedTag))
   );
 
   const handleNoteClick = (note: Note) => {
@@ -29,7 +37,8 @@ export const MobileSearchView = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-border p-4">
+      <MobileHeader title="Search" />
+      <div className="border-b border-border p-4 space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -48,6 +57,23 @@ export const MobileSearchView = ({
             </button>
           )}
         </div>
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {tags.map(tag => (
+              <button
+                key={tag}
+                onClick={() => onTagSelect(tag)}
+                className={`rounded-md px-2 py-1 text-xs ${
+                  selectedTag === tag
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-accent text-accent-foreground hover:bg-accent/80'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto">
         {filteredNotes.length === 0 ? (
@@ -57,28 +83,32 @@ export const MobileSearchView = ({
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-border">
+          <div className="space-y-1 p-2">
             {filteredNotes.map(note => (
-              <button
+              <div
                 key={note.id}
                 onClick={() => handleNoteClick(note)}
-                className="w-full p-4 text-left hover:bg-muted/50"
+                className={`group relative rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/50`}
               >
-                <h3 className="font-medium">{note.title}</h3>
-                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{note.content}</p>
-                {note.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {note.tags.map(tag => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <h3 className="font-medium text-card-foreground">{note.title}</h3>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{note.content}</p>
+                    {note.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {note.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="rounded-md bg-accent px-2 py-0.5 text-xs text-accent-foreground"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </button>
+                </div>
+              </div>
             ))}
           </div>
         )}
